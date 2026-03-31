@@ -1,0 +1,18 @@
+node_modules/
+dist/
+release/
+*.log
+
+# Media pesados para release inicial liviano
+assets/movies/*.mp4
+assets/movies/*.crdownload
+assets/adelantos/*.mp4
+
+# Backups y descartes locales
+index.backup.html
+index.html.backup
+index.html.bad
+index_clean.html
+index_new.html
+index_old.html
+results.txt
