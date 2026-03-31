@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ocean Cinemas — Phonk Collection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Netflix Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Enhanced Intro Animation */
+    #intro-animation {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #001f3f 0%, #000814 40%, #000000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      overflow: hidden;
+      animation: fadeOut 1s ease 4s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+
+    /* Animated Particles */
+    #intro-animation::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.2), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.4), transparent),
+        radial-gradient(2px 2px at 80% 10%, rgba(255, 255, 255, 0.25), transparent);
+      background-size: 200% 200%;
+      animation: sparkle 4s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+
+      0%,
+      100% {
+        background-position: 0% 0%, 100% 100%, 50% 50%, 100% 0%;
+      }
+
+      50% {
+        background-position: 100% 100%, 0% 0%, 0% 100%, 0% 100%;
+      }
+    }
+
+    #intro-ocean {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      animation: oceanFloat 3s ease-in-out infinite alternate, pulseGlow 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 50px rgba(30, 144, 255, 0.9));
+      z-index: 2;
+    }
+
+    @keyframes oceanFloat {
+      0% {
+        transform: translateY(-15px) rotate(-3deg) scale(0.95);
+      }
+
+      100% {
+        transform: translateY(15px) rotate(3deg) scale(1.05);
+      }
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 30px rgba(30, 144, 255, 0.6));
+      }
+
+      50% {
+        filter: drop-shadow(0 0 60px rgba(30, 144, 255, 1));
+      }
+    }
+
+    #intro-text {
+      position: absolute;
+      font-size: 5rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: slideUp 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(150px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    #intro-o {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: rotateO 3s ease-in-out infinite, gradientShift 3s ease infinite;
+      position: relative;
+    }
+
+    #intro-o::after {
+      content: '';
+      position: absolute;
+      inset: -15px;
+      border: 3px solid rgba(102, 126, 234, 0.5);
+      border-radius: 50%;
+      animation: ripple 2s ease-out infinite;
+    }
+
+    @keyframes rotateO {
+
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(-15deg);
+      }
+
+      75% {
+        transform: rotate(15deg);
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0.8);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }
+
+    #intro-rest {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: gradientShift 3s ease infinite;
+      filter: drop-shadow(0 0 20px rgba(67, 233, 123, 0.4));
+    }
+
+    @keyframes gradientShift {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    #intro-animation::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100px;
+      background: linear-gradient(180deg, transparent, rgba(30, 144, 255, 0.2));
+      border-radius: 50%;
+      animation: wave 3s ease-in-out infinite;
+      transform-origin: 50% 100%;
+    }
+
+    @keyframes wave {
+
+      0%,
+      100% {
+        transform: translateX(-50%) scaleY(1);
+      }
+
+      50% {
+        transform: translateX(-50%) scaleY(1.5);
+      }
+    }
+
+    .glass {
+      background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.85));
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-banner {
+      position: relative;
+      height: 80vh;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, #0a0a0a 0%, transparent 60%),
+        linear-gradient(to right, #0a0a0a 0%, transparent 40%);
+    }
+
+    .movie-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .movie-card:hover {
+      transform: scale(1.05) translateY(-8px);
+      z-index: 10;
+      box-shadow: 0 12px 40px rgba(229, 9, 20, 0.4);
+    }
+
+    #cinema-room {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 100;
+    }
+
+    #cinema-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #cinema-header,
+    #cinema-controls {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #cinema-room:hover #cinema-header,
+    #cinema-room:hover #cinema-controls {
+      opacity: 1;
+    }
+
+    #progress-bar {
+      background: linear-gradient(90deg, #E50914, #B20610);
+      box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    }
+
+    .netflix-btn {
+      background: linear-gradient(135deg, #E50914 0%, #B20610 100%);
+      padding: 0.85rem 2.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      transition: all 0.3s;
+      border: none;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .netflix-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .netflix-btn:hover::before {
+      opacity: 1;
+    }
+
+    .netflix-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(229, 9, 20, 0.5);
+    }
+
+    .netflix-secondary {
+      background: rgba(109, 109, 110, 0.7);
+      padding: 0.85rem 2.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      transition: all 0.3s;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .netflix-secondary:hover {
+      background: rgba(109, 109, 110, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #E50914, #B20610);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #ff0a16, #E50914);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Enhanced Intro -->
+  <div id="intro-animation">
+    <img id="intro-ocean" src="assets/ocean-intro.png" alt="Ocean">
+    <div id="intro-text">
+      <span id="intro-o">O</span><span id="intro-rest">cean Cinemas</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav
+    class="fixed top-0 w-full z-50 px-12 py-6 flex items-center justify-between bg-gradient-to-b from-black via-black/80 to-transparent">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-4">
+        <img src="assets/OceanCinemas.png" alt="Ocean Cinemas" class="h-10">
+        <span
+          class="text-3xl font-black bg-gradient-to-r from-[#E50914] to-[#ff4d4d] bg-clip-text text-transparent">OCEAN
+          CINEMAS</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div
+        class="bg-black/60 backdrop-blur-md px-5 py-3 rounded-lg flex items-center gap-3 border border-white/20 shadow-lg">
+        <i class="fas fa-coins text-yellow-400 text-lg"></i>
+        <span id="balance-display" class="font-bold text-xl">0</span>
+        <span class="text-xs text-gray-400 uppercase tracking-wider">AquaBux</span>
+      </div>
+      <button onclick="openVipModal()" class="netflix-secondary px-5 py-3">
+        <i class="fas fa-crown mr-2"></i>VIP
+      </button>
+      <button onclick="openOceanPayModal()" class="netflix-btn px-5 py-3">
+        <i class="fas fa-wallet mr-2"></i>Ocean Pay
+      </button>
+      <button onclick="showSection('tickets')" class="netflix-secondary px-5 py-3">
+        <i class="fas fa-ticket-alt mr-2"></i>Tickets
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero-banner" style="background-image: url('assets/hero-background.png');">
+      <div class="hero-gradient"></div>
+      <div class="absolute bottom-32 left-12 max-w-2xl space-y-8 z-10">
+        <h1
+          class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
+          PHONK<br>COLLECTION
+        </h1>
+        <p class="text-2xl text-gray-200 drop-shadow-lg font-medium">Las mejores producciones de phonk en un solo lugar
+        </p>
+        <div class="flex gap-6">
+          <button onclick="showSection('movies')" class="netflix-btn text-xl px-10 py-4">
+            <i class="fas fa-play mr-3"></i>Explorar Ahora
+          </button>
+          <button onclick="showSection('tickets')" class="netflix-secondary text-xl px-10 py-4">
+            <i class="fas fa-ticket-alt mr-3"></i>Mis Tickets
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Movies -->
+    <section id="movies-section" class="px-12 py-16 -mt-20 relative z-10">
+      <h2 class="text-4xl font-bold mb-8 flex items-center gap-3">
+        <i class="fas fa-fire text-[#E50914]"></i>Tendencias Ahora
+      </h2>
+      <div id="movies-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+    </section>
+
+    <!-- Tickets -->
+    <section id="tickets-section" class="hidden px-12 py-16">
+      <h2 class="text-4xl font-bold mb-8 flex items-center gap-3">
+        <i class="fas fa-ticket-alt text-[#E50914]"></i>Mis Tickets
+      </h2>
+      <div id="tickets-list" class="space-y-4"></div>
+    </section>
+  </main>
+
+  <!-- Cinema Room -->
+  <div id="cinema-room" class="hidden">
+    <video id="cinema-video" class="w-full h-full">
+      <source id="video-source" src="" type="video/mp4">
+    </video>
+    <div id="video-loading" class="absolute inset-0 flex items-center justify-center bg-black/80">
+      <i class="fas fa-circle-notch fa-spin text-6xl text-[#E50914]"></i>
+    </div>
+    <div id="cinema-header"
+      class="absolute top-0 left-0 right-0 p-8 flex items-center justify-between z-20 bg-gradient-to-b from-black/90 to-transparent">
+      <div>
+        <h3 id="video-title" class="text-3xl font-bold"></h3>
+        <p id="video-info" class="text-sm text-gray-400 mt-1"></p>
+      </div>
+      <button onclick="closeCinema()" class="px-6 py-3 bg-[#E50914] rounded-lg font-bold hover:bg-[#F40612] transition">
+        <i class="fas fa-times mr-2"></i>Salir
+      </button>
+    </div>
+    <div id="cinema-controls"
+      class="absolute bottom-0 left-0 right-0 p-8 space-y-4 z-20 bg-gradient-to-t from-black/90 to-transparent">
+      <div id="progress-container" class="h-2 bg-gray-700 rounded-full cursor-pointer relative">
+        <div id="progress-bar" class="h-full rounded-full transition-all"></div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <button onclick="rewind()" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-backward text-2xl"></i></button>
+          <button id="play-pause-btn" onclick="togglePlay()" class="p-4 hover:scale-110 transition"><i
+              class="fas fa-play text-3xl"></i></button>
+          <button onclick="forward()" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-forward text-2xl"></i></button>
+        </div>
+        <div class="flex items-center gap-3 text-sm font-mono">
+          <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <button onclick="toggleMute()" id="mute-btn" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-volume-up text-xl"></i></button>
+          <button onclick="toggleFullscreen()" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-expand text-xl"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movie Modal -->
+  <div id="movie-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeMovieModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl glass rounded-2xl p-10"
+      style="background: #181818;">
+      <button onclick="closeMovieModal()"
+        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+      <div id="movie-modal-content" class="grid md:grid-cols-2 gap-10"></div>
+    </div>
+  </div>
+
+  <!-- Ocean Pay Modal -->
+  <div id="ocean-pay-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeOceanPayModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md glass rounded-2xl p-10">
+      <button onclick="closeOceanPayModal()"
+        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+      <h2 class="text-3xl font-bold mb-8 text-center">
+        <i class="fas fa-wallet text-[#E50914] mr-3"></i>Vincular Ocean Pay
+      </h2>
+      <div id="op-login-form" class="space-y-5">
+        <input type="text" id="op-username" placeholder="Usuario"
+          class="w-full px-5 py-4 bg-[#2a2a2a] border border-gray-600 rounded-lg focus:outline-none focus:border-[#E50914] transition">
+        <input type="password" id="op-password" placeholder="Contraseña"
+          class="w-full px-5 py-4 bg-[#2a2a2a] border border-gray-600 rounded-lg focus:outline-none focus:border-[#E50914] transition">
+        <button onclick="loginOceanPay()" class="w-full netflix-btn py-4 text-lg">Vincular Cuenta</button>
+        <p class="text-xs text-center text-gray-400">
+          ¿No tienes cuenta? <a href="../Ocean Pay/index.html" target="_blank"
+            class="text-[#E50914] hover:underline font-semibold">Crear una aquí</a>
+        </p>
+      </div>
+      <div id="op-success" class="hidden text-center space-y-6">
+        <div class="text-7xl mb-4 animate-bounce">✅</div>
+        <p class="text-2xl font-semibold">¡Cuenta vinculada!</p>
+        <div class="glass rounded-xl p-6">
+          <p class="text-[#E50914] font-mono text-4xl font-black" id="op-balance">0</p>
+          <p class="text-sm text-gray-400 mt-2 uppercase tracking-wider">AquaBux disponibles</p>
+        </div>
+        <button onclick="closeOceanPayModal()" class="w-full netflix-btn py-4">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIP Modal -->
+  <div id="vip-modal" class="fixed inset-0 z-[70] hidden">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeVipModal()"></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl glass rounded-2xl p-10 overflow-y-auto max-h-[90vh]">
+      <button onclick="closeVipModal()"
+        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition z-10">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+      <div class="text-center mb-12">
+        <h2
+          class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-yellow-500">
+          PLANES VIP
+        </h2>
+        <p class="text-xl text-gray-300">Desbloquea todo el potencial de Ocean Cinemas</p>
+        <div id="vip-status-container" class="mt-6 hidden">
+          <div
+            class="inline-flex items-center gap-3 bg-gray-800/80 px-8 py-4 rounded-full border border-gray-700 backdrop-blur-sm">
+            <span class="text-gray-400 text-sm">Tu suscripción expira el:</span>
+            <span id="vip-expiry-display" class="font-mono font-bold text-yellow-400"></span>
+          </div>
+        </div>
+      </div>
+      <div id="vip-plans-grid" class="grid md:grid-cols-3 gap-8"></div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeCheckoutModal()"></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass rounded-2xl p-10 transform transition-all">
+      <h3 class="text-3xl font-bold mb-8 text-center border-b border-gray-700 pb-6">Confirmar Compra</h3>
+      <div id="checkout-content" class="space-y-6">
+        <div class="flex gap-6">
+          <img id="checkout-poster" src="" class="w-28 h-40 object-cover rounded-lg shadow-lg">
+          <div class="flex-1">
+            <h4 id="checkout-title" class="text-2xl font-bold text-[#E50914] mb-2"></h4>
+            <p class="text-sm text-gray-400">Ticket de acceso ilimitado</p>
+          </div>
+        </div>
+        <div class="bg-black/50 rounded-xl p-6 space-y-4">
+          <div class="flex justify-between text-gray-300">
+            <span>Saldo actual:</span>
+            <span class="font-mono font-bold"><span id="checkout-balance">0</span> AB</span>
+          </div>
+          <div class="flex justify-between text-[#E50914] font-bold text-lg">
+            <span>Precio:</span>
+            <span class="font-mono">-<span id="checkout-price">0</span> AB</span>
+          </div>
+          <div class="h-px bg-gray-700 my-2"></div>
+          <div class="flex justify-between font-bold text-xl">
+            <span>Saldo restante:</span>
+            <div>
+              <span id="checkout-remaining" class="font-mono text-green-400">0</span>
+              <span class="text-xs text-gray-500 ml-1">AB</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-4 mt-8">
+          <button id="cancel-purchase-btn" onclick="closeCheckoutModal()"
+            class="flex-1 py-4 netflix-secondary text-lg">Cancelar</button>
+          <button id="confirm-purchase-btn" onclick="confirmPurchase()"
+            class="flex-1 py-4 netflix-btn text-lg">Confirmar</button>
+          toast.textContent = message;
+          document.body.appendChild(toast);
+          requestAnimationFrame(() => toast.style.transform = 'translateY(0)');
+          setTimeout(() => {
+          toast.style.transform = 'translateY(200%)';
+          setTimeout(() => toast.remove(), 300);
+          }, 3500);
+          }
+
+          function formatTime(seconds) {
+          const mins = Math.floor(seconds / 60);
+          const secs = Math.floor(seconds % 60);
+          return `${mins}:${secs.toString().padStart(2, '0')}`;
+          }
+
+          function generateTicketId() {
+          return 'TKT-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+          }
+
+          function saveToStorage() {
+          localStorage.setItem('oceanTickets', JSON.stringify(STATE.tickets));
+          }
+
+          function loadFromStorage() {
+          const storedTickets = localStorage.getItem('oceanTickets');
+          if (storedTickets) STATE.tickets = JSON.parse(storedTickets);
+
+          if (STATE.vipExpiry) {
+          const now = new Date();
+          const expiry = new Date(STATE.vipExpiry);
+          if (now > expiry) {
+          STATE.vipLevel = 'none';
+          STATE.vipExpiry = null;
+          localStorage.setItem('vipLevel', 'none');
+          localStorage.removeItem('vipExpiry');
+          showToast('⚠️ Tu suscripción VIP ha expirado');
+          }
+          }
+          updateBalanceDisplay();
+          }
+
+          function updateBalanceDisplay() {
+          document.getElementById('balance-display').textContent = STATE.balance.toLocaleString();
+          }
+
+          function renderVipPlans() {
+          const container = document.getElementById('vip-plans-grid');
+          if (!container) return;
+
+          const plans = ['basic', 'premium', 'ultimate'];
+          container.innerHTML = plans.map(planId => {
+          const plan = STATE.vipPlans[planId];
+          const isCurrent = STATE.vipLevel === planId;
+          const levels = ['none', 'basic', 'premium', 'ultimate'];
+          const isLower = levels.indexOf(STATE.vipLevel) > levels.indexOf(planId);
+
+          let btnText = 'Suscribirse';
+          let btnClass = 'hover:opacity-90';
+          let btnDisabled = '';
+          let btnStyle = `background-color: ${plan.color}`;
+
+          if (isCurrent) {
+          btnText = 'Plan Actual';
+          btnClass = 'bg-gray-600 cursor-not-allowed opacity-70';
+          btnStyle = '';
+          btnDisabled = 'disabled';
+          } else if (isLower) {
+          btnText = 'Incluido';
+          btnClass = 'bg-gray-700 cursor-not-allowed opacity-50';
+          btnStyle = '';
+          btnDisabled = 'disabled';
+          }
+
+          return `
+          <div
+            class="bg-gray-900/50 border-2 border-white/10 rounded-2xl p-8 hover:border-[${plan.color}] transition-all relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+              <i class="fas fa-${planId === 'basic' ? 'star' : planId === 'premium' ? 'crown' : 'dragon'} text-9xl"
+                style="color: ${plan.color}"></i>
+            </div>
+            ${planId === 'premium' ? `<div
+              class="absolute -top-1 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-2 rounded-b-lg text-white shadow-lg"
+              style="background-color: ${plan.color}">MÁS POPULAR</div>` : ''}
+            <h3 class="text-3xl font-bold mb-3 mt-3" style="color: ${plan.color}">${plan.name}</h3>
+            <div class="text-4xl font-black mb-6">${plan.price.toLocaleString()} <span
+                class="text-base font-normal text-gray-400">AB/mes</span></div>
+            <ul class="space-y-4 mb-10 text-gray-300">
+              <li class="flex items-center"><i class="fas fa-check mr-3" style="color: ${plan.color}"></i>Acceso a
+                películas ${plan.name}</li>
+              <li class="flex items-center"><i class="fas fa-check mr-3"
+                  style="color: ${plan.color}"></i>${plan.discount * 100}% de descuento en tickets</li>
+              <li class="flex items-center"><i class="fas fa-check mr-3" style="color: ${plan.color}"></i>Insignia
+                ${plan.badge} en perfil</li>
+              ${planId === 'ultimate' ? `<li class="flex items-center"><i class="fas fa-check mr-3"
+                  style="color: ${plan.color}"></i>Soporte prioritario</li>` : ''}
+            </ul>
+            <button onclick="subscribeToVIP('${planId}')" ${btnDisabled}
+              class="w-full py-4 rounded-lg font-bold text-white transition ${btnClass}" style="${btnStyle}">
+              ${btnText}
+            </button>
+          </div>
+          `;
+          }).join('');
+          }
+
+          function subscribeToVIP(planLevel) {
+          if (!STATE.oceanPayLinked) {
+          showToast('❌ Vincula tu cuenta de Ocean Pay primero');
+          closeVipModal();
+          openOceanPayModal();
+          return;
+          }
+
+          const plan = STATE.vipPlans[planLevel];
+          if (STATE.balance < plan.price) { showToast('❌ Saldo insuficiente para este plan'); return; } if
+            (confirm(`¿Confirmar suscripción al plan ${plan.name} por ${plan.price} AB?`)) { STATE.balance -=plan.price;
+            STATE.vipLevel=planLevel; const expiry=new Date(); expiry.setDate(expiry.getDate() + 30);
+            STATE.vipExpiry=expiry.toISOString(); localStorage.setItem('vipLevel', STATE.vipLevel);
+            localStorage.setItem('vipExpiry', STATE.vipExpiry); updateOceanPayBalance(); saveToStorage();
+            updateBalanceDisplay(); renderMovies(); updateVipDisplay(); closeVipModal(); showToast(`🎉 ¡Bienvenido al
+            plan ${plan.name}!`); } } function updateVipDisplay() { const container=document.querySelector('nav
+            .flex.items-center.gap-6'); let vipBadge=document.getElementById('vip-badge-nav'); if (STATE.vipLevel
+            !=='none' ) { const plan=STATE.vipPlans[STATE.vipLevel]; if (!vipBadge) {
+            vipBadge=document.createElement('div'); vipBadge.id='vip-badge-nav' ;
+            vipBadge.className='px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider shadow-lg animate-pulse'
+            ; const vipBtn=container.querySelector('button[onclick="openVipModal()" ]');
+            container.insertBefore(vipBadge, vipBtn); } vipBadge.style.backgroundColor=plan.color;
+            vipBadge.textContent=`${plan.badge} ${plan.name}`; } else if (vipBadge) { vipBadge.remove(); } } function
+            openVipModal() { renderVipPlans(); const statusContainer=document.getElementById('vip-status-container');
+            const expiryDisplay=document.getElementById('vip-expiry-display'); if (STATE.vipLevel !=='none' &&
+            STATE.vipExpiry) { statusContainer.classList.remove('hidden'); const date=new Date(STATE.vipExpiry);
+            expiryDisplay.textContent=date.toLocaleDateString('es-ES', { day: '2-digit' , month: 'long' ,
+            year: 'numeric' }); } else { statusContainer.classList.add('hidden'); }
+            document.getElementById('vip-modal').classList.remove('hidden'); } function closeVipModal() {
+            document.getElementById('vip-modal').classList.add('hidden'); } function openOceanPayModal() {
+            document.getElementById('ocean-pay-modal').classList.remove('hidden'); } function closeOceanPayModal() {
+            document.getElementById('ocean-pay-modal').classList.add('hidden'); } async function loginOceanPay() { const
+            username=document.getElementById('op-username').value; const
+            password=document.getElementById('op-password').value; if (!username || !password) { showToast('❌ Completa
+            todos los campos'); return; } try { const response=await fetch(`${API_URL}/ocean-pay/login`, {
+            method: 'POST' , headers: { 'Content-Type' : 'application/json' }, body: JSON.stringify({ username, password
+            }) }); if (!response.ok) throw new Error('Login failed'); const data=await response.json();
+            STATE.oceanPayToken=data.token; STATE.oceanPayUser=data.user; STATE.oceanPayLinked=true; if
+            (data.user.username && data.user.username.toLowerCase()==='oceanandwild' ) { STATE.balance=999999999;
+            data.user.aquabux=999999999; console.log('[DEV MODE] OceanandWild - AquaBux: 999999999'); } else {
+            STATE.balance=data.user.aquabux || 0; } localStorage.setItem('opToken', data.token);
+            localStorage.setItem('opUser', JSON.stringify(data.user)); saveToStorage(); updateBalanceDisplay();
+            document.getElementById('op-login-form').classList.add('hidden');
+            document.getElementById('op-success').classList.remove('hidden');
+            document.getElementById('op-balance').textContent=STATE.balance.toLocaleString(); updateVipDisplay();
+            showToast('✅ Cuenta vinculada exitosamente'); } catch (error) { showToast('❌ Error al vincular cuenta.
+            Verifica tus credenciales.'); } } async function updateOceanPayBalance() { if (!STATE.oceanPayLinked)
+            return; try { await fetch(`${API_URL}/ocean-pay/update-balance`, { method: 'POST' , headers:
+            { 'Content-Type' : 'application/json' , 'Authorization' : `Bearer ${STATE.oceanPayToken}` }, body:
+            JSON.stringify({ aquabux: STATE.balance }) }); } catch (error) { console.error('Balance update error:',
+            error); } } function renderMovies() { const grid=document.getElementById('movies-grid');
+            grid.innerHTML=STATE.movies.map((movie, index)=> {
+            let vipBadge = '';
+            let isLocked = false;
+            const levels = ['none', 'basic', 'premium', 'ultimate'];
+            const userLevelIndex = levels.indexOf(STATE.vipLevel);
+            const movieLevelIndex = levels.indexOf(movie.vipLevel);
+
+            if (movie.vipLevel !== 'free') {
+            const plan = STATE.vipPlans[movie.vipLevel];
+            vipBadge = `<div
+              class="absolute top-3 right-3 px-3 py-1 rounded-lg text-xs font-bold shadow-xl backdrop-blur-sm"
+              style="background: ${plan.color}">${plan.badge} ${plan.name}</div>`;
+            if (userLevelIndex < movieLevelIndex) { isLocked=true; } } return ` <div
+              class="movie-card cursor-pointer relative group" onclick="openMovieModal(${movie.id})">
+              <img src="${movie.poster}" onerror="this.src='assets/OceanCinemas.png'"
+                class="w-full h-64 object-cover transition-all duration-300 ${isLocked ? 'blur-sm grayscale' : ''}">
+              ${vipBadge}
+              ${index < 2
+                ? '<div class="absolute top-3 left-3 px-3 py-1 bg-[#E50914] text-white text-xs font-bold rounded-lg shadow-lg animate-pulse">NUEVO</div>'
+                : '' } ${isLocked
+                ? '<div class="absolute inset-0 flex items-center justify-center bg-black/70"><i class="fas fa-lock text-4xl text-white/90"></i></div>'
+                : '' } <div
+                class="p-4 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 class="font-bold text-base mb-1 text-white">${movie.title}</h3>
+                <p class="text-xs text-gray-300"><i class="far fa-clock mr-1"></i>${movie.duration} min • ${movie.genre}
+                </p>
+        </div>
+      </div>
+      `;
+      }).join('');
+      }
+
+      function openMovieModal(movieId) {
+      const movie = STATE.movies.find(m => m.id === movieId);
+      if (!movie) return;
+
+      const levels = ['none', 'basic', 'premium', 'ultimate'];
+      const userLevelIndex = levels.indexOf(STATE.vipLevel);
+      const movieLevelIndex = levels.indexOf(movie.vipLevel);
+
+      if (movie.vipLevel !== 'free' && userLevelIndex < movieLevelIndex) { showToast(`🔒 Requiere plan
+        ${STATE.vipPlans[movie.vipLevel].name}`); setTimeout(()=> openVipModal(), 1000);
+        return;
+        }
+
+        const modal = document.getElementById('movie-modal');
+        const content = document.getElementById('movie-modal-content');
+
+        let price = movie.price;
+        let discountMsg = '';
+        if (STATE.vipLevel !== 'none') {
+        const discount = STATE.vipPlans[STATE.vipLevel].discount;
+        if (discount > 0) {
+        price = Math.floor(price * (1 - discount));
+        discountMsg = `<span class="text-sm text-green-400 ml-2">(${Math.round(discount * 100)}% OFF VIP)</span>`;
+        }
+        }
+
+        content.innerHTML = `
+        <div>
+          <img src="${movie.poster}" alt="${movie.title}" class="w-full rounded-xl shadow-2xl">
+        </div>
+        <div class="space-y-5">
+          <h2 class="text-4xl font-bold">${movie.title}</h2>
+          <div class="flex items-center gap-4 text-sm text-gray-400">
+            <span><i class="fas fa-clock mr-2"></i>${movie.duration} min</span>
+            <span><i class="fas fa-music mr-2"></i>${movie.genre}</span>
+            ${movie.vipLevel !== 'free' ? `<span style="color: ${STATE.vipPlans[movie.vipLevel].color}"><i
+                class="fas fa-crown mr-2"></i>${STATE.vipPlans[movie.vipLevel].name}</span>` : ''}
+          </div>
+          <p class="text-gray-300 leading-relaxed text-lg">${movie.description}</p>
+          <div class="bg-black/40 rounded-xl p-8 border border-white/10">
+            <div class="flex items-center justify-between mb-8">
+              <span class="text-lg font-bold text-gray-300">Precio:</span>
+              <div class="text-right">
+                <span class="text-4xl font-black text-[#E50914]"><i class="fas fa-coins mr-2"></i>${price}</span>
+                <span class="text-sm text-gray-400 ml-2">AquaBux</span>
+                ${discountMsg}
+              </div>
+            </div>
+            <button onclick="buyTicket(${movie.id})"
+              class="w-full netflix-btn text-xl py-5 transform hover:scale-105 transition-transform">
+              <i class="fas fa-ticket-alt mr-3"></i>Comprar Ticket
+            </button>
+          </div>
+          <div class="text-xs text-gray-500 text-center">
+            <i class="fas fa-info-circle mr-2"></i>Acceso inmediato tras la compra
+          </div>
+        </div>
+        `;
+        modal.classList.remove('hidden');
+        }
+
+        function closeMovieModal() {
+        document.getElementById('movie-modal').classList.add('hidden');
+        }
+
+        let pendingPurchase = null;
+
+        function buyTicket(movieId) {
+        const movie = STATE.movies.find(m => m.id === movieId);
+        if (!movie) return;
+
+        if (!STATE.oceanPayLinked) {
+        showToast('❌ Vincula tu cuenta de Ocean Pay primero');
+        closeMovieModal();
+        openOceanPayModal();
+        return;
+        }
+
+        pendingPurchase = movie;
+        const modal = document.getElementById('checkout-modal');
+
+        document.getElementById('checkout-poster').src = movie.poster;
+        document.getElementById('checkout-title').textContent = movie.title;
+        document.getElementById('checkout-balance').textContent = STATE.balance.toLocaleString();
+
+        let price = movie.price;
+        if (STATE.vipLevel !== 'none') {
+        const discount = STATE.vipPlans[STATE.vipLevel].discount;
+        price = Math.floor(price * (1 - discount));
+        }
+
+        document.getElementById('checkout-price').textContent = price.toLocaleString();
+
+        const remaining = STATE.balance - price;
+        const remainingEl = document.getElementById('checkout-remaining');
+        remainingEl.textContent = remaining.toLocaleString();
+
+        const confirmBtn = document.getElementById('confirm-purchase-btn');
+        if (remaining < 0) { remainingEl.classList.remove('text-green-400'); remainingEl.classList.add('text-red-500');
+          confirmBtn.disabled=true; confirmBtn.classList.add('opacity-50', 'cursor-not-allowed' );
+          confirmBtn.textContent='Saldo Insuficiente' ; } else { remainingEl.classList.add('text-green-400');
+          remainingEl.classList.remove('text-red-500'); confirmBtn.disabled=false;
+          confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed' ); confirmBtn.textContent='Confirmar' ; }
+          modal.classList.remove('hidden'); } function closeCheckoutModal() {
+          document.getElementById('checkout-modal').classList.add('hidden'); pendingPurchase=null; } function
+          confirmPurchase() { if (!pendingPurchase) return; const movie=pendingPurchase; let price=movie.price; if
+          (STATE.vipLevel !=='none' ) { const discount=STATE.vipPlans[STATE.vipLevel].discount; price=Math.floor(price *
+          (1 - discount)); } if (STATE.balance < price) { showToast('❌ No tienes suficientes AquaBux'); return; }
+          STATE.balance -=price; const ticket={ id: generateTicketId(), movieId: movie.id, title: movie.title, poster:
+          movie.poster, price: price, purchaseDate: new Date().toISOString(), used: false }; STATE.tickets.push(ticket);
+          updateOceanPayBalance(); saveToStorage(); updateBalanceDisplay(); closeCheckoutModal(); closeMovieModal();
+          showToast(`✅ ¡Compra exitosa! Disfruta ${movie.title}`); setTimeout(()=> {
+          if (confirm('¿Quieres ver tu película ahora?')) {
+          watchMovie(movie.id, ticket.id);
+          }
+          }, 500);
+          }
+
+          function renderTickets() {
+          const list = document.getElementById('tickets-list');
+
+          if (STATE.tickets.length === 0) {
+          list.innerHTML = `
+          <div class="glass rounded-2xl p-16 text-center">
+            <i class="fas fa-ticket-alt text-7xl text-gray-600 mb-6"></i>
+            <p class="text-2xl text-gray-400 mb-2">No tienes tickets aún</p>
+            <p class="text-base text-gray-500 mb-8">Compra un ticket para ver películas increíbles</p>
+            <button onclick="showSection('movies')" class="netflix-btn px-8 py-4 text-lg">
+              <i class="fas fa-film mr-3"></i>Ver Cartelera
+            </button>
+          </div>
+          `;
+          return;
+          }
+
+          list.innerHTML = STATE.tickets.map(ticket => {
+          const movie = STATE.movies.find(m => m.id === ticket.movieId);
+          if (!movie) return '';
+
+          return `
+          <div
+            class="glass rounded-xl p-6 flex items-center gap-6 ${ticket.used ? 'opacity-50' : 'hover:border-[#E50914]/60 cursor-pointer'} border border-white/10 transition">
+            <img src="${ticket.poster}" alt="${ticket.title}" class="w-28 h-40 object-cover rounded-lg shadow-lg">
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-3">${ticket.title}</h3>
+              <div class="text-sm text-gray-400 space-y-2">
+                <p><i class="fas fa-calendar mr-3"></i>${new Date(ticket.purchaseDate).toLocaleDateString('es-ES')}</p>
+                <p><i class="fas fa-coins mr-3"></i>${ticket.price} AquaBux</p>
+                <p class="text-xs font-mono text-gray-500">ID: ${ticket.id}</p>
+              </div>
+            </div>
+            <div>
+              ${ticket.used ?
+              '<span class="px-6 py-3 bg-gray-700 text-gray-400 rounded-lg font-bold">USADO</span>' :
+              `<button onclick="watchMovie(${ticket.movieId}, '${ticket.id}')" class="netflix-btn px-6 py-3"><i
+                  class="fas fa-play mr-2"></i>Ver Ahora</button>`
+              }
+            </div>
+          </div>
+          `;
+          }).join('');
+          }
+
+          let videoState = { playing: false, currentTicket: null };
+
+          function watchMovie(movieId, ticketId) {
+          const movie = STATE.movies.find(m => m.id === movieId);
+          const ticket = STATE.tickets.find(t => t.id === ticketId);
+
+          if (!movie || !ticket) return;
+          if (ticket.used) {
+          showToast('❌ Este ticket ya fue usado');
+          return;
+          }
+
+          videoState.currentTicket = ticket;
+          const room = document.getElementById('cinema-room');
+          const video = document.getElementById('cinema-video');
+          const source = document.getElementById('video-source');
+          const loading = document.getElementById('video-loading');
+
+          document.getElementById('video-title').textContent = movie.title;
+          document.getElementById('video-info').textContent = `${movie.duration} min • ${movie.genre}`;
+
+          source.src = movie.video;
+          video.load();
+          room.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+
+          video.addEventListener('loadedmetadata', () => {
+          loading.classList.add('hidden');
+          document.getElementById('time-total').textContent = formatTime(video.duration);
+          }, { once: true });
+
+          video.addEventListener('canplay', () => loading.classList.add('hidden'), { once: true });
+
+          video.addEventListener('timeupdate', () => {
+          const percent = (video.currentTime / video.duration) * 100;
+          document.getElementById('progress-bar').style.width = `${percent}%`;
+          document.getElementById('time-current').textContent = formatTime(video.currentTime);
+          });
+          }
+
+          function closeCinema() {
+          const video = document.getElementById('cinema-video');
+
+          if (videoState.currentTicket && video.currentTime / video.duration > 0.1) {
+          const ticketIndex = STATE.tickets.findIndex(t => t.id === videoState.currentTicket.id);
+          if (ticketIndex !== -1) {
+          STATE.tickets[ticketIndex].used = true;
+          saveToStorage();
+          showToast('✅ Gracias por ver la película');
+          }
+          }
+
+          video.pause();
+          document.getElementById('cinema-room').classList.add('hidden');
+          document.body.style.overflow = '';
+          videoState = { playing: false, currentTicket: null };
+          renderTickets();
+          }
+
+          function togglePlay() {
+          const video = document.getElementById('cinema-video');
+          const btn = document.getElementById('play-pause-btn');
+
+          if (video.paused) {
+          video.play();
+          btn.querySelector('i').className = 'fas fa-pause text-3xl';
+          videoState.playing = true;
+          } else {
+          video.pause();
+          btn.querySelector('i').className = 'fas fa-play text-3xl';
+          videoState.playing = false;
+          }
+          }
+
+          function rewind() {
+          const video = document.getElementById('cinema-video');
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          }
+
+          function forward() {
+          const video = document.getElementById('cinema-video');
+          video.currentTime = Math.min(video.duration, video.currentTime + 10);
+          }
+
+          function toggleMute() {
+          const video = document.getElementById('cinema-video');
+          const btn = document.getElementById('mute-btn');
+          video.muted = !video.muted;
+          btn.querySelector('i').className = video.muted ? 'fas fa-volume-mute text-xl' : 'fas fa-volume-up text-xl';
+          }
+
+          function toggleFullscreen() {
+          const room = document.getElementById('cinema-room');
+          if (!document.fullscreenElement) {
+          room.requestFullscreen();
+          } else {
+          document.exitFullscreen();
+          }
+          }
+
+          function showSection(section) {
+          document.getElementById('movies-section').classList.toggle('hidden', section !== 'movies');
+          document.getElementById('tickets-section').classList.toggle('hidden', section !== 'tickets');
+          if (section === 'tickets') renderTickets();
+          }
+
+          document.addEventListener('DOMContentLoaded', () => {
+          const container = document.getElementById('progress-container');
+          container.addEventListener('click', (e) => {
+          const video = document.getElementById('cinema-video');
+          if (video.duration) {
+          const rect = container.getBoundingClientRect();
+          const percent = (e.clientX - rect.left) / rect.width;
+          video.currentTime = percent * video.duration;
+          }
+          });
+
+          loadFromStorage();
+          renderMovies();
+          updateVipDisplay();
+          showToast('🎬 Bienvenido a Ocean Cinemas!');
+          });
+          </script>
+</body>
+
+</html>

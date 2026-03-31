@@ -1,0 +1,770 @@
+﻿<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ocean Cinemas — Phonk Collection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Netflix Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #141414;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.9));
+      backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-banner {
+      position: relative;
+      height: 70vh;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to top, #141414, transparent);
+    }
+
+    .movie-card {
+      transition: transform 0.3s ease, z-index 0s 0s;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.3);
+      z-index: 10;
+      transition: transform 0.3s ease, z-index 0s 0.3s;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #cinema-room {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: black;
+      z-index: 100;
+    }
+
+    #cinema-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #cinema-header,
+    #cinema-controls {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #cinema-room:hover #cinema-header,
+    #cinema-room:hover #cinema-controls {
+      opacity: 1;
+    }
+
+    #progress-bar {
+      background: linear-gradient(90deg, #E50914, #B20610);
+    }
+
+    .netflix-btn {
+      background: #E50914;
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .netflix-btn:hover {
+      background: #F40612;
+      transform: scale(1.05);
+    }
+
+    .netflix-secondary {
+      background: rgba(109, 109, 110, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .netflix-secondary:hover {
+      background: rgba(109, 109, 110, 0.9);
+    }
+
+    /* Animación de Intro */
+    #intro-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #intro-ocean {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: oceanZoom 2s ease-out forwards;
+    }
+
+    @keyframes oceanZoom {
+      0% {
+        opacity: 0;
+        transform: scale(1);
+      }
+
+      30% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+    }
+
+    @keyframes fadeInO {
+      to {
+        opacity: 1;
+      }
+    }
+
+    #intro-rest {
+      animation: fadeInRest 0.3s 2.5s forwards, colorChange 0.2s 2.5s forwards;
+      margin-left: 0.5rem;
+    }
+
+    @keyframes fadeInRest {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes colorChange {
+      to {
+        color: #00D9FF;
+      }
+    }
+
+    .intro-fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    #intro-text {
+      position: absolute;
+      font-size: 8rem;
+      font-weight: 900;
+      color: #fff;
+      z-index: 10;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Intro Animation -->
+  <div id="intro-animation">
+    <img id="intro-ocean" src="assets/ocean-intro.png" alt="Ocean">
+    <div id="intro-text">
+      <span id="intro-o">O</span><span id="intro-rest" style="opacity:0;">cean Cinemas</span>
+    </div>
+  </div>
+
+  <nav
+    class="fixed top-0 w-full z-50 px-12 py-6 flex items-center justify-between bg-gradient-to-b from-black via-transparent to-transparent">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-4">
+        <img src="assets/OceanCinemas.png" alt="Ocean Cinemas" class="h-8">
+        <span class="text-3xl font-black text-[#E50914]">OCEAN CINEMAS</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="bg-black/60 backdrop-blur-md px-4 py-2 rounded-md flex items-center gap-2 border border-white/20">
+        <i class="fas fa-coins text-yellow-400"></i>
+        <span id="balance-display" class="font-bold">0</span>
+        <span class="text-xs text-gray-400">AquaBux</span>
+      </div>
+      <button onclick="openOceanPayModal()" class="netflix-btn">
+        <i class="fas fa-wallet mr-2"></i>Ocean Pay
+      </button>
+      <button onclick="showSection('tickets')" class="netflix-secondary">
+        <i class="fas fa-ticket-alt mr-2"></i>Tickets
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero-banner" style="background-image: url('assets/hero-background.png');">
+      <div class="hero-gradient"></div>
+      <div class="absolute bottom-32 left-12 max-w-xl space-y-6">
+        <h1 class="text-6xl md:text-7xl font-black drop-shadow-2xl">PHONK<br />COLLECTION</h1>
+        <p class="text-xl text-gray-200 drop-shadow-lg">Las mejores producciones de phonk en un solo lugar</p>
+        <div class="flex gap-4">
+          <button onclick="showSection('movies')" class="netflix-btn text-xl">
+            <i class="fas fa-play mr-3"></i>Explorar
+          </button>
+          <button onclick="showSection('tickets')" class="netflix-secondary text-xl">
+            <i class="fas fa-info-circle mr-3"></i>Mis Tickets
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="movies-section" class="px-12 py-12 -mt-20 relative z-10">
+      <h2 class="text-3xl font-bold mb-6">Tendencias Ahora</h2>
+      <div id="movies-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+    </section>
+
+    <section id="tickets-section" class="hidden px-12 py-12">
+      <h2 class="text-3xl font-bold mb-6">Mis Tickets</h2>
+      <div id="tickets-list" class="space-y-4"></div>
+    </section>
+  </main>
+
+  <div id="cinema-room" class="hidden">
+    <video id="cinema-video" class="w-full h-full">
+      <source id="video-source" src="" type="video/mp4">
+    </video>
+    <div id="video-loading" class="absolute inset-0 flex items-center justify-center bg-black/80">
+      <i class="fas fa-circle-notch fa-spin text-6xl text-[#E50914]"></i>
+    </div>
+    <div id="cinema-header"
+      class="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-20 bg-gradient-to-b from-black/80 to-transparent">
+      <div>
+        <h3 id="video-title" class="text-2xl font-bold"></h3>
+        <p id="video-info" class="text-sm text-gray-400"></p>
+      </div>
+      <button onclick="closeCinema()" class="px-6 py-3 bg-[#E50914] rounded font-bold hover:bg-[#F40612] transition">
+        <i class="fas fa-times mr-2"></i>Salir
+      </button>
+    </div>
+    <div id="cinema-controls" class="absolute bottom-0 left-0 right-0 p-6 space-y-4 z-20">
+      <div id="progress-container" class="h-2 bg-gray-700 rounded cursor-pointer relative">
+        <div id="progress-bar" class="h-full rounded transition-all" style="width: 0%"></div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <button onclick="rewind()" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-backward text-2xl"></i></button>
+          <button id="play-pause-btn" onclick="togglePlay()" class="p-4 hover:scale-110 transition"><i
+              class="fas fa-play text-3xl"></i></button>
+          <button onclick="forward()" class="p-3 hover:scale-110 transition"><i
+              class="fas fa-forward text-2xl"></i></button>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <span id="time-current">00:00</span> / <span id="time-total">00:00</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <button onclick="toggleMute()" id="mute-btn" class="p-2"><i class="fas fa-volume-up text-xl"></i></button>
+          <button onclick="toggleFullscreen()" class="p-3"><i class="fas fa-expand text-xl"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="movie-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeMovieModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl glass rounded-lg p-8"
+      style="background: #181818;">
+      <button onclick="closeMovieModal()"
+        class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+      <div id="movie-modal-content" class="grid md:grid-cols-2 gap-8"></div>
+    </div>
+  </div>
+
+  <div id="ocean-pay-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeOceanPayModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md glass rounded-lg p-8"
+      style="background: #181818;">
+      <button onclick="closeOceanPayModal()"
+        class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+      <h2 class="text-2xl font-bold mb-6 text-center">
+        <i class="fas fa-wallet text-[#E50914] mr-2"></i>Vincular Ocean Pay
+      </h2>
+      <div id="op-login-form" class="space-y-4">
+        <input type="text" id="op-username" placeholder="Usuario"
+          class="w-full px-4 py-3 bg-[#333] border border-gray-600 rounded focus:outline-none focus:border-[#E50914]">
+        <input type="password" id="op-password" placeholder="Contraseña"
+          class="w-full px-4 py-3 bg-[#333] border border-gray-600 rounded focus:outline-none focus:border-[#E50914]">
+        <button onclick="loginOceanPay()" class="w-full netflix-btn">Vincular Cuenta</button>
+        <p class="text-xs text-center text-gray-400">
+          ¿No tienes cuenta? <a href="../Ocean Pay/index.html" target="_blank"
+            class="text-[#E50914] hover:underline">Crear una aquí</a>
+        </p>
+      </div>
+      <div id="op-success" class="hidden text-center space-y-4">
+        <div class="text-6xl mb-4 animate-bounce">✅</div>
+        <p class="text-xl font-semibold">¡Cuenta vinculada!</p>
+        <div class="glass rounded-lg p-4">
+          <p class="text-[#E50914] font-mono text-3xl font-black" id="op-balance">0</p>
+          <p class="text-xs text-gray-400">AquaBux disponibles</p>
+        </div>
+        <button onclick="closeOceanPayModal()" class="w-full netflix-btn">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="checkout-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeCheckoutModal()"></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md glass rounded-lg p-8 transform transition-all"
+      style="background: #181818;">
+      <h3 class="text-2xl font-bold mb-6 text-center border-b border-gray-700 pb-4">Confirmar Compra</h3>
+      <div id="checkout-content" class="space-y-6">
+        <div class="flex gap-4">
+          <img id="checkout-poster" src="" class="w-24 h-36 object-cover rounded shadow-lg">
+          <div>
+            <h4 id="checkout-title" class="text-xl font-bold text-[#E50914]"></h4>
+            <p class="text-sm text-gray-400 mt-1">Ticket de acceso ilimitado</p>
+          </div>
+        </div>
+        <div class="bg-black/50 rounded-lg p-4 space-y-3">
+          <div class="flex justify-between text-gray-300"><span>Saldo actual:</span><span class="font-mono"><span
+                id="checkout-balance">0</span> AB</span></div>
+          <div class="flex justify-between text-[#E50914] font-bold"><span>Precio:</span><span class="font-mono">-<span
+                id="checkout-price">0</span> AB</span></div>
+          <div class="h-px bg-gray-700 my-2"></div>
+          <div class="flex justify-between font-bold text-lg"><span>Saldo restante:</span><span id="checkout-remaining"
+              class="font-mono text-green-400">0</span> <span class="text-xs text-gray-500">AB</span></div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button id="cancel-purchase-btn" onclick="closeCheckoutModal()"
+            class="flex-1 py-3 netflix-secondary">Cancelar</button>
+          <button id="confirm-purchase-btn" onclick="confirmPurchase()"
+            class="flex-1 py-3 netflix-btn">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"
+    class="fixed top-20 right-6 z-[100] glass px-6 py-4 rounded shadow-2xl hidden transform translate-x-full transition-transform duration-300"
+    style="background: #181818;">
+    <p id="toast-msg" class="font-semibold"></p>
+  </div>
+
+  <script>
+    // Intro Animation
+    setTimeout(() => {
+      document.getElementById('intro-animation').classList.add('intro-fade-out');
+      setTimeout(() => {
+        document.getElementById('intro-animation').remove();
+      }, 500);
+    }, 3200);
+
+    const API_URL = 'https://owsdatabase.onrender.com';
+
+    const STATE = {
+      balance: 0,
+      oceanPayLinked: false,
+      oceanPayToken: localStorage.getItem('opToken') || '',
+      oceanPayUser: null,
+      movies: [
+        { id: 1, title: "Nada Malo", duration: 3, genre: "Musical - Phonk", poster: "assets/nadamalo.jpeg", video: "assets/movies/p2.mp4", description: "Phonk con beats oscuros y atmósfera melancólica.", price: 300 },
+        { id: 2, title: "SYSTEM", duration: 3, genre: "Musical - Phonk", poster: "assets/system.jpg", video: "assets/movies/p6.mp4", description: "Phonk futurista con samples electrónicos y ritmos pesados.", price: 300 },
+        { id: 3, title: "Nada Baddie", duration: 3, genre: "Musical - Phonk", poster: "assets/nadabaddie.jpg", video: "assets/movies/p2.mp4", description: "Phonk con energía rebelde y beats explosivos.", price: 300 },
+        { id: 4, title: "Deixa Rolar", duration: 3, genre: "Musical - Phonk", poster: "assets/deixarolar.png", video: "assets/movies/p6.mp4", description: "Brazilian phonk relajado con vibes tropicales.", price: 300 },
+        { id: 5, title: "DROWNING", duration: 3, genre: "Musical - Phonk", poster: "assets/drowning.png", video: "assets/movies/drowning.mp4", description: "Phonk profundo con atmósfera submarina y reverb intenso.", price: 300 },
+        { id: 6, title: "DELUXE", duration: 3, genre: "Musical - Phonk", poster: "assets/deluxe.jpg", video: "assets/movies/deluxe.mp4", description: "Phonk premium con producción de lujo y samples únicos.", price: 300 },
+        { id: 7, title: "Montagem Nada Tropica", duration: 3, genre: "Musical - Phonk", poster: "assets/montagemnadatropica.jpg", video: "assets/movies/montagemnadatropica.mp4", description: "Brazilian phonk con mezcla tropical y ritmos de favela.", price: 300 },
+        { id: 8, title: "TRELENO", duration: 3, genre: "Musical - Phonk", poster: "assets/treleno.jpeg", video: "assets/movies/treleno.mp4", description: "Phonk con samples de tren y beats industriales.", price: 300 },
+        { id: 9, title: "ROMANO", duration: 3, genre: "Musical - Phonk", poster: "assets/romano.jpg", video: "assets/movies/p8.mp4", description: "Phonk con ritmos agresivos y samples épicos.", price: 300 },
+        { id: 10, title: "Sente Mais", duration: 3, genre: "Musical - Phonk", poster: "assets/sentemais.jpg", video: "assets/movies/p9.mp4", description: "Brazilian phonk sensual con beats envolventes.", price: 300 },
+        { id: 11, title: "DRESS", duration: 3, genre: "Musical - Phonk", poster: "assets/dress2.jpg", video: "assets/movies/p8.mp4", description: "Phonk con estilo único y ritmos hipnóticos.", price: 300 },
+        { id: 12, title: "SENTA", duration: 3, genre: "Musical - Phonk", poster: "assets/senta.jpg", video: "assets/movies/p9.mp4", description: "Brazilian phonk con samples tropicales y beats acelerados.", price: 300 },
+        { id: 13, title: "Nada Sem Pero", duration: 3, genre: "Musical - Phonk", poster: "assets/nadasempero.png", video: "assets/movies/p11.mp4", description: "Phonk underground con atmósfera oscura y letras profundas.", price: 300 },
+        { id: 14, title: "Starset - My Demons", duration: 3, genre: "Musical - Phonk", poster: "assets/starsetmydemons.jpg", video: "assets/movies/drowning.mp4", description: "Phonk remix épico con elementos electrónicos oscuros.", price: 300 },
+        { id: 15, title: "Montagem Butterfly Effect", duration: 3, genre: "Musical - Phonk", poster: "assets/montagembutteflyeffect.jpg", video: "assets/movies/deluxe.mp4", description: "Brazilian phonk experimental con efectos psicodélicos.", price: 300 }
+      ],
+      tickets: []
+    };
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toast-msg');
+      msg.textContent = message;
+      toast.classList.remove('hidden', 'translate-x-full');
+      setTimeout(() => { toast.classList.add('translate-x-full'); setTimeout(() => toast.classList.add('hidden'), 300); }, 3000);
+    }
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || !isFinite(seconds)) return '00:00';
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function generateTicketId() {
+      return 'TICKET-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function loadFromStorage() {
+      const tickets = localStorage.getItem('oceanCinemasTickets');
+      if (tickets) STATE.tickets = JSON.parse(tickets);
+      const balance = localStorage.getItem('oceanCinemasBalance');
+      if (balance) STATE.balance = parseInt(balance) || 0;
+      const opUser = localStorage.getItem('opUser');
+      if (opUser && STATE.oceanPayToken) {
+        STATE.oceanPayUser = JSON.parse(opUser);
+        STATE.oceanPayLinked = true;
+
+        // 🔧 DEV MODE: OceanandWild unlimited AquaBux
+        if (STATE.oceanPayUser.username && STATE.oceanPayUser.username.toLowerCase() === 'oceanandwild') {
+          STATE.balance = 999999999;
+          console.log('🔧 [DEV MODE] OceanandWild - AquaBux: 999999999');
+        } else {
+          STATE.balance = STATE.oceanPayUser.aquabux || 0;
+        }
+      }
+      updateBalanceDisplay();
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('oceanCinemasTickets', JSON.stringify(STATE.tickets));
+      localStorage.setItem('oceanCinemasBalance', STATE.balance.toString());
+    }
+
+    function updateBalanceDisplay() {
+      document.getElementById('balance-display').textContent = STATE.balance.toLocaleString();
+    }
+
+    function openOceanPayModal() { document.getElementById('ocean-pay-modal').classList.remove('hidden'); }
+    function closeOceanPayModal() { document.getElementById('ocean-pay-modal').classList.add('hidden'); }
+
+    async function loginOceanPay() {
+      const username = document.getElementById('op-username').value;
+      const password = document.getElementById('op-password').value;
+      if (!username || !password) { showToast('❌ Completa todos los campos'); return; }
+      try {
+        const response = await fetch(`${API_URL}/ocean-pay/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!response.ok) throw new Error('Login failed');
+        const data = await response.json();
+        STATE.oceanPayToken = data.token;
+        STATE.oceanPayUser = data.user;
+        STATE.oceanPayLinked = true;
+
+        // 🔧 DEV MODE: OceanandWild unlimited AquaBux
+        if (data.user.username && data.user.username.toLowerCase() === 'oceanandwild') {
+          STATE.balance = 999999999;
+          data.user.aquabux = 999999999;
+          console.log('🔧 [DEV MODE] OceanandWild - AquaBux: 999999999');
+        } else {
+          STATE.balance = data.user.aquabux || 0;
+        }
+
+        localStorage.setItem('opToken', data.token);
+        localStorage.setItem('opUser', JSON.stringify(data.user));
+        saveToStorage();
+        updateBalanceDisplay();
+        document.getElementById('op-login-form').classList.add('hidden');
+        document.getElementById('op-success').classList.remove('hidden');
+        document.getElementById('op-balance').textContent = STATE.balance.toLocaleString();
+        showToast('✅ Cuenta vinculada exitosamente');
+      } catch (error) {
+        showToast('❌ Error al vincular cuenta. Verifica tus credenciales.');
+      }
+    }
+
+    function renderMovies() {
+      const grid = document.getElementById('movies-grid');
+      grid.innerHTML = STATE.movies.map(movie => `
+        <div class="movie-card bg-gray-900 cursor-pointer" onclick="openMovieModal(${movie.id})">
+          <img src="${movie.poster}" onerror="this.src='assets/OceanCinemas.png'" class="w-full h-52 object-cover">
+          <div class="p-3 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 hover:opacity-100 transition-opacity">
+            <h3 class="font-bold text-sm mb-1">${movie.title}</h3>
+            <p class="text-xs text-gray-400">${movie.duration} min • ${movie.genre}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openMovieModal(movieId) {
+      const movie = STATE.movies.find(m => m.id === movieId);
+      if (!movie) return;
+      const modal = document.getElementById('movie-modal');
+      const content = document.getElementById('movie-modal-content');
+      content.innerHTML = `
+        <div><img src="${movie.poster}" alt="${movie.title}" class="w-full rounded"></div>
+        <div class="space-y-4">
+          <h2 class="text-4xl font-bold">${movie.title}</h2>
+          <div class="flex items-center gap-4 text-sm text-gray-400">
+            <span><i class="fas fa-clock mr-1"></i>${movie.duration} min</span>
+            <span><i class="fas fa-music mr-1"></i>${movie.genre}</span>
+          </div>
+          <p class="text-gray-300">${movie.description}</p>
+          <div class="bg-black/30 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-lg font-bold">Precio:</span>
+              <span class="text-2xl font-black text-[#E50914]"><i class="fas fa-coins mr-2"></i>${movie.price} AquaBux</span>
+            </div>
+            <button onclick="buyTicket(${movie.id})" class="w-full netflix-btn text-lg py-4">
+              <i class="fas fa-ticket-alt mr-2"></i>Comprar Ticket
+            </button>
+          </div>
+          <div class="text-xs text-gray-500 text-center"><i class="fas fa-info-circle mr-1"></i>Al comprar podrás ver la película inmediatamente</div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeMovieModal() { document.getElementById('movie-modal').classList.add('hidden'); }
+
+    let pendingPurchase = null;
+
+    function buyTicket(movieId) {
+      const movie = STATE.movies.find(m => m.id === movieId);
+      if (!movie) return;
+      if (!STATE.oceanPayLinked) {
+        showToast('❌ Vincula tu cuenta de Ocean Pay primero');
+        closeMovieModal();
+        openOceanPayModal();
+        return;
+      }
+      pendingPurchase = movie;
+      const modal = document.getElementById('checkout-modal');
+      document.getElementById('checkout-poster').src = movie.poster;
+      document.getElementById('checkout-title').textContent = movie.title;
+      document.getElementById('checkout-balance').textContent = STATE.balance.toLocaleString();
+      document.getElementById('checkout-price').textContent = movie.price.toLocaleString();
+      const remaining = STATE.balance - movie.price;
+      const remainingEl = document.getElementById('checkout-remaining');
+      remainingEl.textContent = remaining.toLocaleString();
+      if (remaining < 0) {
+        remainingEl.classList.remove('text-green-400');
+        remainingEl.classList.add('text-red-500');
+        document.getElementById('confirm-purchase-btn').disabled = true;
+        document.getElementById('confirm-purchase-btn').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('confirm-purchase-btn').textContent = "Saldo Insuficiente";
+      } else {
+        remainingEl.classList.add('text-green-400');
+        remainingEl.classList.remove('text-red-500');
+        document.getElementById('confirm-purchase-btn').disabled = false;
+        document.getElementById('confirm-purchase-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+        document.getElementById('confirm-purchase-btn').textContent = "Confirmar";
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+      pendingPurchase = null;
+    }
+
+    function confirmPurchase() {
+      if (!pendingPurchase) return;
+      const movie = pendingPurchase;
+      if (STATE.balance < movie.price) {
+        showToast('❌ No tienes suficientes AquaBux');
+        return;
+      }
+      STATE.balance -= movie.price;
+      const ticket = {
+        id: generateTicketId(),
+        movieId: movie.id,
+        title: movie.title,
+        poster: movie.poster,
+        price: movie.price,
+        purchaseDate: new Date().toISOString(),
+        used: false
+      };
+      STATE.tickets.push(ticket);
+      updateOceanPayBalance();
+      saveToStorage();
+      updateBalanceDisplay();
+      closeCheckoutModal();
+      closeMovieModal();
+      showToast(`✅ ¡Compra exitosa! Disfruta ${movie.title}`);
+      setTimeout(() => {
+        if (confirm('¿Quieres ver tu película ahora?')) {
+          watchMovie(movie.id, ticket.id);
+        }
+      }, 500);
+    }
+
+    async function updateOceanPayBalance() {
+      if (!STATE.oceanPayLinked) return;
+      try {
+        await fetch(`${API_URL}/ocean-pay/update-balance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${STATE.oceanPayToken}` },
+          body: JSON.stringify({ aquabux: STATE.balance })
+        });
+      } catch (error) { console.error('Balance update error:', error); }
+    }
+
+    function renderTickets() {
+      const list = document.getElementById('tickets-list');
+      if (STATE.tickets.length === 0) {
+        list.innerHTML = `<div class="glass rounded-lg p-12 text-center" style="background: #181818;"><i class="fas fa-ticket-alt text-6xl text-gray-600 mb-4"></i>
+        <p class="text-xl text-gray-400">No tienes tickets aún</p>
+        <p class="text-sm text-gray-500 mt-2">Compra un ticket para ver películas increíbles</p><button onclick="showSection('movies')" class="mt-6 netflix-btn">Ver Cartelera</button></div>`;
+        return;
+      }
+      list.innerHTML = STATE.tickets.map(ticket => {
+        const movie = STATE.movies.find(m => m.id === ticket.movieId);
+        if (!movie) return '';
+        return `<div class="glass rounded-lg p-6 flex items-center gap-6 ${ticket.used ? 'opacity-50' : 'hover:border-[#E50914]/60 cursor-pointer'}" style="background: #181818;">
+        <img src="${ticket.poster}" alt="${ticket.title}" class="w-24 h-32 object-cover rounded">
+        <div class="flex-1">
+          <h3 class="text-xl font-bold mb-2">${ticket.title}</h3>
+          <div class="text-sm text-gray-400 space-y-1">
+            <p><i class="fas fa-calendar mr-2"></i>${new Date(ticket.purchaseDate).toLocaleDateString()}</p>
+            <p><i class="fas fa-coins mr-2"></i>${ticket.price} AquaBux</p>
+            <p class="text-xs">ID: ${ticket.id}</p>
+          </div>
+        </div>
+        <div>${ticket.used ? '<span class="px-4 py-2 bg-gray-700 text-gray-400 rounded font-bold">USADO</span>' :
+            `<button onclick="watchMovie(${ticket.movieId}, '${ticket.id}')" class="netflix-btn"><i class="fas fa-play mr-2"></i>Ver Ahora</button>`}</div>
+      </div>`;
+      }).join('');
+    }
+
+    let videoState = { playing: false, currentTicket: null };
+
+    function watchMovie(movieId, ticketId) {
+      const movie = STATE.movies.find(m => m.id === movieId);
+      const ticket = STATE.tickets.find(t => t.id === ticketId);
+      if (!movie || !ticket) return;
+      if (ticket.used) { showToast('❌ Este ticket ya fue usado'); return; }
+      videoState.currentTicket = ticket;
+      const room = document.getElementById('cinema-room');
+      const video = document.getElementById('cinema-video');
+      const source = document.getElementById('video-source');
+      const loading = document.getElementById('video-loading');
+      document.getElementById('video-title').textContent = movie.title;
+      document.getElementById('video-info').textContent = `${movie.duration} min • ${movie.genre}`;
+      source.src = movie.video;
+      video.load();
+      room.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      video.addEventListener('loadedmetadata', () => { loading.classList.add('hidden'); document.getElementById('time-total').textContent = formatTime(video.duration); }, { once: true });
+      video.addEventListener('canplay', () => loading.classList.add('hidden'), { once: true });
+      video.addEventListener('timeupdate', () => {
+        const percent = (video.currentTime / video.duration) * 100;
+        document.getElementById('progress-bar').style.width = `${percent}%`;
+        document.getElementById('time-current').textContent = formatTime(video.currentTime);
+      });
+    }
+
+    function closeCinema() {
+      const video = document.getElementById('cinema-video');
+      if (videoState.currentTicket && video.currentTime / video.duration > 0.1) {
+        const ticketIndex = STATE.tickets.findIndex(t => t.id === videoState.currentTicket.id);
+        if (ticketIndex !== -1) {
+          STATE.tickets[ticketIndex].used = true;
+          saveToStorage();
+          showToast('✅ Gracias por ver la película');
+        }
+      }
+      video.pause();
+      document.getElementById('cinema-room').classList.add('hidden');
+      document.body.style.overflow = '';
+      videoState = { playing: false, currentTicket: null };
+      renderTickets();
+    }
+
+    function togglePlay() {
+      const video = document.getElementById('cinema-video');
+      const btn = document.getElementById('play-pause-btn');
+      if (video.paused) {
+        video.play();
+        btn.querySelector('i').className = 'fas fa-pause text-3xl';
+        videoState.playing = true;
+      } else {
+        video.pause();
+        btn.querySelector('i').className = 'fas fa-play text-3xl';
+        videoState.playing = false;
+      }
+    }
+
+    function rewind() {
+      const video = document.getElementById('cinema-video');
+      video.currentTime = Math.max(0, video.currentTime - 10);
+    }
+
+    function forward() {
+      const video = document.getElementById('cinema-video');
+      video.currentTime = Math.min(video.duration, video.currentTime + 10);
+    }
+
+    function toggleMute() {
+      const video = document.getElementById('cinema-video');
+      const btn = document.getElementById('mute-btn');
+      video.muted = !video.muted;
+      btn.querySelector('i').className = video.muted ? 'fas fa-volume-mute text-xl' : 'fas fa-volume-up text-xl';
+    }
+
+    function toggleFullscreen() {
+      const room = document.getElementById('cinema-room');
+      if (!document.fullscreenElement) room.requestFullscreen();
+      else document.exitFullscreen();
+    }
+
+    function showSection(section) {
+      document.getElementById('movies-section').classList.toggle('hidden', section !== 'movies');
+      document.getElementById('tickets-section').classList.toggle('hidden', section !== 'tickets');
+      if (section === 'tickets') renderTickets();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('progress-container');
+      container.addEventListener('click', (e) => {
+        const video = document.getElementById('cinema-video');
+        if (video.duration) {
+          const rect = container.getBoundingClientRect();
+          const percent = (e.clientX - rect.left) / rect.width;
+          video.currentTime = percent * video.duration;
+        }
+      });
+      loadFromStorage();
+      renderMovies();
+      showToast('🎬 Bienvenido a Ocean Cinemas!');
+    });
+  </script>
+</body>
+
+</html>

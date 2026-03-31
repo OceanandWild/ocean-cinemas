@@ -1,0 +1,171 @@
+﻿<!doctype html>
+<html lang=\"es\">
+<head>
+  <meta charset=\"utf-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+  <title>Ocean Cinemas  Phonk Collection</title>
+  <script src=\"https://cdn.tailwindcss.com\"></script>
+  <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css\">
+  <link rel=\"stylesheet\" href=\"styles.css\">
+</head>
+<body>
+  <div id=\"intro-animation\">
+    <img id=\"intro-ocean\" src=\"assets/ocean-intro.png\" alt=\"Ocean\">
+    <div id=\"intro-text\">
+      <span id=\"intro-o\">O</span><span id=\"intro-rest\">cean Cinemas</span>
+    </div>
+  </div>
+
+  <nav class=\"fixed top-0 w-full z-50 px-12 py-6 flex items-center justify-between bg-gradient-to-b from-black via-black/80 to-transparent\">
+    <div class=\"flex items-center gap-8\">
+      <div class=\"flex items-center gap-4\">
+        <img src=\"assets/OceanCinemas.png\" alt=\"Ocean Cinemas\" class=\"h-10\">
+        <span class=\"text-3xl font-black bg-gradient-to-r from-[#E50914] to-[#ff4d4d] bg-clip-text text-transparent\">OCEAN CINEMAS</span>
+      </div>
+    </div>
+    <div class=\"flex items-center gap-6\">
+      <div class=\"bg-black/60 backdrop-blur-md px-5 py-3 rounded-lg flex items-center gap-3 border border-white/20 shadow-lg\">
+        <i class=\"fas fa-coins text-yellow-400 text-lg\"></i>
+        <span id=\"balance-display\" class=\"font-bold text-xl\">0</span>
+        <span class=\"text-xs text-gray-400 uppercase tracking-wider\">AquaBux</span>
+      </div>
+      <button onclick=\"openVipModal()\" class=\"netflix-secondary px-5 py-3\">
+        <i class=\"fas fa-crown mr-2\"></i>VIP
+      </button>
+      <button onclick=\"openOceanPayModal()\" class=\"netflix-btn px-5 py-3\">
+        <i class=\"fas fa-wallet mr-2\"></i>Ocean Pay
+      </button>
+      <button onclick=\"showSection('tickets')\" class=\"netflix-secondary px-5 py-3\">
+        <i class=\"fas fa-ticket-alt mr-2\"></i>Tickets
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <section class=\"hero-banner\" style=\"background-image: url('assets/hero-background.png');\">
+      <div class=\"hero-gradient\"></div>
+      <div class=\"absolute bottom-32 left-12 max-w-2xl space-y-8 z-10\">
+        <h1 class=\"text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent\">PHONK<br>COLLECTION</h1>
+        <p class=\"text-2xl text-gray-200 drop-shadow-lg font-medium\">Las mejores producciones de phonk en un solo lugar</p>
+        <div class=\"flex gap-6\">
+          <button onclick=\"showSection('movies')\" class=\"netflix-btn text-xl px-10 py-4\"><i class=\"fas fa-play mr-3\"></i>Explorar Ahora</button>
+          <button onclick=\"showSection('tickets')\" class=\"netflix-secondary text-xl px-10 py-4\"><i class=\"fas fa-ticket-alt mr-3\"></i>Mis Tickets</button>
+        </div>
+      </div>
+    </section>
+
+    <section class=\"px-12 py-12 -mt-16 relative z-10\">
+      <div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-16\">
+        <div class=\"stat-card\">
+          <div class=\"flex items-center justify-between mb-3\"><i class=\"fas fa-film text-4xl text-[#E50914]\"></i><span class=\"text-5xl font-black text-white\">16</span></div>
+          <p class=\"text-gray-400 text-sm uppercase tracking-wider\">Películas Disponibles</p>
+        </div>
+        <div class=\"stat-card\">
+          <div class=\"flex items-center justify-between mb-3\"><i class=\"fas fa-music text-4xl text-purple-500\"></i><span class=\"text-5xl font-black text-white\">2</span></div>
+          <p class=\"text-gray-400 text-sm uppercase tracking-wider\">Artistas Destacados</p>
+        </div>
+        <div class=\"stat-card\">
+          <div class=\"flex items-center justify-between mb-3\"><i class=\"fas fa-crown text-4xl text-yellow-500\"></i><span class=\"text-5xl font-black text-white\">3</span></div>
+          <p class=\"text-gray-400 text-sm uppercase tracking-wider\">Niveles VIP</p>
+        </div>
+      </div>
+    </section>
+
+    <section id=\"recommendations-section\" class=\"hidden px-12 py-16 bg-gradient-to-b from-transparent to-black/30\">
+      <div class=\"mb-12\">
+        <h2 class=\"text-4xl font-black mb-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent\"><i class=\"fas fa-sparkles mr-3\"></i>Recomendado para Ti</h2>
+        <p class=\"text-gray-400 text-lg\">Basado en tu historial de visualización</p>
+      </div>
+      <div id=\"recommendations-grid\" class=\"grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8\"></div>
+    </section>
+
+   <section id=\"movies-section\" class=\"px-12 py-16\">
+      <div class=\"mb-12\">
+        <h2 class=\"text-5xl font-black mb-4 bg-gradient-to-r from-[#E50914] via-purple-500 to-[#E50914] bg-clip-text text-transparent animate-pulse\">Catálogo Completo</h2>
+        <p class=\"text-gray-400 text-lg\">Explora nuestra colección exclusiva de música phonk</p>
+      </div>
+      <div id=\"movies-grid\" class=\"grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8\"></div>
+    </section>
+
+   <section id=\"tickets-section\" class=\"hidden px-12 py-16\">
+      <h2 class=\"text-4xl font-bold mb-8 flex items-center gap-3\"><i class=\"fas fa-ticket-alt text-[#E50914]\"></i>Mis Tickets</h2>
+      <div id=\"tickets-list\" class=\"space-y-4\"></div>
+    </section>
+  </main>
+
+  <div id=\"cinema-room\" class=\"hidden\">
+    <video id=\"cinema-video\" class=\"w-full h-full\"><source id=\"video-source\" src=\"\" type=\"video/mp4\"></video>
+    <div id=\"video-loading\" class=\"absolute inset-0 flex items-center just ify-center bg-black/80\"><i class=\"fas fa-circle-notch fa-spin text-6xl text-[#E50914]\"></i></div>
+    <div id=\"cinema-header\" class=\"absolute top-0 left-0 right-0 p-8 flex items-center justify-between z-20 bg-gradient-to-b from-black/90 to-transparent\">
+      <div><h3 id=\"video-title\" class=\"text-3xl font-bold\"></h3><p id=\"video-info\" class=\"text-sm text-gray-400 mt-1\"></p></div>
+      <button onclick=\"closeCinema()\" class=\"px-6 py-3 bg-[#E50914] rounded-lg font-bold hover:bg-[#F40612] transition\"><i class=\"fas fa-times mr-2\"></i>Salir</button>
+    </div>
+    <div id=\"cinema-controls\" class=\"absolute bottom-0 left-0 right-0 p-8 space-y-4 z-20 bg-gradient-to-t from-black/90 to-transparent\">
+      <div id=\"progress-container\" class=\"h-2 bg-gray-700 rounded-full cursor-pointer relative\"><div id=\"progress-bar\" class=\"h-full rounded-full transition-all\"></div></div>
+      <div class=\"flex items-center justify-between\">
+        <div class=\"flex items-center gap-6\">
+          <button onclick=\"rewind()\" class=\"p-3 hover:scale-110 transition\"><i class=\"fas fa-backward text-2xl\"></i></button>
+          <button id=\"play-pause-btn\" onclick=\"togglePlay()\" class=\"p-4 hover:scale-110 transition\"><i class=\"fas fa-play text-3xl\"></i></button>
+          <button onclick=\"forward()\" class=\"p-3 hover:scale-110 transition\"><i class=\"fas fa-forward text-2xl\"></i></button>
+        </div>
+        <div class=\"flex items-center gap-3 text-sm font-mono\"><span id=\"time-current\">00:00</span> / <span id=\"time-total\">00:00</span></div>
+        <div class=\"flex items-center gap-6\">
+          <button onclick=\"toggleMute()\" id=\"mute-btn\" class=\"p-3 hover:scale-110 transition\"><i class=\"fas fa-volume-up text-xl\"></i></button>
+          <button onclick=\"toggleFullscreen()\" class=\"p-3 hover:scale-110 transition\"><i class=\"fas fa-expand text-xl\"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div id=\"movie-modal\" class=\"fixed inset-0 z-50 hidden\">
+  <div class=\"absolute inset-0 bg-black/95 backdrop-blur-md\" onclick=\"closeMovieModal()\"></div>
+  <div class=\"absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl glass rounded-2xl p-10\" style=\"background: #181818;\">
+    <button onclick=\"closeMovieModal()\" class=\"absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition\"><i class=\"fas fa-times text-2xl\"></i></button>
+    <div id=\"movie-modal-content\" class=\"grid md:grid-cols-2 gap-10\"></div>
+  </div>
+</div>
+
+<div id=\"ocean-pay-modal\" class=\"fixed inset-0 z-50 hidden\">
+  <
+
+div class=\"absolute inset-0 bg-black/95 backdrop-blur-md\" onclick=\"closeOceanPayModal()\"></div>
+  <div class=\"absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto\">
+    <div class=\"relative bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400 p-8\">
+      <button onclick=\"closeOceanPayModal()\" class=\"absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition backdrop-blur-sm\"><i class=\"fas fa-times text-white text-lg\"></i></button>
+      <div class=\"flex flex-col items-center mb-4\">
+        <div class=\"w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 ring-4 ring-white/30 shadow-2xl\"><i class=\"fas fa-wallet text-white text-4xl\"></i></div>
+        <h2 class=\"text-4xl font-black text-white mb-2 drop-shadow-lg\">Ocean Pay</h2>
+        <p class=\"text-white/90 text-sm font-medium\">Tu billetera digital de AquaBux</p>
+      </div>
+    </div>
+    <div class=\"bg-gradient-to-b from-gray-900 to-black p-8\">
+      <div id=\"op-login-form\" class=\"space-y-6\">
+        <div class=\"text-center mb-6\"><h3 class=\"text-xl font-bold text-white mb-2\">Conecta tu Cuenta</h3><p class=\"text-sm text-gray-400\">Ingresa tus credenciales de Ocean Pay</p></div>
+        <div class=\"space-y-2\"><label class=\"text-sm font-semibold text-gray-300 flex items-center gap-2\"><i class=\"fas fa-user text-cyan-400\"></i>Usuario</label><input type=\"text\" id=\"op-username\" placeholder=\"Ingresa tu usuario\" class=\"w-full px-5 py-4 bg-gray-800/50 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-cyan-500 text-white placeholder-gray-500\"></div>
+        <div class=\"space-y-2\"><label class=\"text-sm font-semibold text-gray-300 flex items-center gap-2\"><i class=\"fas fa-lock text-cyan-400\"></i>Contraseña</label><input type=\"password\" id=\"op-password\" placeholder=\"\" class=\"w-full px-5 py-4 bg-gray-800/50 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-cyan-500 text-white placeholder-gray-500\"></div>
+        <button onclick=\"loginOceanPay()\" class=\"w-full py-5 bg-gradient-to-r from-cyan-500 via-blue-500 to-teal-500 hover:from-cyan-600 hover:via-blue-600 hover:to-teal-600 text-white font-bold text-lg rounded-xl shadow-lg transition-all transform hover:scale-[1.02]\"><i class=\"fas fa-link mr-2\"></i>Vincular Cuenta</button>
+        <div class=\"space-y-3 pt-4 border-t border-gray-800\"><p class=\"text-xs text-center text-gray-400\">¿No tienes cuenta? <a href=\"../Ocean Pay/index.html\" target=\"_blank\" class=\"text-cyan-400 hover:text-cyan-300 font-semibold hover:underline\">Crear una aquí</a></p><div class=\"flex items-center justify-center gap-2 text-xs text-gray-500\"><i class=\"fas fa-shield-alt text-cyan-500\"></i><span>Conexión segura y encriptada</span></div></div>
+      </div>
+      <div id=\"op-success\" class=\"hidden text-center space-y-6 py-4\">
+        <div class=\"relative inline-block\"><div class=\"w-28 h-28 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-2xl shadow-green-500/50 animate-bounce\"><i class=\"fas fa-check text-white text-6xl\"></i></div><div class=\"absolute inset-0 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 animate-ping opacity-20\"></div></div>
+        <div class=\"space-y-2\"><h3 class=\"text-3xl font-black text-white\">¡Cuenta Vinculada!</h3><p class=\"text-gray-400\">Tu billetera Ocean Pay está conectada</p></div>
+        <div class=\"relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-8 border-2 border-cyan-500/30 shadow-2xl\">
+          <div class=\"absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl\"></div>
+          <div class=\"absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-br from-teal-500/20 to-green-500/20 rounded-full blur-3xl\"></div>
+          <div class=\"relative\"><div class=\"flex items-center justify-center gap-2 mb-3\"><i class=\"fas fa-coins text-yellow-400 text-2xl\"></i><span class=\"text-sm text-gray-400 uppercase tracking-wider font-semibold\">Saldo Disponible</span></div><p class=\"font-mono text-6xl font-black bg-gradient-to-r from-cyan-400 via-blue-400 to-teal-400 bg-clip-text text-transparent mb-2\" id=\"op-balance\">0</p><p class=\"text-lg text-gray-400 font-bold\">AquaBux</p></div>
+        </div>
+        <div class=\"grid grid-cols-3 gap-3 pt-4\">
+          <div class=\"bg-gray-800/50 rounded-xl p-3 border border-gray-700\"><i class=\"fas fa-bolt text-yellow-400 text-xl mb-2\"></i><p class=\"text-xs text-gray-400\">Pagos Rápidos</p></div>
+          <div class=\"bg-gray-800/50 rounded-xl p-3 border border-gray-700\"><i class=\"fas fa-shield-alt text-green-400 text-xl mb-2\"></i><p class=\"text-xs text-gray-400\">Seguro</p></div>
+          <div class=\"bg-gray-800/50 rounded-xl p-3 border border-gray-700\"><i class=\"fas fa-infinity text-cyan-400 text-xl mb-2\"></i><p class=\"text-xs text-gray-400\">Sin Límites</p></div>
+        </div>
+        <button onclick=\"closeOceanPayModal()\" class=\"w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02]\">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js\"></script>
+  <script src=\"script.js\"></script>
+</body>
+</html>
