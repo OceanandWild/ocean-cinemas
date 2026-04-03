@@ -22,6 +22,8 @@
       "index.html",
       "additional-movies.js",
       "assets/**/*",
+      "!assets/movies/**/*",
+      "!**/*.crdownload",
       "!assets/**/*.crdownload",
       "main.js",
       "preload.js",
