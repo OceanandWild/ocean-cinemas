@@ -1,7 +1,7 @@
 {
   "name": "ocean-cinemas",
   "productName": "Ocean Cinemas",
-  "version": "2026.3.30-t0001",
+  "version": "2026.4.16-t0459",
   "description": "Ocean Cinemas desktop app",
   "main": "main.js",
   "author": "Ocean and Wild Studios",
@@ -36,7 +36,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "build/ocean-cinemas.png"
+      "icon": "build/ocean-cinemas.ico"
     },
     "nsis": {
       "oneClick": false,
