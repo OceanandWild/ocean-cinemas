@@ -703,24 +703,66 @@
     /* Pulse effect */
     .purchase-option-card {
       position: relative;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      border: 2px solid rgba(255, 255, 255, 0.05);
-      background: rgba(255, 255, 255, 0.03);
+      padding: 1.25rem 1.5rem;
+      border-radius: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+      transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+      transform-origin: center;
     }
 
     .purchase-option-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.15);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%);
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
     .purchase-option-card.selected {
       border-color: #00e5ff;
-      background: rgba(0, 229, 255, 0.08);
-      box-shadow: 0 10px 30px -10px rgba(0, 229, 255, 0.3);
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.11) 0%, rgba(0, 229, 255, 0.05) 100%);
+      box-shadow: 0 12px 40px -8px rgba(0, 229, 255, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .purchase-option-card.selected::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.4), transparent 70%);
+      z-index: -1;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Scroll container mejorado para sección de métodos y horarios */
+    .precompra-scroll-container {
+      max-height: 54vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 0.5rem;
+      scroll-behavior: smooth;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      margin: 0.5rem 0;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.4), rgba(0, 184, 212, 0.5));
+      border-radius: 10px;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.6), rgba(0, 184, 212, 0.7));
     }
 
     .text-cinema-card {
@@ -782,6 +824,122 @@
         transform: scale(1.05);
         opacity: 0.8;
       }
+    }
+
+    /* === METHOD SELECTOR (Precompra rework) === */
+    .method-selector-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .method-pill {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      padding: 0.65rem 0.5rem;
+      border-radius: 0.85rem;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.19,1,0.22,1);
+      text-align: center;
+      min-height: 72px;
+      overflow: hidden;
+    }
+
+    .method-pill:hover:not(.disabled) {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-2px);
+    }
+
+    .method-pill.active {
+      border-color: #00e5ff;
+      background: linear-gradient(135deg, rgba(0,229,255,0.13) 0%, rgba(0,184,212,0.06) 100%);
+      box-shadow: 0 4px 20px -4px rgba(0,229,255,0.3);
+    }
+
+    .method-pill.active-purple {
+      border-color: #a855f7;
+      background: linear-gradient(135deg, rgba(168,85,247,0.13) 0%, rgba(139,92,246,0.06) 100%);
+      box-shadow: 0 4px 20px -4px rgba(168,85,247,0.3);
+    }
+
+    .method-pill.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: rgba(239,68,68,0.25);
+    }
+
+    .method-pill .pill-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .method-pill .pill-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+
+    .method-pill .pill-price {
+      font-size: 0.78rem;
+      font-weight: 900;
+      font-family: monospace;
+    }
+
+    .method-pill .pill-check {
+      position: absolute;
+      top: 4px;
+      right: 5px;
+      font-size: 0.6rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .method-pill.active .pill-check,
+    .method-pill.active-purple .pill-check {
+      opacity: 1;
+    }
+
+    /* Horario grid compacto */
+    .horario-grid-compact {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+    }
+
+    .horario-btn-compact {
+      padding: 0.4rem 0.25rem;
+      border-radius: 0.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: center;
+    }
+
+    .horario-btn-compact:hover {
+      background: #E50914;
+      border-color: #E50914;
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    .horario-btn-compact.selected {
+      background: #E50914;
+      border-color: #ff4d4d;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(229,9,20,0.4);
     }
   </style>
 </head>
@@ -3650,7 +3808,8 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
         { id: 16, title: 'La Vida en el Océano', artist: 'Ocean and Wild Studios', genre: 'Documental - Narrativa', category: 'nature', duration: 15, price: 400, poster: 'assets/la_vida_oceano.png', description: 'Una experiencia cinematográfica que te sumerge en las profundidades del océano.', type: 'text', sala: 'Sala IMAX Oceánica', puerta: 'IMAX-1', proximamente: false, content: [{ chapter: 1, title: 'El Despertar del Océano', text: 'El sol comienza a elevarse sobre el horizonte...' }, { chapter: 2, title: 'Los Guardianes Silenciosos', text: 'Los arrecifes de coral son las selvas tropicales...' }, { chapter: 3, title: 'Las Corrientes de la Vida', text: 'El océano no es simplemente un cuerpo de agua estático...' }, { chapter: 4, title: 'El Abismo de las Maravillas', text: 'Más allá de donde la luz solar puede alcanzar...' }, { chapter: 5, title: 'El Llamado a la Acción', text: 'El océano cubre más del 70% de nuestro planeta...' }] },
         { id: 17, title: 'Arrecifes de Coral', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 12, price: 360, poster: 'assets/OceanCinemas.png', description: 'Explora los ecosistemas más coloridos del planeta.', type: 'video', sala: 'Sala IMAX Oceánica', puerta: 'IMAX-2', proximamente: true },
         { id: 18, title: 'El Abismo Marino', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 18, price: 450, poster: 'assets/OceanCinemas.png', description: 'Desciende a las profundidades donde la luz no llega.', type: 'video', sala: 'Sala Premium', puerta: 'P1', proximamente: true },
-        { id: 19, title: 'Ballenas Migratorias', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 20, price: 420, poster: 'assets/OceanCinemas.png', description: 'Sigue el épico viaje de las ballenas jorobadas.', type: 'video', sala: 'Sala Marina', puerta: 'M1', proximamente: true }
+        { id: 19, title: 'Ballenas Migratorias', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 20, price: 420, poster: 'assets/OceanCinemas.png', description: 'Sigue el épico viaje de las ballenas jorobadas.', type: 'video', sala: 'Sala Marina', puerta: 'M1', proximamente: true },
+        { id: 20, title: 'Ciencalipsis', artist: 'Ocean and Wild Studios', genre: 'Accion - Ciencia Ficción', category: 'ows_universe', duration: 132, price: 760, poster: 'assets/ciencalipsis.png', description: 'Kael Veyron nació como sujeto cero del Proyecto Kronos, un experimento dirigido por la Dra. Selene Arkos, el Dr. Ivar Nolte y la genetista Mara Qin. Lo criaron como conejillo de indias para forzar una furia biológica controlable, pero el resultado fue una inmunidad imposible de romper. Años después, Kael regresa para cobrar venganza: cada toxina, protocolo y trampa científica que antes lo torturó ahora es inútil contra él. Sin embargo, su poder no era suficiente para derribarlos de un solo golpe. Entrena hasta convertir su rabia en técnica letal y lidera el ataque final contra el complejo Helix Dominion, donde se prepara la Apocalipsis Científica que amenaza al mundo. En la batalla definitiva, Kael debe decidir si destruye a sus creadores o rompe el ciclo que ellos iniciaron.', type: 'video', sala: 'Sala Omega Prime', puerta: 'OP-7', proximamente: true, releaseDate: '2026-04-19T20:00:00-03:00', precompraAvailableFrom: '2026-04-16T15:15:00-03:00' }
       ],
       adminSettings: JSON.parse(localStorage.getItem('oceanAdmin') || '{ "infiniteBalance": false, "forceEnter": false, "allAccess": false }')
     };
@@ -4107,7 +4266,108 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       }
     }
 
-    function openMovieModal(id) {
+    async function fetchMovieRatingSummary(movieId) {
+      const safeMovieId = Number(movieId);
+      if (!safeMovieId) {
+        return { hasRatings: false, avgRating: 0, count: 0 };
+      }
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/movies/${safeMovieId}/rating-summary`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        return {
+          hasRatings: Boolean(data?.hasRatings),
+          avgRating: Number(data?.avgRating || 0),
+          count: Number(data?.count || 0)
+        };
+      } catch (err) {
+        console.warn('No se pudo cargar rating de pelicula:', err);
+        return { hasRatings: false, avgRating: 0, count: 0 };
+      }
+    }
+
+    const movieAccessPolicyCache = {};
+
+    function formatPolicyDateLabel(rawDate) {
+      if (!rawDate) return 'fecha por confirmar';
+      const parsed = new Date(rawDate);
+      if (Number.isNaN(parsed.getTime())) return 'fecha por confirmar';
+      return parsed.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function parseMovieReleaseDate(movie, policy = null) {
+      const candidate = policy?.releaseDate || movie?.releaseDate || null;
+      if (!candidate) return null;
+      const parsed = new Date(candidate);
+      if (Number.isNaN(parsed.getTime())) return null;
+      return parsed;
+    }
+
+    async function fetchMovieAccessPolicy(movieId) {
+      const safeMovieId = Number(movieId);
+      if (!safeMovieId) {
+        return {
+          canPrepurchase: true,
+          isUpcoming: false,
+          releaseDate: null,
+          prepurchaseMessage: 'Precompra disponible.',
+          premiumSurchargePercent: 0,
+          fastPass: { enabled: true, availableAt: null, reason: '' }
+        };
+      }
+
+      if (movieAccessPolicyCache[safeMovieId]) {
+        return movieAccessPolicyCache[safeMovieId];
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/movies/${safeMovieId}/access-policy`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const normalized = {
+          canPrepurchase: Boolean(data?.canPrepurchase),
+          isUpcoming: Boolean(data?.isUpcoming),
+          releaseDate: data?.releaseDate || null,
+          prepurchaseMessage: String(data?.prepurchaseMessage || ''),
+          premiumSurchargePercent: Number(data?.premiumSurchargePercent || 0),
+          fastPass: {
+            enabled: Boolean(data?.fastPass?.enabled),
+            availableAt: data?.fastPass?.availableAt || null,
+            reason: String(data?.fastPass?.reason || '')
+          }
+        };
+        movieAccessPolicyCache[safeMovieId] = normalized;
+        return normalized;
+      } catch (error) {
+        console.warn('No se pudo cargar policy de acceso de pelicula:', error);
+        const fallbackMovie = STATE.movies.find(m => Number(m.id) === safeMovieId);
+        const releaseDate = fallbackMovie?.releaseDate || null;
+        const release = releaseDate ? new Date(releaseDate) : null;
+        const isUpcoming = Boolean(release && release.getTime() > Date.now());
+        const fallback = {
+          canPrepurchase: true,
+          isUpcoming,
+          releaseDate,
+          prepurchaseMessage: 'Precompra disponible para este titulo.',
+          premiumSurchargePercent: isUpcoming ? 20 : 0,
+          fastPass: {
+            enabled: !isUpcoming,
+            availableAt: null,
+            reason: isUpcoming ? 'Fast Pass no disponible para estrenos recientes.' : 'Fast Pass habilitado.'
+          }
+        };
+        movieAccessPolicyCache[safeMovieId] = fallback;
+        return fallback;
+      }
+    }
+
+    async function openMovieModal(id) {
       console.log('1. Iniciando openMovieModal para ID:', id);
       const m = STATE.movies.find(x => x.id === id);
       if (!m) {
@@ -4195,6 +4455,20 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       let pr = OCEAN_TICKET_PRICE;
 
       const isProximamente = m.proximamente === true;
+      const ratingSummary = await fetchMovieRatingSummary(m.id);
+      const accessPolicy = await fetchMovieAccessPolicy(m.id);
+      window._activeMoviePolicy = accessPolicy;
+      window._activeMovieId = m.id;
+      const ratingCount = Number(ratingSummary.count || 0);
+      const ratingCountLabel = ratingCount === 1 ? '1 calificacion' : `${ratingCount} calificaciones`;
+      const ratingMainLabel = ratingSummary.hasRatings
+        ? `${Number(ratingSummary.avgRating || 0).toFixed(1)}/5.0`
+        : 'Sin calificaciones por ahora';
+      const ratingSubLabel = ratingSummary.hasRatings ? ratingCountLabel : 'Aun no hay valoraciones registradas';
+      const fastPassEnabled = Boolean(accessPolicy?.fastPass?.enabled);
+      const fastPassAvailableLabel = formatPolicyDateLabel(accessPolicy?.fastPass?.availableAt);
+      const releaseLabel = formatPolicyDateLabel(accessPolicy?.releaseDate || m.releaseDate);
+      const premiumSurcharge = Number(accessPolicy?.premiumSurchargePercent || 0);
 
       content.innerHTML = `
         <button onclick="closeMovieModal()" class="absolute top-4 right-4 z-[60] w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white transition md:top-6 md:right-6 backdrop-blur-md border border-white/10">
@@ -4212,56 +4486,72 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
                         <span class="text-gray-400 text-xs font-mono uppercase tracking-wider">${m.genre}</span>
                     </div>
                     <h2 class="text-4xl md:text-5xl font-black text-white leading-tight mb-2">${m.title}</h2>
-                    <p class="text-xl text-purple-400 font-medium flex items-center gap-2"><i class="fas fa-music text-sm"></i> ${m.artist}</p>
+                    <p class="text-xl text-purple-400 font-medium flex items-center gap-2"><i class="fas fa-clapperboard text-sm"></i> ${m.artist}</p>
                 </div>
-                <div class="flex items-center gap-6 text-sm text-gray-400 border-y border-white/10 py-4 flex-wrap">
-                    <div class="flex items-center gap-2"><i class="far fa-clock text-[#E50914]"></i><span>${m.duration} min</span></div>
-                    <div class="flex items-center gap-2"><i class="fas fa-door-open text-cyan-400"></i><span>Puerta ${m.puerta || 'N/A'}</span></div>
-                    <div class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-purple-400"></i><span>${m.sala || 'N/A'}</span></div>
-                    <div class="flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i><span>4.9/5.0</span></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 border-y border-white/10 py-4">
+                    <div class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-1">Duracion</p>
+                      <p class="text-sm text-gray-200 flex items-center gap-2"><i class="far fa-clock text-[#E50914]"></i><span>${m.duration} min</span></p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-1">Puerta</p>
+                      <p class="text-sm text-gray-200 flex items-center gap-2"><i class="fas fa-door-open text-cyan-400"></i><span>${m.puerta || 'N/A'}</span></p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-1">Sala</p>
+                      <p class="text-sm text-gray-200 flex items-center gap-2"><i class="fas fa-map-marker-alt text-purple-400"></i><span>${m.sala || 'N/A'}</span></p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                      <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-1">Calificacion</p>
+                      <p class="text-sm text-gray-100 flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i><span>${ratingMainLabel}</span></p>
+                      <p class="text-[11px] text-gray-500 mt-1">${ratingSubLabel}</p>
+                    </div>
                 </div>
+                ${isProximamente ? `
+                <div class="rounded-2xl border border-yellow-500/30 bg-yellow-950/20 p-4 md:p-5">
+                  <div class="flex items-start gap-3">
+                    <i class="fas fa-triangle-exclamation text-yellow-400 mt-1"></i>
+                    <div>
+                      <h4 class="text-yellow-300 font-black uppercase tracking-wider text-sm mb-2">Pre-compra de estreno</h4>
+                      <p class="text-sm text-yellow-100/90 leading-relaxed">
+                        Esta pelicula es de estreno reciente. La pre-compra asegura tu ticket para la fecha y hora oficial de estreno, pero no habilita reproduccion inmediata.
+                        El acceso Fast-Pass se habilita dias despues del estreno y puede tener costo superior por alta demanda inicial.
+                      </p>
+                      <p class="text-xs text-yellow-200/80 mt-3">
+                        Estreno estimado: ${releaseLabel}. Recargo de lanzamiento estimado: ${premiumSurcharge}%.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                ` : ''}
                 <div class="prose prose-invert max-w-none"><p class="text-gray-300 text-lg leading-relaxed">${m.description}</p></div>
-                <div class="space-y-4 mt-6">
-                  <h4 class="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2"><i class="fas fa-ticket-alt text-[#E50914]"></i> Elige tu tipo de entrada:</h4>
-                  <div class="grid grid-cols-1 gap-3" id="purchase-options">
+                <div class="space-y-3 mt-6">
+                  <h4 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2"><i class="fas fa-ticket-alt text-[#E50914]"></i> Tipo de entrada</h4>
+                  <div class="method-selector-wrap" id="purchase-options">
                     <!-- Standard Tier -->
-                    <div class="purchase-option-card selected" onclick="updatePurchaseOption(this, 'standard', ${pr})" id="opt-standard">
-                      <div class="flex justify-between items-center">
-                        <div>
-                          <p class="font-bold text-white">Entrada Estándar</p>
-                          <p class="text-xs text-gray-400">Horario prefijado por el cine</p>
-                        </div>
-                        <p class="text-xl font-black text-cyan-400">${pr} AB</p>
-                      </div>
-                      <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg"></i>
+                    <div class="method-pill active" onclick="updatePurchaseOption(this, 'standard', ${pr})" id="opt-standard">
+                      <i class="fas fa-ticket-alt pill-icon text-cyan-400"></i>
+                      <span class="pill-label text-white">Estándar</span>
+                      <span class="pill-price text-cyan-400">${pr} AB</span>
+                      <i class="fas fa-circle-check pill-check text-cyan-400"></i>
                     </div>
-                    
                     <!-- Custom Schedule Tier -->
-                    <div class="purchase-option-card" onclick="updatePurchaseOption(this, 'custom', ${pr})" id="opt-custom">
-                      <div class="flex justify-between items-center">
-                        <div>
-                          <p class="font-bold text-white">Horario Personalizado</p>
-                          <p class="text-xs text-gray-400">Elige la hora que tú quieras</p>
-                        </div>
-                        <p class="text-xl font-black text-white">${pr} AB</p>
-                      </div>
-                      <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg hidden"></i>
-                      <div id="custom-time-picker" class="hidden mt-3 pt-3 border-t border-white/10">
-                        <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Seleccionar Hora:</label>
-                        <input type="time" id="purchase-time" class="bg-black/50 border border-white/20 rounded-lg px-3 py-1 text-white text-sm" value="20:00">
+                    <div class="method-pill" onclick="updatePurchaseOption(this, 'custom', ${pr})" id="opt-custom">
+                      <i class="fas fa-clock pill-icon text-white"></i>
+                      <span class="pill-label text-white">Personalizado</span>
+                      <span class="pill-price text-white">${pr} AB</span>
+                      <i class="fas fa-circle-check pill-check text-cyan-400"></i>
+                      <div id="custom-time-picker" class="hidden mt-2 pt-2 border-t border-white/10 w-full">
+                        <input type="time" id="purchase-time" class="w-full bg-black/50 border border-white/20 rounded-lg px-2 py-1 text-white text-xs" value="20:00">
                       </div>
                     </div>
-
                     <!-- Instant Access Tier -->
-                    <div class="purchase-option-card border-purple-500/30" onclick="updatePurchaseOption(this, 'instant', ${pr})" id="opt-instant">
-                      <div class="flex justify-between items-center">
-                        <div>
-                          <p class="font-bold text-purple-400 flex items-center gap-2">Ver Ahora (Fast Pass) <i class="fas fa-bolt"></i></p>
-                          <p class="text-xs text-gray-400">Acceso inmediato sin esperas</p>
-                        </div>
-                        <p class="text-xl font-black text-white">${pr} AB</p>
-                      </div>
-                      <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg hidden"></i>
+                    <div class="method-pill border-purple-500/30 ${fastPassEnabled ? '' : 'disabled'}" onclick="updatePurchaseOption(this, 'instant', ${pr})" id="opt-instant">
+                      <i class="fas fa-bolt pill-icon ${fastPassEnabled ? 'text-purple-400' : 'text-red-400'}"></i>
+                      <span class="pill-label ${fastPassEnabled ? 'text-purple-300' : 'text-red-300'}">Fast Pass</span>
+                      <span class="pill-price ${fastPassEnabled ? 'text-purple-300' : 'text-red-400'}">${pr} AB</span>
+                      <i class="fas fa-circle-check pill-check text-purple-400"></i>
+                      ${!fastPassEnabled ? `<span style="position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:0.55rem;color:#f87171;font-weight:700;line-height:1.1;padding:0 4px;">Desde: ${fastPassAvailableLabel}</span>` : ''}
                     </div>
                   </div>
                 </div>
@@ -4278,9 +4568,12 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
                         </div>
                     </div>
                     ${isProximamente ? `
-                    <button disabled class="w-full rounded-xl bg-gray-600 py-4 px-8 font-bold text-gray-300 cursor-not-allowed opacity-60">
-                        <span class="flex items-center justify-center gap-3 text-lg"><i class="fas fa-clock text-xl"></i>Próximamente</span>
+                    <button onclick="openPrecompraScreen(${m.id})" class="w-full rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 py-4 px-8 font-bold text-white shadow-lg transition-all hover:scale-[1.01]">
+                        <span class="flex items-center justify-center gap-3 text-lg"><i class="fas fa-ticket-alt text-xl"></i>Revisar Pre-compra</span>
                     </button>
+                    <p class="text-xs text-yellow-200/80 mt-3 text-center">
+                      Se revisará si este estreno ya puede precomprarse. Fast-Pass seguirá bloqueado hasta su fecha de habilitación.
+                    </p>
                     ` : `
                     <div class="flex gap-3">
                         <button onclick="buyTicket(${m.id})" class="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-[#E50914] to-red-700 py-4 px-4 font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-95">
@@ -4303,13 +4596,17 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
     }
 
     function updatePurchaseOption(el, type, price) {
-      // Update visual selection
-      document.querySelectorAll('.purchase-option-card').forEach(card => {
-        card.classList.remove('selected', 'border-cyan-500');
-        card.querySelector('i.fa-check-circle').classList.add('hidden');
+      if (type === 'instant' && window._activeMoviePolicy && !window._activeMoviePolicy.fastPass?.enabled) {
+        const availableText = formatPolicyDateLabel(window._activeMoviePolicy.fastPass?.availableAt);
+        showToast(`⚠️ Fast Pass bloqueado por estreno reciente. Disponible desde: ${availableText}`);
+        return;
+      }
+
+      // Update visual selection — new method-pill classes
+      document.querySelectorAll('#purchase-options .method-pill').forEach(card => {
+        card.classList.remove('active', 'active-purple');
       });
-      el.classList.add('selected', 'border-cyan-500');
-      el.querySelector('i.fa-check-circle').classList.remove('hidden');
+      el.classList.add(type === 'instant' ? 'active-purple' : 'active');
 
       // Update state
       window._selectedPurchaseChoice = { type, price };
@@ -4332,7 +4629,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
 
     let pendingPurchase = null;
 
-    function buyTicket(id) {
+    async function buyTicket(id) {
       const m = STATE.movies.find(x => x.id === id);
       if (!m) return;
 
@@ -4346,6 +4643,19 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       const choice = window._selectedPurchaseChoice || { type: 'standard', price: OCEAN_TICKET_PRICE };
       let pr = choice.price;
       const purchaseType = choice.type;
+      const accessPolicy = await fetchMovieAccessPolicy(m.id);
+
+      if (m.proximamente) {
+        closeMovieModal();
+        openPrecompraScreen(m.id);
+        return;
+      }
+
+      if (purchaseType === 'instant' && !accessPolicy.fastPass?.enabled) {
+        const fastPassDate = formatPolicyDateLabel(accessPolicy.fastPass?.availableAt);
+        showToast(`⚠️ Fast Pass no autorizado para este estreno. Disponible desde: ${fastPassDate}`);
+        return;
+      }
 
       // Apply VIP discounts ONLY to standard price or at least consistent with logic
       // Actually, if they chose a more expensive tier, let's keep that price but check for balance
@@ -5347,12 +5657,14 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
 
     function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    function generateHorarios() {
-      const now = new Date();
+    function generateHorarios(baseDate = null, intervalMinutes = 15) {
+      const now = baseDate instanceof Date && !Number.isNaN(baseDate.getTime())
+        ? new Date(baseDate.getTime())
+        : new Date();
       const horarios = [];
-      // Generar horarios cada 15 minutos a partir de ahora
+      // Generar horarios con intervalo configurable
       for (let i = 1; i <= 8; i++) {
-        const h = new Date(now.getTime() + i * 15 * 60000);
+        const h = new Date(now.getTime() + i * intervalMinutes * 60000);
         horarios.push(h.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
       }
       return horarios;
@@ -5409,7 +5721,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       `;
       await delay(1500);
 
-      const movies = STATE.movies.filter(m => !m.proximamente && m.category === STATE.currentCategory && !m.hidden);
+      const movies = STATE.movies.filter(m => m.category === STATE.currentCategory && !m.hidden);
       content.innerHTML = `
         <div class="max-w-5xl mx-auto">
           <h2 class="text-3xl font-black mb-6">Selecciona un titulo para precompra</h2>
@@ -5433,6 +5745,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
                   <div class="absolute bottom-0 left-0 right-0 p-3">
                     <h4 class="font-bold text-sm">${m.title}</h4>
                     <p class="text-xs text-cyan-400">${OCEAN_TICKET_PRICE} <canvas class="currency-canvas" data-currency="aquabux"></canvas></p>
+                    ${m.proximamente ? '<p class="text-[10px] text-yellow-400 font-bold uppercase tracking-wide">Próximamente · Revisar pre-compra</p>' : ''}
                     <p class="text-xs text-cyan-400"><i class="fas fa-door-open mr-1"></i>${m.puerta}</p>
                   </div>
                 </div>
@@ -5444,16 +5757,98 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
         `;
     }
 
-    async function startPrecompraFlow(movieId, isEpisode = false) {
+    async function startPrecompraFlow(movieId, isEpisode = false, skipUpcomingGate = false) {
       const movie = STATE.movies.find(m => m.id === movieId);
       if (!movie) return;
 
       const content = document.getElementById('process-content');
       document.getElementById('process-screen').classList.add('active');
 
+      // BLOQUEO LOCAL: precompraAvailableFrom
+      if (movie.precompraAvailableFrom) {
+        const availableAt = new Date(movie.precompraAvailableFrom);
+        if (Date.now() < availableAt.getTime()) {
+          const fmt = availableAt.toLocaleString('es-AR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: false
+          });
+          content.innerHTML = `
+            <div class="max-w-2xl mx-auto text-center py-8">
+              <div class="w-20 h-20 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-lock text-4xl text-red-400"></i>
+              </div>
+              <h2 class="text-3xl font-black text-white mb-3">Pre-compra no disponible aún</h2>
+              <p class="text-gray-300 mb-2 text-lg">"${movie.title}" abrirá su pre-compra el:</p>
+              <div class="inline-block bg-white/5 border border-cyan-500/30 rounded-2xl px-8 py-4 mb-6">
+                <p class="text-2xl font-black text-cyan-300 font-mono">${fmt}</p>
+              </div>
+              <p class="text-sm text-gray-400 mb-8">Vuelve en esa fecha para asegurar tu lugar. El estreno oficial es el 19 de abril a las 20:00.</p>
+              <button onclick="showCatalogSelection()" class="netflix-btn px-8 py-3">Volver al catálogo</button>
+            </div>
+          `;
+          return;
+        }
+      }
+
       // SERIES CHECK: Si es serie y no es episodio, mostrar lista de caps
       if (movie.type === 'series_container' && !isEpisode) {
         showEpisodeSelection(movieId);
+        return;
+      }
+
+      const policy = await fetchMovieAccessPolicy(movie.id);
+      window._precompraPolicyByMovie = window._precompraPolicyByMovie || {};
+      window._precompraPolicyByMovie[movie.id] = policy;
+
+      const releaseDate = parseMovieReleaseDate(movie, policy);
+      const releaseLabel = formatPolicyDateLabel(policy.releaseDate || movie.releaseDate);
+      const fastPassLabel = formatPolicyDateLabel(policy.fastPass?.availableAt);
+      const fastPassAllowed = Boolean(policy.fastPass?.enabled);
+      const upcomingFlow = Boolean(movie.proximamente || policy.isUpcoming);
+      const premiumSurcharge = Number(policy.premiumSurchargePercent || 0);
+
+      if (upcomingFlow && !skipUpcomingGate) {
+        content.innerHTML = `
+          <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-black mb-4">Estreno detectado</h2>
+            <p class="text-gray-300 mb-6">"${movie.title}" está marcado como próximo estreno. ¿Quieres revisar si ya puede precomprarse?</p>
+            <div class="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-4 mb-6">
+              <div class="glass rounded-2xl p-6 border border-cyan-500/30">
+                <p class="text-xs uppercase tracking-widest text-cyan-400 font-bold mb-2">Estado de pre-compra</p>
+                <h3 class="text-xl font-black text-white mb-2">${policy.canPrepurchase ? 'Pre-compra habilitada' : 'Pre-compra aún bloqueada'}</h3>
+                <p class="text-sm text-gray-300">${policy.prepurchaseMessage || 'Se verificará la disponibilidad en servidor antes de continuar.'}</p>
+                <p class="text-xs text-gray-400 mt-3">Estreno oficial: ${releaseLabel}</p>
+              </div>
+              <div class="rounded-2xl border border-yellow-500/40 bg-yellow-950/25 p-6">
+                <p class="text-xs uppercase tracking-widest text-yellow-300 font-black mb-2">Aviso importante</p>
+                <p class="text-sm text-yellow-100/90 leading-relaxed">
+                  Los estrenos recientes pueden tener precio más elevado por demanda temprana. La pre-compra solo reserva tu acceso para fecha y hora de estreno:
+                  no significa reproducción inmediata. Fast-Pass queda bloqueado hasta su ventana de liberación y solo se habilita días o 1-2 semanas después.
+                </p>
+                <p class="text-xs text-yellow-200/80 mt-3">Recargo estimado por estreno: ${premiumSurcharge}% · Fast-Pass estimado: ${fastPassLabel}</p>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button onclick="startPrecompraFlow(${movie.id}, ${isEpisode ? 'true' : 'false'}, true)" class="netflix-btn px-6 py-3">
+                <i class="fas fa-search mr-2"></i>Revisar disponibilidad
+              </button>
+              <button onclick="showCatalogSelection()" class="netflix-secondary px-6 py-3">Volver al catálogo</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (!policy.canPrepurchase) {
+        content.innerHTML = `
+          <div class="max-w-3xl mx-auto text-center">
+            <i class="fas fa-ban text-5xl text-red-400 mb-4"></i>
+            <h2 class="text-3xl font-black text-white mb-3">Pre-compra no disponible aún</h2>
+            <p class="text-gray-300 mb-2">${policy.prepurchaseMessage || 'Este estreno todavía no habilitó pre-compra en servidor.'}</p>
+            <p class="text-sm text-gray-400 mb-6">Fecha de estreno: ${releaseLabel}</p>
+            <button onclick="showCatalogSelection()" class="netflix-btn px-8 py-3">Volver al catálogo</button>
+          </div>
+        `;
         return;
       }
 
@@ -5471,107 +5866,120 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       `;
       await delay(1500);
 
-      // Step 3: Selección de método y horario
-      const horarios = generateHorarios();
+      const horariosBase = releaseDate && releaseDate.getTime() > Date.now()
+        ? new Date(releaseDate.getTime() - (30 * 60000))
+        : null;
+      const horarios = upcomingFlow ? generateHorarios(horariosBase, 30) : generateHorarios();
       const customPrice = OCEAN_TICKET_PRICE;
       const instantPrice = OCEAN_TICKET_PRICE;
       window._precompraPurchaseChoice = { type: 'standard', price: OCEAN_TICKET_PRICE };
       content.innerHTML = `
-        <div class="max-w-lg mx-auto">
-          <div class="glass rounded-2xl p-6 mb-6">
-            <div class="flex gap-4 mb-4">
-              <img src="${movie.poster}" class="w-24 h-36 object-cover rounded-lg" onerror="this.src='assets/OceanCinemas.png'">
-              <div class="flex-1 text-left">
-                <h3 class="text-2xl font-bold mb-1 leading-tight text-white">${movie.title}</h3>
-                <p class="text-gray-400 text-sm mb-2">${movie.artist}</p>
-                <div class="flex gap-3 text-xs flex-wrap">
-                  <span class="bg-white/10 px-2 py-1 rounded text-gray-300"><i class="far fa-clock mr-1"></i>${movie.duration} min</span>
-                  <span class="bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded border border-cyan-500/30">Sala ${movie.sala}</span>
+        <div class="max-w-5xl mx-auto">
+          <div class="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-5">
+            <div class="glass rounded-2xl p-6 mb-6">
+              <div class="flex gap-4 mb-4">
+                <img src="${movie.poster}" class="w-24 h-36 object-cover rounded-lg" onerror="this.src='assets/OceanCinemas.png'">
+                <div class="flex-1 text-left">
+                  <h3 class="text-2xl font-bold mb-1 leading-tight text-white">${movie.title}</h3>
+                  <p class="text-gray-400 text-sm mb-2">${movie.artist}</p>
+                  <div class="flex gap-3 text-xs flex-wrap">
+                    <span class="bg-white/10 px-2 py-1 rounded text-gray-300"><i class="far fa-clock mr-1"></i>${movie.duration} min</span>
+                    <span class="bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded border border-cyan-500/30">${movie.sala}</span>
+                    ${upcomingFlow ? `<span class="bg-yellow-900/30 text-yellow-300 px-2 py-1 rounded border border-yellow-500/30">Estreno: ${releaseLabel}</span>` : ''}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="border-t border-white/10 pt-4">
-              <p class="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Selecciona un método:</p>
-              <div class="grid grid-cols-1 gap-3 mb-4" id="precompra-purchase-options">
-                <div class="purchase-option-card selected" id="precompra-opt-standard" onclick="setPrecompraPurchaseOption('standard', ${OCEAN_TICKET_PRICE}, ${movie.id})">
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <p class="font-bold text-white">Entrada Estándar</p>
-                      <p class="text-xs text-gray-400">Horario prefijado por el cine</p>
-                    </div>
-                    <p class="text-xl font-black text-cyan-400">${OCEAN_TICKET_PRICE} AB</p>
+              <div class="border-t border-white/10 pt-4">
+                <p class="text-[10px] text-gray-500 mb-2 font-black uppercase tracking-widest">Método de entrada</p>
+                <div class="method-selector-wrap" id="precompra-purchase-options">
+                  <!-- Entrada Estándar -->
+                  <div class="method-pill active" id="precompra-opt-standard" onclick="setPrecompraPurchaseOption('standard', ${OCEAN_TICKET_PRICE}, ${movie.id})">
+                    <i class="fas fa-ticket-alt pill-icon text-cyan-400"></i>
+                    <span class="pill-label text-white">Estándar</span>
+                    <span class="pill-price text-cyan-400">${OCEAN_TICKET_PRICE} AB</span>
+                    <i class="fas fa-circle-check pill-check text-cyan-400"></i>
                   </div>
-                  <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg"></i>
-                </div>
-                <div class="purchase-option-card" id="precompra-opt-custom" onclick="setPrecompraPurchaseOption('custom', ${customPrice}, ${movie.id})">
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <p class="font-bold text-white">Horario Personalizado</p>
-                      <p class="text-xs text-gray-400">Elige la hora que tú quieras</p>
-                    </div>
-                    <p class="text-xl font-black text-white">${customPrice} AB</p>
+                  <!-- Horario Personalizado -->
+                  <div class="method-pill" id="precompra-opt-custom" onclick="setPrecompraPurchaseOption('custom', ${customPrice}, ${movie.id})">
+                    <i class="fas fa-clock pill-icon text-white"></i>
+                    <span class="pill-label text-white">Personalizado</span>
+                    <span class="pill-price text-white">${customPrice} AB</span>
+                    <i class="fas fa-circle-check pill-check text-cyan-400"></i>
                   </div>
-                  <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg hidden"></i>
-                </div>
-                <div class="purchase-option-card border-purple-500/30" id="precompra-opt-instant" onclick="setPrecompraPurchaseOption('instant', ${instantPrice}, ${movie.id})">
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <p class="font-bold text-purple-400 flex items-center gap-2">Fast Pass <i class="fas fa-bolt"></i></p>
-                      <p class="text-xs text-gray-400">Acceso inmediato sin horario</p>
-                    </div>
-                    <p class="text-xl font-black text-white">${instantPrice} AB</p>
+                  <!-- Fast Pass -->
+                  <div class="method-pill ${fastPassAllowed ? '' : 'disabled'}" id="precompra-opt-instant" onclick="setPrecompraPurchaseOption('instant', ${instantPrice}, ${movie.id})">
+                    <i class="fas fa-bolt pill-icon ${fastPassAllowed ? 'text-purple-400' : 'text-red-400'}"></i>
+                    <span class="pill-label ${fastPassAllowed ? 'text-purple-300' : 'text-red-300'}">Fast Pass</span>
+                    <span class="pill-price ${fastPassAllowed ? 'text-purple-300' : 'text-red-400'}">${instantPrice} AB</span>
+                    <i class="fas fa-circle-check pill-check text-purple-400"></i>
+                    ${!fastPassAllowed ? `<span style="position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:0.55rem;color:#f87171;font-weight:700;line-height:1.1;padding:0 4px;">Desde: ${fastPassLabel}</span>` : ''}
                   </div>
-                  <i class="fas fa-check-circle absolute -top-2 -right-2 text-cyan-500 text-lg hidden"></i>
                 </div>
+                <!-- Horarios -->
+                <div id="horarios-grid-wrap">
+                  <p class="text-[10px] text-gray-500 mb-2 font-black uppercase tracking-widest">Horario</p>
+                  <div class="horario-grid-compact" id="horarios-grid">
+                    ${horarios.map(h => `
+                      <button onclick="selectHorario(${movieId}, '${h}', window._precompraPurchaseChoice.type || 'standard', window._precompraPurchaseChoice.price || ${OCEAN_TICKET_PRICE})" class="horario-btn-compact">
+                        ${h}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+                <button id="precompra-fastpass-continue" onclick="selectHorario(${movieId}, 'Fast Pass', 'instant', window._precompraPurchaseChoice.price || ${instantPrice})" class="hidden mt-3 w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 transition text-sm font-bold text-white flex items-center justify-center gap-2">
+                  <i class="fas fa-bolt"></i> Confirmar Fast Pass
+                </button>
               </div>
-              <p class="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Selecciona un horario:</p>
-              <div class="grid grid-cols-3 gap-2" id="horarios-grid">
-                ${horarios.map(h => `
-                  <button onclick="selectHorario(${movieId}, '${h}', window._precompraPurchaseChoice.type || 'standard', window._precompraPurchaseChoice.price || ${OCEAN_TICKET_PRICE})" class="px-3 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-[#E50914] hover:border-[#E50914] transition text-sm font-bold text-white">
-                    ${h}
-                  </button>
-                `).join('')}
+              <div class="mt-4 flex justify-between items-center border-t border-white/10 pt-4">
+                <span class="text-gray-400 text-sm">Precio por Ticket:</span>
+                <span class="text-2xl font-black text-white flex items-center gap-1"><span id="precompra-price-display">${OCEAN_TICKET_PRICE}</span> <i class="fas fa-coins text-yellow-500 text-lg"></i></span>
               </div>
-              <button id="precompra-fastpass-continue" onclick="selectHorario(${movieId}, 'Fast Pass', 'instant', window._precompraPurchaseChoice.price || ${instantPrice})" class="hidden mt-3 w-full px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition text-sm font-bold text-white">
-                Continuar con Fast Pass
-              </button>
             </div>
-            <div class="mt-4 flex justify-between items-center border-t border-white/10 pt-4">
-              <span class="text-gray-400 text-sm">Precio por Ticket:</span>
-              <span class="text-2xl font-black text-white flex items-center gap-1"><span id="precompra-price-display">${OCEAN_TICKET_PRICE}</span> <i class="fas fa-coins text-yellow-500 text-lg"></i></span>
-            </div>
+            <aside class="rounded-2xl border border-yellow-500/35 bg-yellow-950/25 p-5 h-fit">
+              <p class="text-xs uppercase tracking-widest text-yellow-300 font-black mb-2">Advertencia de estreno</p>
+              <p class="text-sm text-yellow-100/90 leading-relaxed">
+                La pre-compra de títulos recientes puede manejar costos superiores por lanzamiento. Aseguras lugar para fecha y hora de estreno, pero no acceso inmediato.
+                Fast-Pass no está autorizado hasta que servidor confirme su apertura.
+              </p>
+              <p class="text-xs text-yellow-200/80 mt-3">Fast-Pass estimado: ${fastPassLabel}</p>
+            </aside>
           </div>
           <button onclick="closeProcessScreen()" class="netflix-secondary w-full py-3 rounded-xl border border-white/10 hover:bg-white/10 transition">Cancelar</button>
         </div>
-        `;
+      `;
     }
 
     function setPrecompraPurchaseOption(type, price, movieId) {
+      const moviePolicy = window._precompraPolicyByMovie?.[movieId];
+      if (type === 'instant' && moviePolicy && !moviePolicy.fastPass?.enabled) {
+        showToast(`⚠️ Fast Pass bloqueado por servidor. Fecha estimada: ${formatPolicyDateLabel(moviePolicy.fastPass?.availableAt)}`);
+        return;
+      }
+
       window._precompraPurchaseChoice = { type, price };
       ['standard', 'custom', 'instant'].forEach(opt => {
         const card = document.getElementById(`precompra-opt-${opt}`);
         if (!card) return;
-        card.classList.remove('selected', 'border-cyan-500');
-        const icon = card.querySelector('i.fa-check-circle');
-        if (icon) icon.classList.add('hidden');
+        card.classList.remove('active', 'active-purple');
       });
 
       const selected = document.getElementById(`precompra-opt-${type}`);
       if (selected) {
-        selected.classList.add('selected', 'border-cyan-500');
-        const selectedIcon = selected.querySelector('i.fa-check-circle');
-        if (selectedIcon) selectedIcon.classList.remove('hidden');
+        selected.classList.add(type === 'instant' ? 'active-purple' : 'active');
       }
 
       const priceDisplay = document.getElementById('precompra-price-display');
       if (priceDisplay) priceDisplay.textContent = price;
 
+      const horariosWrap = document.getElementById('horarios-grid-wrap');
       const horariosGrid = document.getElementById('horarios-grid');
       const fastPassContinue = document.getElementById('precompra-fastpass-continue');
       if (type === 'instant') {
+        if (horariosWrap) horariosWrap.classList.add('hidden');
         if (horariosGrid) horariosGrid.classList.add('hidden');
         if (fastPassContinue) fastPassContinue.classList.remove('hidden');
       } else {
+        if (horariosWrap) horariosWrap.classList.remove('hidden');
         if (horariosGrid) horariosGrid.classList.remove('hidden');
         if (fastPassContinue) fastPassContinue.classList.add('hidden');
       }
@@ -5660,6 +6068,12 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       const content = document.getElementById('process-content');
       const finalPrice = Number.isFinite(Number(selectedPrice)) ? Number(selectedPrice) : OCEAN_TICKET_PRICE;
       const finalPurchaseType = purchaseType || 'standard';
+      const policy = window._precompraPolicyByMovie?.[movieId] || await fetchMovieAccessPolicy(movieId);
+
+      if (finalPurchaseType === 'instant' && !policy.fastPass?.enabled) {
+        showToast(`⚠️ Fast Pass no autorizado para este estreno. Fecha estimada: ${formatPolicyDateLabel(policy.fastPass?.availableAt)}`);
+        return;
+      }
 
       // Step 4: Imprimiendo Ticket
       content.innerHTML = `
@@ -5864,10 +6278,27 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
       const movie = STATE.movies.find(m => m.id === ticket.movieId);
       const durationMins = movie ? parseDuration(movie.duration) : 120;
       const pDate = new Date(ticket.purchaseDate || Date.now());
+      const releaseDate = parseMovieReleaseDate(movie);
 
       // USADO
       if (ticket.used && ticket.usedAt) {
         return { status: 'USADO', class: 'bg-gray-600 text-gray-300', icon: 'fa-check-circle', canWatch: false, canDelete: true, canRefund: false };
+      }
+
+      // Estreno no liberado aún
+      if (releaseDate && releaseDate.getTime() > now) {
+        const waitMs = releaseDate.getTime() - now;
+        const waitH = Math.floor(waitMs / (1000 * 60 * 60));
+        const waitM = Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60));
+        return {
+          status: 'PRÓXIMAMENTE',
+          class: 'bg-yellow-700 text-yellow-100',
+          icon: 'fa-hourglass-half',
+          canWatch: false,
+          canDelete: true,
+          canRefund: true,
+          msg: `Estreno en ${waitH}h ${waitM}m`
+        };
       }
 
       // FAST PASS
@@ -6125,17 +6556,20 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
         return;
       }
 
-      // Check for "proximamente" movies
+      // Validar por servidor disponibilidad de pre-compra por título seleccionado
       for (const id of selectedTicketIds) {
         const ticket = STATE.precompras.find(t => t.id === id);
+        if (!ticket) continue;
         const movie = STATE.movies.find(m => m.id === ticket.movieId);
-        if (movie.proximamente) {
+        const policy = await fetchMovieAccessPolicy(ticket.movieId);
+        if (!policy.canPrepurchase) {
           content.innerHTML = `
         <div class="flex items-center justify-center h-full">
           <div class="text-center max-w-md">
             <i class="fas fa-exclamation-triangle text-5xl text-yellow-400 mb-4"></i>
-            <h2 class="text-2xl font-bold mb-2">Película no disponible</h2>
-            <p class="text-gray-400 mb-6">"${movie.title}" aún no está disponible. Por favor, espera a su estreno.</p>
+            <h2 class="text-2xl font-bold mb-2">Pre-compra no disponible</h2>
+            <p class="text-gray-400 mb-3">"${movie?.title || 'Título'}" todavía no habilitó pre-compra en servidor.</p>
+            <p class="text-xs text-gray-500 mb-6">${policy.prepurchaseMessage || ''}</p>
             <button onclick="showMisTicketsList()" class="netflix-btn px-6 py-3">Volver</button>
           </div>
             </div>
@@ -6519,6 +6953,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
 </body>
 
 </html>
+
 
 
 
