@@ -1010,13 +1010,46 @@
           Descubre un universo de entretenimiento digital curado para ti. Desde producciones musicales exclusivas hasta
           narrativas inmersivas que desafían lo convencional.
         </p>
-        <div class="mb-8 max-w-3xl rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-900/30 via-blue-900/20 to-transparent p-4 backdrop-blur-sm">
-          <p class="text-cyan-200 font-bold tracking-wide uppercase text-xs mb-2">Actualización de Estrenos</p>
-          <p class="text-white text-sm md:text-base leading-relaxed">
-            Ya están disponibles <strong>HEP</strong> (Hijo del Ente Primario) y <strong>CUHH</strong> (Código Umbral: Hijos de Hierro) en Ocean Cinemas.
-            CUHH podría seguir creciendo más allá de los 36 episodios actuales, y HEP recién comienza su historia.
-          </p>
+
+        <!-- HIGHLIGHT: Ciencalipsis -->
+        <div class="mb-6 max-w-3xl rounded-2xl overflow-hidden border border-red-500/40 shadow-2xl shadow-red-900/30"
+             style="background: linear-gradient(135deg, rgba(30,6,6,0.95) 0%, rgba(80,10,10,0.85) 50%, rgba(10,10,30,0.95) 100%);">
+          <div class="flex items-stretch gap-0">
+            <!-- Poster lateral -->
+            <div class="hidden md:block flex-shrink-0 w-28 relative overflow-hidden">
+              <img src="assets/ciencalipsis.png" alt="Ciencalipsis"
+                   class="w-full h-full object-cover"
+                   onerror="this.parentElement.style.display='none'">
+              <div class="absolute inset-0" style="background: linear-gradient(to right, transparent 60%, rgba(30,6,6,0.9) 100%);"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="flex-1 p-4 md:p-5">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style="background: rgba(229,9,20,0.25); color: #ff6b6b; border: 1px solid rgba(229,9,20,0.4);">
+                  <i class="fas fa-star mr-1"></i>ESTRENO
+                </span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">19 de abril · Sala Omega Prime</span>
+              </div>
+              <p class="text-white font-black text-xl md:text-2xl leading-tight mb-1">Ciencalipsis</p>
+              <p class="text-gray-300 text-sm leading-relaxed mb-3">
+                Kael Veyron fue el sujeto cero del Proyecto Kronos. Ahora regresa para desmantelar a sus creadores antes de que lancen la Apocalipsis Científica.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="openPrecompraScreen(20)"
+                  class="px-4 py-2 rounded-xl font-black text-sm transition-all hover:scale-105"
+                  style="background: linear-gradient(135deg, #E50914, #b00710); color: white; box-shadow: 0 4px 15px rgba(229,9,20,0.35);">
+                  <i class="fas fa-ticket-alt mr-2"></i>Pre-comprar · 760 AB
+                </button>
+                <span class="px-3 py-2 rounded-xl text-xs font-bold text-gray-300"
+                      style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
+                  <i class="fas fa-book-open mr-1 text-cyan-400"></i>65 min lectura
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="flex gap-6">
           <button onclick="openPrecompraScreen()"
             class="netflix-btn text-xl px-10 py-4 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all">
@@ -1142,7 +1175,10 @@
       </div>
 
       <div class="flex flex-wrap gap-3 mb-8">
-        <button id="tab-ows_universe" class="category-tab active" onclick="showMovieCategory('ows_universe')">
+        <button id="tab-all" class="category-tab active" onclick="showMovieCategory('all')">
+          <i class="fas fa-th-large mr-2"></i>Todos
+        </button>
+        <button id="tab-ows_universe" class="category-tab" onclick="showMovieCategory('ows_universe')">
           <i class="fas fa-infinity mr-2"></i>Universo OWS
         </button>
         <button id="tab-other_worlds" class="category-tab" onclick="showMovieCategory('other_worlds')">
@@ -1855,7 +1891,7 @@
       oceanPayUser: JSON.parse(localStorage.getItem('opUser') || '{}'),
       oceanPayLinked: !!localStorage.getItem('opToken'),
       viewHistory: JSON.parse(localStorage.getItem('viewHistory') || '[]'),
-      currentCategory: 'ows_universe',
+      currentCategory: 'all',
       tickets: [],
       precompras: JSON.parse(localStorage.getItem('oceanPrecompras') || '[]'),
       movies: [
@@ -3812,7 +3848,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
         { id: 17, title: 'Arrecifes de Coral', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 12, price: 360, poster: 'assets/OceanCinemas.png', description: 'Explora los ecosistemas más coloridos del planeta.', type: 'video', sala: 'Sala IMAX Oceánica', puerta: 'IMAX-2', proximamente: true },
         { id: 18, title: 'El Abismo Marino', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 18, price: 450, poster: 'assets/OceanCinemas.png', description: 'Desciende a las profundidades donde la luz no llega.', type: 'video', sala: 'Sala Premium', puerta: 'P1', proximamente: true },
         { id: 19, title: 'Ballenas Migratorias', artist: 'Ocean and Wild Studios', genre: 'Documental - Naturaleza', category: 'nature', duration: 20, price: 420, poster: 'assets/OceanCinemas.png', description: 'Sigue el épico viaje de las ballenas jorobadas.', type: 'video', sala: 'Sala Marina', puerta: 'M1', proximamente: true },
-        { id: 20, title: 'Ciencalipsis', artist: 'Ocean and Wild Studios', genre: 'Acción - Ciencia Ficción', category: 'accion', duration: 132, price: 760, poster: 'assets/ciencalipsis.png', description: 'Kael Veyron nació como sujeto cero del Proyecto Kronos, un experimento dirigido por la Dra. Selene Arkos, el Dr. Ivar Nolte y la genetista Mara Qin. Lo criaron como conejillo de indias para forzar una furia biológica controlable, pero el resultado fue una inmunidad imposible de romper. Años después, Kael regresa para cobrar venganza: cada toxina, protocolo y trampa científica que antes lo torturó ahora es inútil contra él. Entrena hasta convertir su rabia en técnica letal y lidera el ataque final contra el complejo Helix Dominion, donde se prepara la Apocalipsis Científica que amenaza al mundo. En la batalla definitiva, Kael debe decidir si destruye a sus creadores o rompe el ciclo que ellos iniciaron.', type: 'text', sala: 'Sala Omega Prime', puerta: 'OP-7', proximamente: true, releaseDate: '2026-04-19T20:00:00-03:00', precompraAvailableFrom: '2026-04-16T15:15:00-03:00',
+        { id: 20, title: 'Ciencalipsis', artist: 'Ocean and Wild Studios', genre: 'Acción - Ciencia Ficción', category: 'accion', duration: 65, price: 760, poster: 'assets/ciencalipsis.png', description: 'Kael Veyron nació como sujeto cero del Proyecto Kronos, un experimento dirigido por la Dra. Selene Arkos, el Dr. Ivar Nolte y la genetista Mara Qin. Lo criaron como conejillo de indias para forzar una furia biológica controlable, pero el resultado fue una inmunidad imposible de romper. Años después, Kael regresa para cobrar venganza: cada toxina, protocolo y trampa científica que antes lo torturó ahora es inútil contra él. Entrena hasta convertir su rabia en técnica letal y lidera el ataque final contra el complejo Helix Dominion, donde se prepara la Apocalipsis Científica que amenaza al mundo. En la batalla definitiva, Kael debe decidir si destruye a sus creadores o rompe el ciclo que ellos iniciaron.', type: 'text', sala: 'Sala Omega Prime', puerta: 'OP-7', proximamente: true, releaseDate: '2026-04-19T20:00:00-03:00', precompraAvailableFrom: '2026-04-16T15:15:00-03:00',
           content: [
             {
               chapter: 1,
@@ -3895,7 +3931,439 @@ Kael llegó a su base con tres costillas fisuradas, el sistema nervioso temporal
 
 Helix Dominion lo conocía demasiado bien.
 
-Era hora de hacer algo que nunca había hecho antes: pedir ayuda.`
+Era hora de hacer algo que nunca había hecho antes: pedir ayuda.
+
+El problema era que no sabía a quién pedírsela.
+
+Durante los nueve años que pasó fuera, Kael había aprendido a evaluar a las personas con la misma frialdad con la que evaluaba sistemas. La mayoría no pasaba el primer filtro: motivos poco claros, lealtades cambiantes, demasiado miedo o demasiada ambición. Había conocido a algunos que cumplían los criterios básicos, pero mantenerlos cerca habría significado exponerlos a algo que no tenían por qué enfrentar.
+
+Ahora la ecuación había cambiado. Helix Dominion ya lo había identificado como una amenaza activa. La opción de operar en soledad sin que nadie más resultara afectado había dejado de existir en el momento en que Arkos ordenó aumentar los protocolos de contención globales. Eso significaba que cualquier persona en el perímetro de sus operaciones pasadas o futuras era ya un objetivo potencial para ellos.
+
+Lo que también significaba que el costo de involucrar aliados había bajado. El riesgo de no hacerlo, en cambio, había subido hasta hacerse insostenible.
+
+Pasó dos días revisando su red de contactos. No era extensa, pero estaba construida con criterios que pocas personas aplicarían: cada persona había demostrado, en algún momento de presión real, que sus decisiones se regían por algo más sólido que el interés inmediato.
+
+El primero de la lista era Davan Corr. Exanalista de inteligencia de un organismo que había dejado de existir después de que Davan filtrara un informe interno que probaba que su propio director había falsificado datos para justificar una operación que mató a diecinueve personas. No lo hizo por heroísmo. Lo hizo porque los números no cuadraban y eso lo molestaba más de lo que podía tolerar. Llevaba cuatro años viviendo bajo un nombre que Kael tardó tres semanas en encontrar.
+
+La segunda era Yse Tanvir. Bioquímica. Había trabajado durante siete años en una empresa farmacéutica que era, sin que ella lo supiera inicialmente, una pantalla de financiamiento para Helix Dominion. Cuando lo descubrió, no fue al gobierno ni a la prensa. Desapareció con una copia cifrada de tres años de registros internos y se instaló en un puerto industrial del sur donde reparaba motores de embarcaciones y esperaba que alguien llegara con la pregunta correcta.
+
+Kael pensó que tal vez tenía la pregunta correcta.
+
+Contactó a Davan primero. No porque fuera el más fácil de convencer, sino porque era el que más rápido podría verificar si Helix Dominion había expandido sus operaciones de la manera que Kael sospechaba. Un analista con acceso a los registros correctos podía confirmar en horas lo que Kael tardaría semanas en triangular solo.
+
+El mensaje que envió era breve y no contenía ningún dato que pudiera comprometer a ninguno de los dos si era interceptado. Solo una fecha, una coordenada y una pregunta que Davan reconocería como proveniente de alguien que sabía exactamente quién era él y por qué había desaparecido.
+
+La respuesta llegó en diecisiete horas. También era breve.
+
+Decía: "Ya lo sé. ¿Cuándo?"
+
+Kael ajustó el mapa frente a él. La red de Helix Dominion tenía tres instalaciones restantes. Ahora, con Davan, podría saber exactamente qué había en cada una antes de acercarse. Y con Yse, si sus registros eran lo que Kael calculaba que eran, tendría algo más valioso que la fuerza o la información.
+
+Tendría pruebas.
+
+Pruebas que podían hacer lo que ninguna cantidad de instalaciones neutralizadas podría lograr por sí sola: hacer que Helix Dominion dejara de tener razón de existir.
+
+Fue a buscar a Yse dos días después. El puerto industrial era exactamente como lo había imaginado: ruidoso, funcional, sin pretensiones. Yse estaba debajo de un motor de mediana potencia cuando él llegó. No se sorprendió de verlo. Eso también era un buen signo.
+
+Le explicó lo que necesitaba en diez minutos. Ella escuchó sin interrumpirlo, con las manos todavía manchadas de grasa, y cuando él terminó le hizo dos preguntas. La primera era técnica, sobre el sistema de liberación distribuida. La segunda era sobre él.
+
+Le preguntó por qué no había muerto ya.
+
+Kael consideró varias respuestas y eligió la más honesta: no lo sabía con certeza. Su cuerpo procesaba lo que otros no podían. Eso le había dado tiempo cuando el tiempo era el único recurso que quedaba.
+
+Yse asintió como si eso fuera suficiente. Limpió sus manos con un trapo y dijo que necesitaba cuarenta y ocho horas para preparar los archivos en un formato que pudiera usarse sin exponerla directamente.
+
+Kael le dijo que tenía cuarenta y ocho horas.
+
+Las cuarenta y ocho horas pasaron casi exactamente como las había calculado. Davan llegó primero, con un dispositivo encriptado que contenía tres años de movimientos financieros de Helix Dominion trazados a través de doce jurisdicciones distintas. Era el tipo de trabajo que habría tomado a un equipo completo varios meses. Davan lo había hecho solo, en dos días, porque según él "los números siempre dejan el mismo tipo de rastro sin importar cuánto los disfracen."
+
+Yse llegó seis horas después con algo diferente: no solo registros, sino síntesis. Había pasado los últimos años analizando silenciosamente los compuestos que había visto desarrollar durante su tiempo en la empresa pantalla. Sabía exactamente cómo funcionaba cada agente del sistema de liberación distribuida. Y sabía algo más: sabía cuál era el punto de falla de cada uno.
+
+El sistema de Arkos era brillante en su diseño general pero tenía un defecto estructural que nadie dentro de Helix Dominion había podido ver porque todos asumían que el sistema funcionaría en condiciones ideales. Yse lo había identificado desde afuera, con la distancia que da no estar invertido emocionalmente en que algo funcione.
+
+El tercer agente, el que Arkos llamaba "el cierre", requería una temperatura de activación muy específica para ser estable durante el transporte. Si esa temperatura se interrumpía en la cadena logística por más de cuatro horas, el compuesto se degradaba en algo inerte. No peligroso. Simplemente inútil.
+
+Kael escuchó esto y sintió algo que no reconoció de inmediato. Tardó un momento en identificarlo.
+
+Era alivio.
+
+No porque el problema estuviera resuelto. Las tres instalaciones seguían activas. Arkos, Nolte y Qin seguían operando. Pero por primera vez desde que volvió, la tarea frente a él no era solo destruir. Era interrumpir. Y eso era algo que podía hacerse con precisión, sin dejar el tipo de rastro que generaría represalias contra personas que no tenían nada que ver con esto.
+
+Davan extendió el mapa de movimientos financieros sobre la mesa. Yse señaló los tres puntos donde la cadena de frío del tercer agente era más vulnerable. Kael los comparó con las ubicaciones de las instalaciones restantes.
+
+Dos de los tres puntos coincidían con rutas de transporte que pasaban por zonas donde él había operado antes y conocía bien.
+
+El tercero estaba en un lugar donde nunca había estado.
+
+Eso era lo que más le preocupaba, y también lo que más le indicaba que era por ahí por donde había que empezar.
+
+El lugar era una zona portuaria en el extremo norte de un país que no tenía tratados de cooperación con ningún organismo internacional relevante. Eso lo hacía ideal para Helix Dominion: sin supervisión externa, con infraestructura logística suficiente para mover contenedores a temperatura controlada sin levantar sospechas, y con el tipo de anonimato institucional que solo existe en los lugares donde nadie espera que pase nada importante.
+
+Kael tardó cuatro días en llegar. Viajó en tres etapas distintas, con documentos diferentes en cada una, y pasó la mayor parte del tiempo estudiando los planos que Davan había extraído de registros de construcción industrial que en teoría eran privados pero que, según Davan, "siempre terminan en alguna base de datos gubernamental que alguien configuró mal."
+
+La instalación era la más pequeña de las tres restantes. También era la más nueva. Eso significaba que no tenía el tipo de vulnerabilidades que acumula la infraestructura envejecida, pero sí tenía algo que las instalaciones más antiguas no tenían: confianza excesiva en sus propios sistemas. Las instalaciones viejas asumen que algo puede fallar. Las nuevas asumen que todo funciona porque todo fue diseñado para funcionar.
+
+Kael había aprendido a los doce años que los sistemas diseñados para funcionar en condiciones ideales son los más frágiles cuando las condiciones dejan de serlo.
+
+Entró de noche, por una ruta de mantenimiento que según los planos de Davan no había sido conectada al sistema de vigilancia central porque fue añadida en una segunda fase de construcción que usó un contratista diferente. Era el tipo de detalle que solo aparece cuando alguien revisa los documentos originales y los compara con los registros de obra posteriores. Nadie dentro de Helix Dominion lo había hecho porque nadie dentro de Helix Dominion esperaba que alguien de afuera tuviera acceso a ambos.
+
+Dentro, encontró lo que esperaba: la cadena de frío del tercer agente, exactamente donde Yse había indicado que estaría. También encontró algo que no esperaba: evidencia de que la producción estaba más avanzada de lo que cualquiera de los tres había calculado.
+
+No semanas. Días.
+
+Salió con esa información y con algo más: una muestra del compuesto en una fase intermedia de síntesis, suficiente para que Yse pudiera confirmar que la degradación que había descrito era real y reproducible bajo las condiciones que podían generarse desde afuera.
+
+No la destruyó. No esa vez.
+
+Esta vez documentó.
+
+Yse confirmó la muestra en menos de doce horas. El compuesto era exactamente lo que había descrito: inestable por encima de cierto umbral térmico, y esa inestabilidad era explotable sin necesidad de entrar a ninguna instalación. Solo hacía falta interrumpir la cadena de frío en el momento correcto.
+
+La pregunta era cuál era el momento correcto para las tres instalaciones simultáneamente. Si lo hacían de una en una, Helix Dominion lo detectaría después de la primera y correría a estabilizar las otras dos. Si fallaban en la sincronización, el tercer agente podría ser reformulado en semanas. Arkos era metódica. Nolte era adaptable. Y Qin, que nunca respondía los correos internos, era la que probablemente tenía el protocolo de contingencia más sólido de los tres porque era la única que no confiaba en que los demás la protegerían.
+
+Necesitaban actuar en las tres al mismo tiempo.
+
+Davan tardó un día en trazar las rutas logísticas de las otras dos instalaciones. La segunda estaba en un país con infraestructura más regulada, lo que paradójicamente la hacía más vulnerable: toda su cadena de frío estaba subcontratada a un proveedor logístico externo que usaba un sistema de monitoreo remoto con credenciales que, según Davan, no habían sido actualizadas desde la instalación inicial del sistema.
+
+La tercera era la instalación principal. La que Kael conocía. La que tenía a Arkos.
+
+Esa requería algo diferente.
+
+No una interrupción de cadena de frío. Esa instalación tenía redundancias térmicas que Yse había identificado en los registros: tres sistemas independientes con generadores propios. Para desestabilizar el tercer agente ahí, necesitarían tiempo dentro del edificio. No cuarenta segundos. Tiempo real.
+
+Kael estudió el plano durante una noche entera.
+
+Al amanecer tenía un plan que funcionaría si todo salía como calculaba, y que los mataría a todos si algo salía mal en el orden equivocado. Lo presentó a Davan y a Yse sin suavizar ninguna de esas dos posibilidades.
+
+Davan dijo que los números le parecían razonables.
+
+Yse dijo que había vivido cuatro años esperando que alguien llegara con la pregunta correcta, y que esto definitivamente era la pregunta correcta.
+
+Fijaron la fecha para cinco días después. Tiempo suficiente para que Davan completara el acceso remoto al sistema logístico de la segunda instalación. Tiempo suficiente para que Kael memorizara cada corredor de la instalación principal con la misma meticulosidad con la que había memorizado todo lo demás en su vida.
+
+Y tiempo suficiente para que los tres aceptaran que había una diferencia real entre un plan que funciona y un plan que va a funcionar.
+
+El día uno fue Davan.
+
+Entró al sistema logístico de la segunda instalación a las 11:47 de la noche, hora local. No lo hackeó en el sentido dramático del término: simplemente usó las credenciales que nadie había cambiado, accedió al panel de control del sistema de monitoreo térmico y configuró una alarma falsa programada para dispararse en exactamente noventa y seis horas. La alarma haría que el sistema entrara en modo de mantenimiento preventivo, lo que según el protocolo estándar del proveedor logístico desactivaría los controles automáticos de temperatura durante una ventana de diagnóstico.
+
+Cuatro horas a temperatura ambiente. Suficiente para que el tercer agente se degradara completamente.
+
+Davan salió del sistema, borró el rastro de acceso con la misma eficiencia con la que había entrado, y envió un mensaje de dos palabras: "Reloj corriendo."
+
+El día dos y tres fueron de preparación. Kael repasó los planos de la instalación principal hasta que pudo recorrerla con los ojos cerrados. Yse preparó un inhibidor térmico derivado de su análisis del compuesto: no una destrucción activa, sino una aceleración de la degradación natural que ya existía en el tercer agente cuando se exponía a variaciones de temperatura. Introducido en los tres sistemas de refrigeración redundantes, actuaría en treinta minutos.
+
+Treinta minutos era todo el tiempo que necesitaban dentro.
+
+El día cuatro no hicieron nada. Eso también era parte del plan. Kael había aprendido a lo largo de los años que el error más común antes de una operación no era la falta de preparación. Era el exceso de ajuste de último momento. Los cambios de último momento generan inconsistencias. Las inconsistencias generan dudas. Las dudas generan errores en el momento en que menos se pueden permitir.
+
+El día cinco llegó con la misma neutralidad con la que llegan todos los días cuando se ha decidido no temerle.
+
+Los tres se separaron antes del amanecer. Davan desde su posición remota. Yse hacia el punto de entrada que habían acordado para ella, que no era la instalación principal sino un nodo de la red logística a tres kilómetros de distancia, desde donde podía monitorear la temperatura de los tres sistemas de refrigeración en tiempo real y actuar si algo fallaba antes de lo previsto.
+
+Kael fue solo a la instalación principal.
+
+Era la única manera en que tenía sentido.
+
+Entró por el mismo corredor por el que había salido nueve años antes. No era nostalgia. Era eficiencia: conocía cada centímetro de esa ruta con un nivel de detalle que ningún mapa podía replicar, porque ese conocimiento no venía de planos sino de años de haberla recorrido con el cuerpo, primero como niño que buscaba salidas y después como adolescente que planeaba usarlas.
+
+La instalación estaba más activa que en sus visitas anteriores. Más personal, más equipamiento, más señales de que el proyecto estaba en su fase final. Eso confirmaba lo que habían calculado y también lo aceleraba todo: si el personal era mayor, la ventana de treinta minutos podía reducirse si alguien notaba algo fuera de lo normal.
+
+Llegó al primer sistema de refrigeración sin encontrar obstáculos. Introdujo el inhibidor de Yse en el circuito de retorno de temperatura. El sistema no lo detectó como una intrusión porque el inhibidor estaba formulado para comportarse dentro de los parámetros normales de variación térmica: la temperatura no caería en picado, sino que derivaría lentamente hacia arriba, lo suficiente para degradar el compuesto pero no lo suficiente para que ninguna alarma automática se disparara antes de que el daño fuera irreversible.
+
+El segundo sistema estaba en el nivel inferior. Tardó cuatro minutos en llegar. Otros dos en introducir el inhibidor.
+
+El tercero estaba en el núcleo de la instalación, a veinte metros del laboratorio principal donde, según la distribución que Kael recordaba y los planos de Davan confirmaban, Arkos pasaba la mayor parte de sus horas de trabajo.
+
+Llegó hasta la puerta del corredor que daba al laboratorio.
+
+Y entonces la puerta se abrió desde adentro.
+
+No fue Arkos. Fue Qin.
+
+Se miraron durante un segundo que se extendió de una manera que no correspondía con el tiempo real. Kael había pensado muchas veces en este momento a lo largo de los años, y en ninguna de sus versiones Qin era la primera en aparecer. Siempre había imaginado a Nolte, con su calma clínica, o a Arkos, con su precisión quirúrgica. Nunca a Qin, que nunca miraba a los ojos.
+
+Esta vez lo miraba.
+
+Y entonces dijo algo que Kael no esperaba.
+
+Dijo: "Sé lo que viniste a hacer. Déjame mostrarte el camino más corto."
+
+Kael no se movió. No porque dudara de sus propias capacidades, sino porque lo que Qin acababa de decir requería ser evaluado con más cuidado que cualquier trampa física.
+
+Qin bajó la vista un momento y volvió a levantarla. Era el mismo gesto que había hecho cuando Kael tenía nueve años, el único segundo en que lo había mirado directamente antes de volver a sus notas. Ahora lo mantenía.
+
+"Llevo cuatro años esperando que alguien llegara," dijo. "No esperaba que fueras tú. Pero tampoco me sorprende."
+
+Kael escuchó eso y reconoció algo en el tono. No traición fingida. No manipulación táctica. Algo más parecido a lo que había escuchado en la voz de Yse cuando le preguntó si sabía por qué no había muerto todavía: la voz de alguien que había estado cargando información que no podía usar solo y que finalmente encontraba a alguien que podía recibirla.
+
+Tenía veintidós minutos.
+
+"Muéstrame," dijo.
+
+Qin no lo llevó por el corredor principal. Lo llevó por una ruta lateral que Kael conocía de los planos pero que en sus años en la instalación nunca había podido usar porque estaba restringida al personal de síntesis. Era más corta. Pasaba por el lateral del laboratorio sin cruzarlo, directo al núcleo de refrigeración.
+
+Mientras caminaban, Qin habló en voz baja y sin detenerse.
+
+Le dijo que había sabido desde el principio que el Proyecto Kronos produciría exactamente lo que produjo. Que sus propias proyecciones, archivadas en un servidor que Arkos nunca revisó porque asumía que Qin no guardaba nada fuera del protocolo oficial, predecían con un margen de error del cuatro por ciento que el sujeto desarrollaría no solo resistencia sino adaptación activa. Que había documentado ese resultado y lo había enterrado porque en aquel momento no tenía manera de usarlo sin destruirse a sí misma en el proceso.
+
+Kael le preguntó por qué no había salido antes. Como él.
+
+Qin consideró la pregunta durante tres pasos exactos.
+
+"Porque yo no tengo lo que tú tienes," dijo. "Tú puedes sobrevivir a todo lo que te lancen. Yo no. Necesitaba que alguien llegara primero para que quedara algo de esto que valiera la pena preservar."
+
+Llegaron al tercer sistema de refrigeración. Kael introdujo el último inhibidor mientras Qin monitoreaba el corredor. Dieciséis minutos.
+
+"Hay algo más," dijo Qin sin girarse. "Arkos tiene una copia del protocolo completo de síntesis en un servidor aislado. Sin conexión exterior. Si no se destruye físicamente antes de que activemos la degradación en los otros dos sistemas, puede reconstruir todo desde cero en menos de un año."
+
+Kael procesó eso.
+
+"¿Dónde está el servidor?"
+
+"En el laboratorio principal. A doce metros de donde está Arkos ahora mismo."
+
+Silencio.
+
+"¿Y Nolte?"
+
+"Nolte salió hace tres horas. Viaje de supervisión a la segunda instalación." Qin hizo una pausa breve. "La que tiene el sistema logístico comprometido."
+
+Kael no dijo nada durante un momento. Luego: "¿Cuánto tiempo tiene antes de que la alarma térmica lo afecte?"
+
+"Si tu gente lo activó correctamente, ya está en la ventana." Qin finalmente se giró. "Lo que significa que tienes doce metros y unos quince minutos para resolver lo del servidor. Después de eso, esta instalación va a empezar a tener problemas mucho más visibles y tendremos que salir."
+
+Kael asintió una vez. Se dirigió hacia la puerta del laboratorio.
+
+"Kael."
+
+Se detuvo sin girarse.
+
+"Yo voy contigo," dijo Qin. "Conozco los protocolos de seguridad del servidor. Tú no."
+
+Era verdad. Y también era la primera vez en su vida que alguien que había formado parte de lo que le habían hecho usaba su nombre sin anteponerle un número de expediente.
+
+Entraron juntos al laboratorio.
+
+Arkos estaba de espaldas a la puerta, frente a una pantalla que mostraba datos de síntesis en tiempo real. No se giró de inmediato cuando entraron, lo que significaba que había escuchado la puerta pero no había reconocido nada fuera de lo normal. La presencia de Qin en el laboratorio era rutinaria. La de Kael, todavía no.
+
+Se giró treinta segundos después.
+
+Lo que ocurrió en su expresión durante ese primer segundo fue algo que Kael estudió con la misma atención con la que había estudiado todo lo demás en su vida: no fue miedo. Fue reconocimiento. La diferencia era importante porque el miedo genera respuestas impredecibles, pero el reconocimiento genera cálculo. Y Arkos, por encima de todo, era alguien que calculaba.
+
+"KV-00," dijo. El número de expediente, no el nombre. Un detalle que lo dijo todo.
+
+"El servidor," dijo Kael. No como pregunta.
+
+Arkos no se movió hacia ningún panel de control ni hacia ninguna salida. Se quedó exactamente donde estaba, con la postura de alguien que ya había evaluado sus opciones y había llegado a una conclusión antes de que nadie más terminara de formular la situación.
+
+"Qin," dijo sin mirarlo a él. Solo a ella.
+
+"Los registros de síntesis van a destruirse," dijo Qin con la misma voz plana con la que anotaba datos. "El servidor aislado también. Los inhibidores ya están en los tres sistemas de refrigeración. Tienes aproximadamente once minutos antes de que el tercer agente sea inerte en esta instalación y en las otras dos."
+
+Arkos procesó eso durante un momento.
+
+"¿Cuánto tiempo llevas planificando esto?"
+
+"No lo planifiqué yo," dijo Qin. "Solo esperé."
+
+Arkos la miró durante un segundo largo. Luego, lentamente, se giró hacia el servidor aislado que estaba en el lateral del laboratorio, debajo de un panel que Kael no habría identificado como un servidor si no lo hubiera sabido de antemano.
+
+"El protocolo de destrucción requiere autenticación biométrica y una clave de doce dígitos," dijo Arkos. "Los dos. En secuencia. Sin los dos, el sistema entra en modo de bloqueo y los datos se replican automáticamente a una ubicación secundaria que ninguno de los tres conoce."
+
+Silencio en el laboratorio.
+
+"Te estoy diciendo esto," continuó Arkos, "porque la alternativa es que intentes destruir el hardware físicamente, lo que activará el mismo protocolo de replicación en menos de cuatro segundos."
+
+Kael la miró. "¿Qué quieres?"
+
+Arkos bajó la vista hacia el suelo un momento. Era el único gesto que Kael le había visto hacer que no parecía completamente calculado.
+
+"Quiero que esto termine," dijo. "Pero en términos que yo pueda aceptar."
+
+"¿Cuáles son esos términos?"
+
+"Inmunidad. Documentada. Con testigos que no puedan desaparecer." Hizo una pausa. "Y que los datos no se destruyan. Que se entreguen. A alguien que pueda usarlos para asegurarse de que nadie más pueda reconstruir esto."
+
+Kael no respondió de inmediato. Davan tenía contactos en tres organismos que podían recibir ese tipo de entrega. Yse tenía los registros que transformarían esa entrega en algo irrefutable. Y ahora Qin, con cuatro años de documentación propia, añadía una tercera capa que haría imposible que cualquier intento de minimizar lo que había ocurrido tuviera éxito.
+
+Era mejor que la destrucción física.
+
+Era mucho mejor.
+
+"Nueve minutos," dijo Qin.
+
+"Haz la autenticación," dijo Kael.
+
+Arkos se acercó al servidor. Colocó la palma sobre el lector biométrico. El sistema emitió un tono de confirmación y esperó la clave.
+
+Doce dígitos. Arkos los introdujo sin vacilar, con la misma precisión con la que había documentado todo a lo largo de su vida. El servidor respondió con una pantalla que mostraba el árbol completo de archivos: tres años de síntesis, protocolos, resultados de prueba, variantes descartadas, y la arquitectura completa del sistema de liberación distribuida.
+
+Todo.
+
+"¿Quién recibe esto?" preguntó Arkos sin girarse.
+
+Kael nombró a Davan. Le dio los datos de contacto de memoria, sin consultar ningún dispositivo, porque así era como funcionaba su cabeza con todo lo que necesitaba.
+
+Arkos asintió una vez. Inició la transferencia encriptada hacia la dirección que Kael le había dado. La barra de progreso indicó que tardaría seis minutos.
+
+Tenían siete.
+
+Los cuatro minutos siguientes transcurrieron en el laboratorio con el único sonido de la transferencia corriendo en segundo plano y los tres respirando en un espacio que ninguno de ellos habría elegido compartir bajo ninguna otra circunstancia. Kael monitoreó la puerta. Qin monitoreó el sistema térmico desde su dispositivo. Arkos miró la pantalla de transferencia con la expresión de alguien que está viendo cómo se cierra un capítulo que ella misma había escrito.
+
+Cuatro minutos antes del final, Kael recibió una señal de Yse: las temperaturas en los tres sistemas estaban derivando según lo calculado. El tercer agente estaba en proceso de degradación irreversible en las tres instalaciones simultáneamente.
+
+Davan confirmó la recepción completa de los archivos treinta segundos después.
+
+La transferencia del servidor terminó a los cinco minutos con cuarenta segundos. Arkos la cerró, retiró los permisos de acceso y ejecutó el protocolo de borrado local. El servidor quedó vacío.
+
+"Dos minutos," dijo Qin.
+
+Salieron del laboratorio en orden. Qin primero, porque conocía las rutas de evacuación del personal de síntesis. Arkos después, con la misma compostura con la que había entrado a cada reunión de los últimos veinte años. Kael al final, mirando hacia atrás una vez antes de cruzar la puerta.
+
+El corredor estaba vacío. El personal restante ya había comenzado a responder a las primeras alertas menores del sistema térmico, lo que los mantenía ocupados en las zonas equivocadas.
+
+Llegaron a la salida exterior en un minuto y cuarenta segundos.
+
+Afuera, el aire era frío y completamente ordinario. El tipo de aire que no sabe que acaba de ocurrir algo.
+
+Kael miró a Arkos. Ella sostuvo la mirada con la misma firmeza con la que lo había observado durante años a través del vidrio, solo que ahora no había vidrio.
+
+"¿Qué pasa con Nolte?" preguntó él.
+
+"Nolte va a descubrir lo que ocurrió cuando llegue a la segunda instalación y encuentre el sistema logístico comprometido," dijo Arkos. "Lo que haga después depende de él." Hizo una pausa. "Pero Nolte siempre supo que el proyecto tenía un límite. Solo nunca quiso calcular cuándo llegaría."
+
+Kael no dijo nada más sobre Nolte. Había tiempo para eso. Ahora mismo, lo que importaba era que los tres sistemas de liberación distribuida eran inerte, los protocolos de síntesis estaban en manos de Davan, y cuatro personas que habían estado en lados completamente distintos de la misma historia se encontraban de pie afuera de un edificio que ya no representaba ninguna amenaza para nadie.
+
+Qin guardó su dispositivo en el bolsillo.
+
+"Supongo que ahora tenemos que averiguar qué sigue," dijo.
+
+Kael miró el horizonte. Era la misma frase que había pensado nueve años antes, cuando salió de esta misma instalación a los diecisiete años y el mundo le resultó simultáneamente enorme y completamente legible.
+
+La diferencia era que esta vez no estaba solo.
+
+Lo que siguió no fue inmediato ni limpio. Las cosas reales nunca lo son.
+
+Davan tardó tres semanas en establecer el canal de entrega correcto. No era una cuestión de voluntad sino de arquitectura: los organismos capaces de recibir el tipo de información que tenían y de hacer algo efectivo con ella eran exactamente los organismos que más cuidado ponían en verificar la procedencia de lo que recibían. Davan lo entendía mejor que nadie. Había pasado por el otro lado de ese proceso. Sabía qué preguntas iban a hacer y cómo responderlas de manera que las respuestas fueran verificables de forma independiente, lo cual era la única clase de respuesta que ese tipo de organismo aceptaba.
+
+Yse preparó durante ese tiempo una documentación técnica que traducía los archivos de síntesis a un lenguaje que pudiera ser comprendido y verificado por científicos que no habían estado dentro del proyecto. Era el trabajo más difícil que había hecho, no por complejidad técnica sino porque requería que ella misma pusiera por escrito, con nombre propio, lo que había visto durante los siete años que trabajó sin saberlo para una pantalla de Helix Dominion. Eso implicaba aceptar que su nombre iba a estar en ese documento para siempre, junto a trabajo que nunca había elegido hacer para los propósitos para los que fue usado.
+
+Lo hizo igualmente. Con la misma eficiencia con la que había hecho todo lo demás.
+
+Arkos cooperó sin que nadie tuviera que pedírselo dos veces. Eso sorprendió a Kael más de lo que esperaba. Le dijo a Davan, en una conversación que tuvo lugar en una habitación sin ventanas en algún lugar que ninguno de ellos habría podido ubicar en un mapa después, que Arkos respondía exactamente igual que siempre: con lógica aplicada a la situación presente, sin apego sentimental a los resultados anteriores. La situación presente indicaba que cooperar era la única variable que podía mejorar su resultado. Entonces cooperaba.
+
+Nolte se entregó voluntariamente cuatro días después de que encontrara la segunda instalación inutilizada. No lo contactaron. No lo buscaron. Simplemente apareció, a través de un intermediario, con un mensaje que decía que quería hablar y que tenía información sobre tres proyectos adicionales en etapas tempranas de desarrollo que nadie más conocía todavía.
+
+Kael leyó ese mensaje dos veces.
+
+La primera vez lo leyó como información operativa.
+
+La segunda vez lo leyó y pensó en el hombre que entraba al cuarto cuando era niño y le explicaba los procedimientos antes de ejecutarlos. No porque le importara el dolor. Sino porque un sujeto informado generaba datos más limpios.
+
+Era posible que Nolte nunca hubiera dejado de ser ese hombre. Era posible que simplemente hubiera encontrado un contexto diferente en el que aplicar la misma lógica.
+
+Kael no tenía una respuesta definitiva para eso. Probablemente nunca la tendría. Y había aprendido, en los años que pasó fuera, que la ausencia de una respuesta definitiva no era un problema que necesitara resolverse antes de poder seguir adelante.
+
+Podía cargar esa pregunta y seguir moviéndose al mismo tiempo.
+
+La entrega formal de los archivos ocurrió un martes por la mañana, en una reunión que no aparecería en ningún registro público durante al menos una década. Davan estuvo presente. Yse también. Arkos respondió preguntas durante cuatro horas seguidas con la misma precisión con la que había documentado todo a lo largo de su carrera, solo que esta vez la precisión trabajaba en la dirección contraria.
+
+Kael no estuvo en esa reunión.
+
+No porque no pudiera. Sino porque su presencia habría generado preguntas sobre él que habrían desviado la atención de lo que importaba, que eran los archivos y lo que contenían. Había aprendido a los diecisiete años que a veces la manera más efectiva de estar en un lugar es no estar.
+
+Esperó afuera, en un banco de un parque que no tenía ninguna característica memorable, y pasó las cuatro horas haciendo lo que había aprendido a hacer en los nueve años que pasó fuera: observar sin intervenir, y confiar en que las personas que había elegido podían hacer lo que él no podía hacer en ese momento.
+
+Davan salió primero. Le hizo un gesto breve con la cabeza que significaba que había ido bien.
+
+Yse salió veinte minutos después. Se sentó en el banco sin decir nada durante un momento. Luego dijo que le habían hecho una pregunta que no esperaba: le habían preguntado si quería volver a trabajar en síntesis, esta vez en un contexto con supervisión real.
+
+Kael le preguntó qué había respondido.
+
+Yse dijo que había pedido tiempo para pensarlo.
+
+Eso le pareció la respuesta correcta.
+
+Arkos salió la última, acompañada de dos personas que Kael no reconoció pero cuya postura y manera de moverse le indicaron suficiente. Se detuvo un momento en la entrada del edificio, miró hacia el parque, y encontró a Kael en el banco con la misma facilidad con la que siempre había encontrado lo que buscaba. Lo miró durante un segundo. Luego siguió caminando.
+
+No fue un gesto de hostilidad. Tampoco de reconciliación. Era simplemente el reconocimiento de que ambos sabían exactamente dónde estaban parados y que eso era suficiente por ahora.
+
+Kael se quedó en el banco un rato más después de que todos se fueron.
+
+Pensó en el número de expediente KV-00. En el vidrio grueso. En los diecisiete años que tardó en salir y los nueve que tardó en volver. En Davan, que había filtrado un informe porque los números no cuadraban. En Yse, que había esperado cuatro años en un puerto industrial. En Qin, que había guardado cuatro años de documentación propia esperando que alguien llegara con la pregunta correcta.
+
+Pensó en que ninguno de ellos había hecho lo que hizo por las mismas razones. Y que eso, en lugar de ser una debilidad del grupo, era probablemente lo que lo había hecho funcionar.
+
+Se levantó del banco cuando el sol empezó a bajar.
+
+No tenía un destino inmediato. Eso también era nuevo. Durante años, cada movimiento había tenido un propósito operativo claro. Ahora el propósito operativo estaba cumplido y lo que quedaba era algo más parecido a una pregunta abierta que a una tarea pendiente.
+
+Era incómodo de una manera que no reconocía como peligrosa.
+
+Solo como nueva.
+
+Tres meses después, los primeros efectos del proceso de entrega empezaron a hacerse visibles en lugares que la mayoría de las personas no habrían conectado entre sí. Una investigación abierta en una jurisdicción que no tenía historial de investigar ese tipo de operaciones. Un cambio de dirección en una empresa farmacéutica que nadie había relacionado públicamente con nada. La cancelación silenciosa de tres contratos de logística especializada en frío que habían estado activos durante años sin que nadie preguntara para qué servían exactamente.
+
+Davan los rastreó todos. Los documentó. Los archivó en el mismo sistema encriptado donde guardaba todo lo demás, con la misma meticulosidad con la que había trazado los movimientos financieros de Helix Dominion. No porque alguien se lo pidiera. Sino porque los números siempre dejan el mismo tipo de rastro y alguien tenía que seguirlo.
+
+Yse aceptó la oferta de trabajo. Con condiciones. Las condiciones eran razonables y las personas que se las ofrecieron las aceptaron sin negociar, lo que le indicó que la oferta era genuina. Empezó a trabajar en síntesis de nuevo, esta vez en un laboratorio con ventanas y con un protocolo de supervisión que ella misma había ayudado a diseñar. El primer mes fue difícil de una manera que no tenía que ver con el trabajo sino con la memoria. El segundo mes fue menos difícil. El tercero empezó a parecerse a algo que podría llamarse normalidad, aunque era una normalidad que no se parecía a ninguna que hubiera tenido antes.
+
+Eso también le parecía suficiente.
+
+Arkos cumplió los términos del acuerdo con exactitud milimétrica, como era de esperar. Respondió cada pregunta que le hicieron, entregó cada documento que le solicitaron, y señaló proactivamente tres inconsistencias en los archivos que los investigadores no habían detectado todavía. Cuando le preguntaron por qué señalaba cosas que nadie le había pedido, respondió que la información incompleta genera conclusiones incorrectas y que las conclusiones incorrectas eran el tipo de error que más le costaba tolerar.
+
+Nadie supo muy bien cómo interpretar eso. Kael, cuando Davan se lo contó, pensó que era completamente consistente con todo lo que había observado de ella a lo largo de su vida.
+
+Nolte habló durante dos semanas seguidas. Los tres proyectos adicionales que había mencionado resultaron ser cuatro, y uno de ellos estaba en una fase de desarrollo más avanzada de lo que nadie había calculado. Eso generó una urgencia que aceleró todo el proceso de investigación y que, según Davan, probablemente salvó entre seis meses y un año de trabajo de detección. Nolte lo sabía. Era posible que lo hubiera calculado así desde el principio.
+
+Kael nunca habló directamente con Nolte durante ese período. No porque no pudiera. Sino porque no tenía nada que decirle que no hubiera dicho ya con sus acciones, y porque Nolte tampoco le había pedido hablar con él específicamente. Había pedido hablar con las personas correctas para el proceso correcto. Eso también era completamente consistente.
+
+Qin desapareció.
+
+No de manera dramática. Simplemente dejó de estar en los lugares donde había estado. Davan la buscó durante dos semanas por curiosidad profesional y encontró rastros que indicaban que se había movido a algún lugar con acceso a laboratorio y sin acceso a ningún sistema de comunicación que pudiera ser rastreado fácilmente. Eso le pareció a Kael exactamente lo que Qin habría elegido: un lugar donde pudiera seguir trabajando en lo que le importaba sin que nadie le hiciera preguntas sobre lo que había hecho antes.
+
+No intentó encontrarla. Si Qin quería ser encontrada, sabía cómo hacerlo.
+
+---
+
+Kael pasó esos tres meses moviéndose. No con un destino operativo, sino con la clase de movimiento que ocurre cuando alguien que ha vivido en función de una tarea específica durante años tiene que aprender a existir sin ella.
+
+Era más difícil de lo que había anticipado. No porque extrañara la tarea. Sino porque la tarea había sido durante mucho tiempo la estructura que organizaba todo lo demás: el tiempo, la atención, las decisiones. Sin ella, todo eso seguía existiendo pero sin el marco que le daba forma.
+
+Tardó unas semanas en entender que el marco no había desaparecido. Solo había cambiado de naturaleza. Antes era una misión. Ahora era una elección continua sobre cómo usar lo que tenía.
+
+Lo que tenía era considerable, si lo pensaba con honestidad. Un cuerpo que no podía ser detenido por ninguna sustancia conocida. Una mente entrenada durante años en la observación y el análisis. Una red de personas que habían demostrado, bajo presión real, que sus decisiones se regían por algo más sólido que el interés inmediato. Y la experiencia de haber llevado a término algo que en cualquier evaluación objetiva no debería haber sido posible para una sola persona.
+
+No era poco.
+
+La pregunta era qué hacer con eso ahora que el propósito original estaba cumplido.
+
+No tenía una respuesta definitiva. Pero había aprendido, en los meses que siguieron al parque, que las preguntas abiertas no eran necesariamente problemas. A veces eran simplemente el espacio donde ocurría lo siguiente.
+
+---
+
+Seis meses después de la entrega de los archivos, Davan le envió un mensaje. Era breve, como todos sus mensajes. Decía que había encontrado algo en los registros financieros que no encajaba con el patrón de Helix Dominion pero que usaba una arquitectura similar. No era el mismo proyecto. Era algo diferente, construido por personas diferentes, que habían estudiado el modelo de Helix Dominion y habían intentado corregir los errores que lo habían hecho vulnerable.
+
+Al final del mensaje, Davan añadió una sola línea: "Los números dejan el mismo tipo de rastro. ¿Quieres verlos?"
+
+Kael leyó el mensaje una vez.
+
+Pensó en el banco del parque. En el sol bajando. En la pregunta abierta que había dejado sin responder porque no tenía respuesta todavía.
+
+Pensó en Yse en su laboratorio con ventanas. En Davan rastreando rastros que nadie más seguía. En Qin en algún lugar sin comunicaciones rastreables, trabajando en lo que le importaba.
+
+Pensó en que ninguno de ellos había terminado. Solo habían terminado esa parte.
+
+Respondió con dos palabras.
+
+"Mándamelos."
+
+Afuera, el mundo seguía siendo enorme y completamente legible. Y Kael Veyron, que había nacido como el número de expediente KV-00 en un laboratorio subterráneo que no aparecía en ningún mapa oficial, seguía siendo el único que podía leerlo de la manera en que necesitaba ser leído.
+
+Eso no había cambiado.
+
+Lo que había cambiado era que ya no tenía que hacerlo solo.`
             }
           ]
         }
@@ -5541,7 +6009,7 @@ Era hora de hacer algo que nunca había hecho antes: pedir ayuda.`
 
       const filtered = STATE.movies.filter(m => {
         if (m.hidden) return false;
-        const matchesCategory = m.category === STATE.currentCategory;
+        const matchesCategory = STATE.currentCategory === 'all' || m.category === STATE.currentCategory;
         const matchesSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           m.artist.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesGenre = genre === 'all' || m.genre.includes(genre);
@@ -5810,11 +6278,14 @@ Era hora de hacer algo que nunca había hecho antes: pedir ayuda.`
       `;
       await delay(1500);
 
-      const movies = STATE.movies.filter(m => m.category === STATE.currentCategory && !m.hidden);
+      const movies = STATE.movies.filter(m => (STATE.currentCategory === 'all' || m.category === STATE.currentCategory) && !m.hidden);
       content.innerHTML = `
         <div class="max-w-5xl mx-auto">
           <h2 class="text-3xl font-black mb-6">Selecciona un titulo para precompra</h2>
           <div class="flex flex-wrap gap-4 mb-6 justify-center">
+            <button onclick="STATE.currentCategory='all'; showCatalogSelection();" class="category-tab ${STATE.currentCategory === 'all' ? 'active' : ''}">
+              <i class="fas fa-th-large mr-2"></i>Todos
+            </button>
             <button onclick="STATE.currentCategory='ows_universe'; showCatalogSelection();" class="category-tab ${STATE.currentCategory === 'ows_universe' ? 'active' : ''}">
               <i class="fas fa-infinity mr-2"></i>Universo OWS
             </button>
