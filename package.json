@@ -1,47 +1,47 @@
-{
-  "name": "ocean-cinemas",
-  "productName": "Ocean Cinemas",
-  "version": "2026.4.16-t0459",
-  "description": "Ocean Cinemas desktop app",
-  "main": "main.js",
-  "author": "Ocean and Wild Studios",
-  "license": "UNLICENSED",
-  "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder --win nsis --publish never"
-  },
-  "devDependencies": {
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8"
-  },
-  "build": {
-    "appId": "com.oceanandwild.oceancinemas",
-    "productName": "Ocean Cinemas",
-    "artifactName": "OceanCinemas-${version}-Setup.${ext}",
-    "files": [
-      "index.html",
-      "additional-movies.js",
-      "assets/**/*",
-      "!assets/movies/**/*",
-      "!**/*.crdownload",
-      "!assets/**/*.crdownload",
-      "main.js",
-      "preload.js",
-      "package.json"
-    ],
-    "directories": {
-      "output": "dist"
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "icon": "build/ocean-cinemas.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true
-    }
-  }
+﻿{
+    "name":  "ocean-cinemas",
+    "productName":  "Ocean Cinemas",
+    "version":  "2026.4.17-t0221",
+    "description":  "Ocean Cinemas desktop app",
+    "main":  "main.js",
+    "author":  "Ocean and Wild Studios",
+    "license":  "UNLICENSED",
+    "scripts":  {
+                    "start":  "electron .",
+                    "dist":  "electron-builder --win nsis --publish never"
+                },
+    "devDependencies":  {
+                            "electron":  "^33.2.1",
+                            "electron-builder":  "^25.1.8"
+                        },
+    "build":  {
+                  "appId":  "com.oceanandwild.oceancinemas",
+                  "productName":  "Ocean Cinemas",
+                  "artifactName":  "OceanCinemas-${version}-Setup.${ext}",
+                  "files":  [
+                                "index.html",
+                                "additional-movies.js",
+                                "assets/**/*",
+                                "!assets/movies/**/*",
+                                "!**/*.crdownload",
+                                "!assets/**/*.crdownload",
+                                "main.js",
+                                "preload.js",
+                                "package.json"
+                            ],
+                  "directories":  {
+                                      "output":  "dist"
+                                  },
+                  "win":  {
+                              "target":  [
+                                             "nsis"
+                                         ],
+                              "icon":  "build/ocean-cinemas.ico"
+                          },
+                  "nsis":  {
+                               "oneClick":  false,
+                               "perMachine":  false,
+                               "allowToChangeInstallationDirectory":  true
+                           }
+              }
 }
