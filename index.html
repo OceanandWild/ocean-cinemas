@@ -4613,6 +4613,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
     function activateCinemasPlan(planId) {
+      // Solo para el plan gratuito — no simula ni deduce nada, solo marca el plan localmente
       const account = getCurrentSessionAccount();
       if (!account) {
         return { ok: false, error: 'Primero inicia sesion en tu cuenta de Ocean Cinemas.' };
@@ -4621,18 +4622,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (!plan) {
         return { ok: false, error: 'Plan no encontrado.' };
       }
+      // Planes de pago NUNCA se activan localmente — deben pasar por el checkout real
       if (plan.monthlyTides > 0) {
-        const tides = Number(account.tidesBalance || 0);
-        if (tides < plan.monthlyTides) {
-          return { ok: false, error: `No tienes Tides suficientes. Necesitas ${plan.monthlyTides} Tides.` };
-        }
-        account.tidesBalance = tides - plan.monthlyTides;
+        return { ok: false, error: 'Los planes de pago requieren checkout con Ocean Pay.' };
       }
+      // Plan gratuito: solo actualiza el estado local sin deducir nada
       account.planId = plan.id;
       account.planStartedAt = Date.now();
-      account.planExpiresAt = plan.monthlyTides > 0
-        ? Date.now() + (OCEAN_PLAN_MONTH_DAYS * 24 * 60 * 60 * 1000)
-        : null;
+      account.planExpiresAt = null;
       saveCinemasAccountState();
       updateVipDisplay();
       return { ok: true, plan, account };
@@ -4877,28 +4874,65 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (!c) return;
       const account = getCurrentSessionAccount();
       const currentPlan = getCurrentPlan();
+
+      // Tides balance: prefer Ocean Pay real balance, fallback to local
+      const tidesBalance = STATE.oceanPayLinked
+        ? (() => {
+            const cards = Array.isArray(STATE.oceanPayUser?.cards) ? STATE.oceanPayUser.cards : [];
+            return cards.reduce((sum, card) => sum + (Number(card?.balances?.tides || 0)), 0);
+          })()
+        : Number(account?.tidesBalance || 0);
+
       c.innerHTML = Object.values(OCEAN_MEMBERSHIP_PLANS).map(plan => {
+        const isFree = plan.monthlyTides === 0;
         const isCurrent = account && currentPlan.id === plan.id;
-        const expiresLabel = account?.planExpiresAt && isCurrent
+        const isPaidAndCurrent = isCurrent && !isFree;
+        const expiresLabel = account?.planExpiresAt && isPaidAndCurrent
           ? new Date(account.planExpiresAt).toLocaleDateString('es-ES')
-          : 'Sin vencimiento';
+          : null;
+        const canAfford = tidesBalance >= plan.monthlyTides;
+
+        let btnLabel, btnClass, btnDisabled = false;
+        if (isFree) {
+          btnLabel = isCurrent ? 'Plan base activo' : 'Usar plan gratuito';
+          btnClass = isCurrent
+            ? 'bg-white/5 text-gray-400 border border-white/10 cursor-default'
+            : 'bg-white/10 text-white border border-white/20 hover:bg-white/20';
+        } else if (isPaidAndCurrent) {
+          btnLabel = `Suscripción activa · vence ${expiresLabel || 'pronto'}`;
+          btnClass = 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 cursor-default';
+          btnDisabled = true;
+        } else {
+          btnLabel = canAfford ? `Suscribirse · ${plan.monthlyTides} Tides/mes` : `Tides insuficientes (${tidesBalance}/${plan.monthlyTides})`;
+          btnClass = canAfford
+            ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
+            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed';
+          btnDisabled = !canAfford;
+        }
+
         return `
-          <article class="relative overflow-hidden rounded-3xl border ${isCurrent ? 'border-cyan-300/60' : 'border-white/10'} bg-black/40 p-7 shadow-2xl">
+          <article class="relative overflow-hidden rounded-3xl border ${isPaidAndCurrent ? 'border-cyan-300/60' : (isCurrent && isFree ? 'border-white/20' : 'border-white/10')} bg-black/40 p-7 shadow-2xl">
             <div class="absolute -top-16 -right-12 w-40 h-40 rounded-full blur-3xl opacity-70" style="background:${plan.color}"></div>
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-4">
                 <span class="px-3 py-1 rounded-full text-xs font-black tracking-widest border border-white/20 bg-white/10">${plan.badge}</span>
-                ${isCurrent ? '<span class="text-cyan-300 text-xs font-black uppercase">Activo</span>' : '<span class="text-gray-500 text-xs font-bold uppercase">Disponible</span>'}
+                ${isPaidAndCurrent
+                  ? '<span class="text-cyan-300 text-xs font-black uppercase flex items-center gap-1"><i class="fas fa-check-circle"></i> Activo</span>'
+                  : (isCurrent && isFree
+                    ? '<span class="text-gray-400 text-xs font-bold uppercase">Base</span>'
+                    : '<span class="text-gray-500 text-xs font-bold uppercase">Disponible</span>')}
               </div>
               <h3 class="text-3xl font-black text-white mb-2">${plan.name}</h3>
-              <p class="text-sm text-gray-300 mb-5">Costo mensual: <span class="font-black text-cyan-300">${plan.monthlyTides} Tides</span></p>
+              <p class="text-sm text-gray-300 mb-5">${isFree ? '<span class="text-gray-400">Sin costo</span>' : `Costo mensual: <span class="font-black text-cyan-300">${plan.monthlyTides} Tides</span>`}</p>
               <ul class="space-y-2 text-sm text-gray-300 mb-6">
                 ${plan.perks.map(perk => `<li class="flex items-start gap-2"><i class="fas fa-check text-cyan-300 mt-1"></i><span>${perk}</span></li>`).join('')}
               </ul>
-              <button onclick="subscribeToVIP('${plan.id}')" class="w-full py-3 rounded-xl font-black transition ${isCurrent ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40' : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'}">
-                ${isCurrent ? 'Plan Actual' : `Elegir ${plan.name}`}
+              <button onclick="${btnDisabled ? '' : `subscribeToVIP('${plan.id}')`}"
+                ${btnDisabled ? 'disabled' : ''}
+                class="w-full py-3 rounded-xl font-black transition ${btnClass}">
+                ${btnLabel}
               </button>
-              ${isCurrent ? `<p class="text-xs text-gray-400 mt-3">Vencimiento: ${expiresLabel}</p>` : ''}
+              ${!STATE.oceanPayLinked && !isFree ? '<p class="text-xs text-yellow-400/80 mt-2 text-center"><i class="fas fa-exclamation-triangle mr-1"></i>Vincula Ocean Pay para ver tu saldo de Tides</p>' : ''}
             </div>
           </article>
         `;
@@ -4972,20 +5006,25 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (!cardsEl) return;
 
       if (!STATE.oceanPayToken) {
-        cardsEl.innerHTML = `<div class="text-sm text-yellow-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vincula Ocean Pay para pagar con Tides.</div>`;
+        cardsEl.innerHTML = `<div class="text-sm text-yellow-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vincula Ocean Pay para pagar con Tides. <button onclick="closeVipModal();openOceanPayModal();" class="underline ml-1">Vincular ahora</button></div>`;
         return;
       }
 
       cardsEl.innerHTML = `<div class="text-sm text-gray-500">Cargando tarjetas...</div>`;
 
       try {
+        // Always fetch fresh from server — never use local cache for payments
         const res = await fetch(`${API_URL}/ocean-pay/me`, {
           headers: { 'Authorization': `Bearer ${STATE.oceanPayToken}` }
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const cards = Array.isArray(data.cards) ? data.cards : [];
 
-        // Total Tides across all cards
+        // Update local state with fresh data
+        STATE.oceanPayUser = data;
+        localStorage.setItem('opUser', JSON.stringify(data));
+
+        const cards = Array.isArray(data.cards) ? data.cards : [];
         const totalTides = cards.reduce((sum, c) => sum + (Number(c?.balances?.tides || 0)), 0);
         if (balanceEl) balanceEl.textContent = `${totalTides.toLocaleString()} Tides`;
 
@@ -4998,7 +5037,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           const tides = Number(card?.balances?.tides || 0);
           const canAfford = tides >= requiredTides;
           return `
-            <div class="plan-checkout-card-item rounded-xl p-3 border cursor-pointer transition-all ${canAfford ? 'border-white/10 hover:border-cyan-500/40' : 'border-white/5 opacity-40 cursor-not-allowed'}"
+            <div class="plan-checkout-card-item rounded-xl p-3 border transition-all ${canAfford ? 'border-white/10 hover:border-cyan-500/40 cursor-pointer' : 'border-white/5 opacity-40 cursor-not-allowed'}"
                  style="background:rgba(255,255,255,0.03);"
                  id="plan-card-${card.card_number}"
                  onclick="${canAfford ? `selectPlanCard('${card.card_number}', ${card.id})` : ''}">
@@ -5009,13 +5048,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
                 </div>
                 <div class="text-right">
                   <p class="font-black text-sm ${canAfford ? 'text-cyan-300' : 'text-red-400'}">${tides.toLocaleString()} Tides</p>
-                  ${!canAfford ? `<p class="text-xs text-red-400">Insuficiente</p>` : ''}
+                  ${!canAfford ? `<p class="text-xs text-red-400">Faltan ${(requiredTides - tides).toLocaleString()}</p>` : ''}
                 </div>
               </div>
             </div>`;
         }).join('');
       } catch (e) {
-        cardsEl.innerHTML = `<div class="text-sm text-red-400">Error al cargar tarjetas.</div>`;
+        cardsEl.innerHTML = `<div class="text-sm text-red-400"><i class="fas fa-exclamation-circle mr-1"></i>Error al cargar tarjetas: ${e.message}</div>`;
       }
     }
 
