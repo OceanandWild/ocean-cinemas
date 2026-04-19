@@ -5205,10 +5205,26 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             <section class="rounded-2xl border ${opReady ? 'border-emerald-500/40 bg-emerald-900/20' : 'border-cyan-500/30 bg-slate-900/60'} p-6">
               <p class="text-xs uppercase tracking-widest font-black ${opReady ? 'text-emerald-300' : 'text-cyan-300'} mb-2">Paso 1 · Ocean Pay</p>
               <h3 class="text-2xl font-black text-white mb-2">${opReady ? 'Conectado correctamente' : 'Conecta tu billetera'}</h3>
-              <p class="text-sm text-gray-300 mb-5">${opReady ? 'Tu cuenta de Ocean Pay ya esta vinculada. Puedes continuar con la pre-compra.' : 'Abre Ocean Pay, ingresa tus credenciales y vuelve a esta pantalla.'}</p>
-              <button onclick="openOceanPayModal()" class="w-full py-3 rounded-xl font-black ${opReady ? 'bg-emerald-500/20 border border-emerald-400/40 text-emerald-200' : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'}">
-                ${opReady ? 'Revisar Ocean Pay' : 'Vincular Ocean Pay'}
-              </button>
+              ${opReady ? `
+                <p class="text-sm text-gray-300 mb-5">Tu cuenta de Ocean Pay ya esta vinculada. Puedes continuar con la pre-compra.</p>
+                <button onclick="openOceanPayModal()" class="w-full py-3 rounded-xl font-black bg-emerald-500/20 border border-emerald-400/40 text-emerald-200">
+                  <i class="fas fa-check-circle mr-2"></i>Revisar Ocean Pay
+                </button>
+              ` : `
+                <p class="text-sm text-gray-300 mb-4">Ingresa tus credenciales de Ocean Pay para vincular tu billetera.</p>
+                <div class="space-y-3">
+                  <input id="op-precompra-user" type="text" placeholder="Usuario Ocean Pay"
+                    class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500 focus:border-cyan-400 outline-none">
+                  <input id="op-precompra-pass" type="password" placeholder="Contraseña"
+                    class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500 focus:border-cyan-400 outline-none">
+                  <p id="op-precompra-error" class="text-xs text-red-400 hidden"></p>
+                  <button onclick="loginOceanPayFromPrecompra(${movieId ? Number(movieId) : 'null'}, '${mode}')"
+                    class="w-full py-3 rounded-xl font-black bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
+                    <i class="fas fa-link mr-2"></i>Vincular Ocean Pay
+                  </button>
+                  <p class="text-xs text-center text-gray-500">¿No tienes cuenta? <a href="../Ocean Pay/index.html" target="_blank" class="text-cyan-400 hover:underline">Crear una aquí</a></p>
+                </div>
+              `}
             </section>
 
             <section class="rounded-2xl border ${accountReady ? 'border-cyan-400/40 bg-cyan-900/20' : 'border-white/15 bg-slate-900/60'} p-6">
@@ -5514,6 +5530,43 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         showToast('âœ… Cuenta vinculada exitosamente');
       } catch (e) {
         showToast('âŒ Error al vincular cuenta. Verifica tus credenciales.');
+      }
+    }
+
+
+    async function loginOceanPayFromPrecompra(movieId, mode) {
+      const u = document.getElementById('op-precompra-user')?.value?.trim();
+      const p = document.getElementById('op-precompra-pass')?.value;
+      const errEl = document.getElementById('op-precompra-error');
+      if (!u || !p) {
+        if (errEl) { errEl.textContent = 'Completa usuario y contrasena.'; errEl.classList.remove('hidden'); }
+        return;
+      }
+      const btn = document.querySelector('[onclick*="loginOceanPayFromPrecompra"]');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Vinculando...'; }
+      if (errEl) errEl.classList.add('hidden');
+      try {
+        const r = await fetch(`${API_URL}/ocean-pay/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || d.message || 'Credenciales incorrectas');
+        STATE.oceanPayToken = d.token;
+        STATE.oceanPayUser = d.user;
+        STATE.oceanPayLinked = true;
+        STATE.balance = resolveOceanPayBalance(d.user);
+        localStorage.setItem('opToken', d.token);
+        localStorage.setItem('opUser', JSON.stringify(d.user));
+        saveToStorage();
+        updateBalanceDisplay();
+        updateVipDisplay();
+        checkRewardsStatus();
+        showPrecompraAuthGateway(movieId, mode || 'login');
+      } catch (e) {
+        if (errEl) { errEl.textContent = e.message || 'Error al vincular. Verifica tus credenciales.'; errEl.classList.remove('hidden'); }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-link mr-2"></i>Vincular Ocean Pay'; }
       }
     }
 
