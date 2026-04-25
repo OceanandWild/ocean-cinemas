@@ -1717,6 +1717,27 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script>
     const API_URL = window.API_URL || 'https://owsdatabase.onrender.com';
+    (function initOwsProjectGuard() {
+      const mountGuard = () => {
+        if (!window.OWSProjectRestrictionGuard || typeof window.OWSProjectRestrictionGuard.mount !== 'function') return;
+        window.OWSProjectRestrictionGuard.mount({
+          apiBaseUrl: API_URL,
+          projectSlug: 'ocean-cinemas',
+          projectName: 'Ocean Cinemas',
+          checkIntervalMs: 30000
+        });
+      };
+      if (window.OWSProjectRestrictionGuard) {
+        mountGuard();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://owsdatabase.onrender.com/shared/ows-project-guard.js';
+      s.async = true;
+      s.onload = mountGuard;
+      document.head.appendChild(s);
+    })();
+
     const CINEMAS_CURRENCY_TYPE = 'aquabux';
     const OCEAN_TICKET_PRICE = 50;
     const OCEAN_REWARD_STATE_KEY = 'ocean_cinemas_rewards_v2';
