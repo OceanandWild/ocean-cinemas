@@ -6438,6 +6438,20 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       return parsed;
     }
 
+    // Returns true if the movie has been released (releaseDate in the past, or no releaseDate and not proximamente)
+    function isMovieReleased(movie) {
+      if (!movie) return false;
+      const releaseDate = parseMovieReleaseDate(movie);
+      if (releaseDate) return Date.now() >= releaseDate.getTime();
+      // No releaseDate: if proximamente flag is set, treat as unreleased; otherwise released
+      return !movie.proximamente;
+    }
+
+    // Returns true if the movie is upcoming (not yet released)
+    function isMovieUpcoming(movie) {
+      return !isMovieReleased(movie);
+    }
+
     async function fetchMovieAccessPolicy(movieId) {
       const safeMovieId = Number(movieId);
       if (!safeMovieId) {
@@ -7613,7 +7627,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           <div class="aspect-[2/3] relative rounded-lg overflow-hidden shadow-lg shadow-black/50 group-hover:shadow-2xl group-hover:shadow-[#E50914]/20 transition-all">
             <img src="${movie.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${movie.title}" onerror="this.src='assets/OceanCinemas.png'">
 
-              ${movie.proximamente ? `
+              ${isMovieUpcoming(movie) ? `
                 <div class="absolute inset-0 bg-black/70 flex items-center justify-center">
                     <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold uppercase">Próximamente</span>
                 </div>
@@ -7896,7 +7910,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
                   <div class="absolute bottom-0 left-0 right-0 p-3">
                     <h4 class="font-bold text-sm">${m.title}</h4>
                     <p class="text-xs text-cyan-400">${OCEAN_TICKET_PRICE} <canvas class="currency-canvas" data-currency="aquabux"></canvas></p>
-                    ${m.proximamente ? '<p class="text-[10px] text-yellow-400 font-bold uppercase tracking-wide">Próximamente · Revisar pre-compra</p>' : ''}
+                    ${isMovieUpcoming(m) ? '<p class="text-[10px] text-yellow-400 font-bold uppercase tracking-wide">Próximamente · Revisar pre-compra</p>' : ''}
                     <p class="text-xs text-cyan-400"><i class="fas fa-door-open mr-1"></i>${m.puerta}</p>
                   </div>
                 </div>
@@ -7941,9 +7955,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         }
       }
 
-      // SERIES CHECK: Si es serie y no es episodio, mostrar lista de caps
+      // SERIES CHECK: Si es serie y no es episodio, mostrar flujo de serie
       if (movie.type === 'series_container' && !isEpisode) {
-        showEpisodeSelection(movieId);
+        showSeriesPrecompra(movieId);
         return;
       }
 
@@ -7955,7 +7969,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const releaseLabel = formatPolicyDateLabel(policy.releaseDate || movie.releaseDate);
       const fastPassLabel = formatPolicyDateLabel(policy.fastPass?.availableAt);
       const fastPassAllowed = canUseFastPassWithPlan(policy);
-      const upcomingFlow = Boolean(movie.proximamente || policy.isUpcoming);
+      // Use isMovieUpcoming() as the source of truth — not the hardcoded proximamente flag
+      const upcomingFlow = isMovieUpcoming(movie) || Boolean(policy.isUpcoming);
       const premiumSurcharge = Number(policy.premiumSurchargePercent || 0);
       const plan = getCurrentPlan();
       const standardBasePrice = upcomingFlow ? Number(movie.price || OCEAN_TICKET_PRICE) : OCEAN_TICKET_PRICE;
@@ -8166,6 +8181,199 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         if (horariosGrid) horariosGrid.classList.remove('hidden');
         if (fastPassContinue) fastPassContinue.classList.add('hidden');
       }
+    }
+
+    // ===== SERIES PRE-COMPRA FLOW =====
+    // For series: show a dedicated pre-compra screen that handles upcoming episodes,
+    // season passes, and individual episode purchases differently from movies.
+    async function showSeriesPrecompra(seriesId) {
+      const series = STATE.movies.find(m => m.id === seriesId);
+      if (!series) return;
+      const episodes = getSeriesEpisodes(series);
+      const content = document.getElementById('process-content');
+
+      content.innerHTML = `<div class="loader-ring mx-auto mb-4"></div><p class="process-text">Cargando serie...</p>`;
+      await delay(800);
+
+      // Classify episodes: released vs upcoming
+      const releasedEps = episodes.filter(ep => isMovieReleased(ep));
+      const upcomingEps = episodes.filter(ep => isMovieUpcoming(ep));
+      const hasUpcoming = upcomingEps.length > 0;
+      const allReleased = upcomingEps.length === 0;
+
+      // Check which episodes the user already has tickets for
+      const ownedEpIds = new Set(STATE.tickets.map(t => t.movieId));
+
+      const plan = getCurrentPlan();
+      const planDiscount = plan.discountRate > 0 ? `${Math.round(plan.discountRate * 100)}% desc.` : '';
+
+      content.innerHTML = `
+        <div class="max-w-4xl mx-auto px-4 w-full">
+          <div class="mb-6 text-center">
+            <div class="inline-block px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-900/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">Serie</div>
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-2">${series.title}</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm leading-relaxed">${series.description}</p>
+          </div>
+
+          ${hasUpcoming ? `
+          <div class="mb-5 rounded-2xl border border-yellow-500/30 bg-yellow-950/20 p-4">
+            <div class="flex items-start gap-3">
+              <i class="fas fa-hourglass-half text-yellow-400 mt-1"></i>
+              <div>
+                <p class="text-sm font-black text-yellow-200 mb-1">Episodios próximos</p>
+                <p class="text-xs text-yellow-100/80">
+                  ${upcomingEps.length === 1
+                    ? `El episodio <b>${upcomingEps[0].title}</b> aún no fue estrenado.`
+                    : `${upcomingEps.length} episodios aún no estrenados.`}
+                  Podés pre-comprar tu acceso ahora y verlos en cuanto se estrenen.
+                </p>
+              </div>
+            </div>
+          </div>` : ''}
+
+          ${allReleased ? `
+          <div class="mb-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4">
+            <div class="flex items-center gap-3">
+              <i class="fas fa-check-circle text-emerald-400"></i>
+              <p class="text-sm text-emerald-200">Todos los episodios disponibles. Comprá acceso a los que quieras ver.</p>
+            </div>
+          </div>` : ''}
+
+          <div class="space-y-3 max-h-[50vh] overflow-y-auto custom-scrollbar pr-1 mb-5">
+            ${episodes.map((ep, idx) => {
+              const released = isMovieReleased(ep);
+              const owned = ownedEpIds.has(ep.id);
+              const pricing = getPriceWithPlan(ep.price || OCEAN_TICKET_PRICE, ep);
+              const releaseDate = parseMovieReleaseDate(ep);
+              const releaseFmt = releaseDate
+                ? releaseDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                : null;
+              return `
+              <div class="rounded-xl border ${owned ? 'border-emerald-500/40 bg-emerald-950/20' : released ? 'border-white/10 bg-[#0f172a]/80 hover:border-cyan-500/40 cursor-pointer' : 'border-yellow-500/20 bg-yellow-950/10 hover:border-yellow-400/40 cursor-pointer'} p-4 flex items-center gap-4 transition-all group ${owned ? '' : 'hover:scale-[1.01]'}"
+                   onclick="${owned ? '' : `startPrecompraFlow(${ep.id}, true)`}">
+                <div class="w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  <img src="${ep.poster}" class="w-full h-full object-cover ${owned ? 'opacity-60' : 'opacity-80 group-hover:opacity-100'} transition">
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas ${owned ? 'fa-check text-emerald-400' : released ? 'fa-play text-white' : 'fa-hourglass-half text-yellow-400'} text-sm drop-shadow"></i>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <span class="text-xs font-bold uppercase tracking-wider ${released ? 'text-cyan-400' : 'text-yellow-400'}">${released ? 'Disponible' : 'Próximamente'}</span>
+                    ${releaseFmt && !released ? `<span class="text-xs text-gray-500">· Estreno: ${releaseFmt}</span>` : ''}
+                    ${owned ? '<span class="text-xs text-emerald-400 font-bold"><i class="fas fa-ticket-alt mr-1"></i>Ticket en mano</span>' : ''}
+                  </div>
+                  <h4 class="font-bold text-sm text-white truncate">${ep.title}</h4>
+                  <p class="text-xs text-gray-500">${ep.duration} min · ${ep.genre}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  ${owned ? `<span class="text-xs text-emerald-400 font-bold">Comprado</span>` : `
+                    <p class="font-black text-sm ${pricing.discounted ? 'text-cyan-300' : 'text-white'}">${pricing.finalPrice} AB</p>
+                    ${pricing.discounted ? `<p class="text-xs text-gray-500 line-through">${pricing.basePrice}</p>` : ''}
+                    ${planDiscount && pricing.discounted ? `<p class="text-xs text-cyan-400">${planDiscount}</p>` : ''}
+                  `}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button onclick="showCatalogSelection()" class="netflix-secondary px-6 py-3 text-sm">
+              <i class="fas fa-arrow-left mr-2"></i>Volver al catálogo
+            </button>
+            ${episodes.filter(ep => !ownedEpIds.has(ep.id)).length > 1 ? `
+            <button onclick="showSeriesPassOption(${seriesId})" class="netflix-btn px-6 py-3 text-sm">
+              <i class="fas fa-layer-group mr-2"></i>Comprar todos los episodios
+            </button>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // Series pass: buy all unowned episodes at once
+    async function showSeriesPassOption(seriesId) {
+      const series = STATE.movies.find(m => m.id === seriesId);
+      if (!series) return;
+      const episodes = getSeriesEpisodes(series);
+      const ownedEpIds = new Set(STATE.tickets.map(t => t.movieId));
+      const toBuy = episodes.filter(ep => !ownedEpIds.has(ep.id));
+      if (!toBuy.length) { showToast('Ya tenés acceso a todos los episodios.'); return; }
+
+      const totalBase = toBuy.reduce((sum, ep) => sum + (ep.price || OCEAN_TICKET_PRICE), 0);
+      const pricing = getPriceWithPlan(totalBase, series);
+      const content = document.getElementById('process-content');
+
+      content.innerHTML = `
+        <div class="max-w-2xl mx-auto text-center py-8">
+          <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center mx-auto mb-5">
+            <i class="fas fa-layer-group text-2xl text-cyan-400"></i>
+          </div>
+          <h2 class="text-3xl font-black text-white mb-2">Pase de Serie</h2>
+          <p class="text-gray-300 mb-1">${series.title}</p>
+          <p class="text-sm text-gray-400 mb-6">${toBuy.length} episodio${toBuy.length > 1 ? 's' : ''} · Acceso inmediato a los disponibles, automático al estreno de los próximos</p>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 text-left space-y-2">
+            ${toBuy.map(ep => {
+              const epPricing = getPriceWithPlan(ep.price || OCEAN_TICKET_PRICE, ep);
+              return `<div class="flex justify-between text-sm">
+                <span class="text-gray-300">${ep.title} ${isMovieUpcoming(ep) ? '<span class="text-yellow-400 text-xs">(próximo)</span>' : ''}</span>
+                <span class="font-bold ${epPricing.discounted ? 'text-cyan-300' : 'text-white'}">${epPricing.finalPrice} AB</span>
+              </div>`;
+            }).join('')}
+            <div class="border-t border-white/10 pt-2 flex justify-between font-black text-white">
+              <span>Total</span>
+              <span class="${pricing.discounted ? 'text-cyan-300' : ''}">${pricing.finalPrice} AB ${pricing.discounted ? `<span class="text-xs text-gray-400 line-through ml-1">${pricing.basePrice}</span>` : ''}</span>
+            </div>
+          </div>
+          <div class="flex gap-3 justify-center">
+            <button onclick="showSeriesPrecompra(${seriesId})" class="netflix-secondary px-6 py-3">Volver</button>
+            <button onclick="buySeriesPass(${seriesId})" class="netflix-btn px-6 py-3">
+              <i class="fas fa-ticket-alt mr-2"></i>Confirmar Pase · ${pricing.finalPrice} AB
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function buySeriesPass(seriesId) {
+      const series = STATE.movies.find(m => m.id === seriesId);
+      if (!series) return;
+      const episodes = getSeriesEpisodes(series);
+      const ownedEpIds = new Set(STATE.tickets.map(t => t.movieId));
+      const toBuy = episodes.filter(ep => !ownedEpIds.has(ep.id));
+      if (!toBuy.length) { showToast('Ya tenés todos los episodios.'); return; }
+
+      const totalBase = toBuy.reduce((sum, ep) => sum + (ep.price || OCEAN_TICKET_PRICE), 0);
+      const pricing = getPriceWithPlan(totalBase, series);
+      const totalCost = pricing.finalPrice;
+
+      if (STATE.balance < totalCost) {
+        showToast(`❌ Saldo insuficiente. Necesitás ${totalCost} AquaBux.`, true);
+        return;
+      }
+
+      // Deduct balance and create tickets for all episodes
+      STATE.balance -= totalCost;
+      updateBalanceDisplay();
+
+      toBuy.forEach(ep => {
+        const ticket = {
+          id: generateTicketId(),
+          movieId: ep.id,
+          movieTitle: ep.title,
+          purchaseDate: new Date().toISOString(),
+          price: getPriceWithPlan(ep.price || OCEAN_TICKET_PRICE, ep).finalPrice,
+          sala: ep.sala || series.sala,
+          puerta: ep.puerta || series.puerta,
+          used: false,
+          isSeriesPass: true,
+          seriesId: seriesId
+        };
+        STATE.tickets.push(ticket);
+      });
+
+      saveToStorage();
+      showToast(`✅ Pase de serie activado. ${toBuy.length} episodio${toBuy.length > 1 ? 's' : ''} desbloqueado${toBuy.length > 1 ? 's' : ''}.`);
+      closeProcessScreen();
     }
 
     async function showEpisodeSelection(seriesId) {
@@ -8469,7 +8677,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
 
       // Estreno no liberado aún — bloqueo doble: por fecha Y por flag proximamente
-      if (movie && movie.proximamente && (!releaseDate || releaseDate.getTime() > now)) {
+      if (movie && isMovieUpcoming(movie)) {
+        const releaseDate = parseMovieReleaseDate(movie);
         const waitMs = releaseDate ? releaseDate.getTime() - now : null;
         const waitH = waitMs ? Math.floor(waitMs / (1000 * 60 * 60)) : null;
         const waitM = waitMs ? Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60)) : null;
@@ -8482,22 +8691,6 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           canDelete: true,
           canRefund: true,
           msg
-        };
-      }
-
-      // Estreno con fecha específica aún no liberado
-      if (releaseDate && releaseDate.getTime() > now) {
-        const waitMs = releaseDate.getTime() - now;
-        const waitH = Math.floor(waitMs / (1000 * 60 * 60));
-        const waitM = Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60));
-        return {
-          status: 'PRÓXIMAMENTE',
-          class: 'bg-yellow-700 text-yellow-100',
-          icon: 'fa-hourglass-half',
-          canWatch: false,
-          canDelete: true,
-          canRefund: true,
-          msg: `Estreno en ${waitH}h ${waitM}m`
         };
       }
 
