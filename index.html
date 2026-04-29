@@ -6595,7 +6595,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         return;
       }
 
-      const isProximamente = m.proximamente === true;
+      const isProximamente = isMovieUpcoming(m);
       const ratingSummary = await fetchMovieRatingSummary(m.id);
       const accessPolicy = await fetchMovieAccessPolicy(m.id);
       const standardModalPricing = getPriceWithPlan(OCEAN_TICKET_PRICE, m);
