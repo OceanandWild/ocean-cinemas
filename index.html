@@ -767,49 +767,148 @@
 
     .text-cinema-card {
       width: min(980px, 92vw);
-      border-radius: 1.25rem;
-      padding: 2.25rem;
-      background: radial-gradient(circle at top, rgba(20, 30, 56, 0.9), rgba(3, 7, 18, 0.96));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      border-radius: 1.5rem;
+      padding: 2.5rem 2.75rem;
+      background: linear-gradient(160deg, rgba(8,14,36,0.97) 0%, rgba(3,7,18,0.99) 100%);
+      border: 1px solid rgba(99,179,237,0.12);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .text-cinema-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.06) 0%, transparent 65%);
+      pointer-events: none;
     }
 
     .text-cinema-stage {
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 420ms ease, transform 420ms ease;
+      transform: translateY(18px) scale(0.98);
+      transition: opacity 520ms cubic-bezier(.22,1,.36,1), transform 520ms cubic-bezier(.22,1,.36,1);
+      position: relative;
+      z-index: 1;
     }
 
     .text-cinema-stage.active {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
 
     .text-cinema-meta {
-      font-size: 0.78rem;
-      letter-spacing: 0.18em;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #8ea0b8;
-      margin-bottom: 0.8rem;
+      color: rgba(125,211,252,0.7);
+      margin-bottom: 1rem;
       text-align: center;
+      font-weight: 700;
     }
 
     .text-cinema-title {
-      font-size: clamp(2rem, 4vw, 3.6rem);
+      font-size: clamp(1.8rem, 3.8vw, 3.2rem);
       font-weight: 900;
-      line-height: 1.05;
+      line-height: 1.06;
       text-align: center;
-      margin-bottom: 1.25rem;
-      color: #f8fafc;
+      margin-bottom: 1.5rem;
+      color: #f0f9ff;
+      text-shadow: 0 0 40px rgba(56,189,248,0.18);
+      letter-spacing: -0.01em;
+    }
+
+    .text-cinema-divider {
+      width: 48px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.6), transparent);
+      margin: 0 auto 1.5rem;
+      border-radius: 999px;
     }
 
     .text-cinema-body {
-      color: #d9e2ef;
+      color: #cbd5e1;
       text-align: center;
-      line-height: 1.9;
-      font-size: clamp(1.02rem, 1.8vw, 1.3rem);
+      line-height: 2;
+      font-size: clamp(1rem, 1.7vw, 1.22rem);
       min-height: 150px;
       white-space: pre-wrap;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .text-cinema-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      gap: 1rem;
+    }
+
+    .text-cinema-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .text-cinema-nav-btn:hover {
+      background: rgba(56,189,248,0.1);
+      border-color: rgba(56,189,248,0.3);
+      color: #7dd3fc;
+      transform: translateY(-1px);
+    }
+
+    .text-cinema-nav-btn.next {
+      background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(99,102,241,0.15));
+      border-color: rgba(56,189,248,0.25);
+      color: #bae6fd;
+    }
+
+    .text-cinema-nav-btn.next:hover {
+      background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(99,102,241,0.25));
+      color: #e0f2fe;
+    }
+
+    .text-cinema-progress {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .text-cinema-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .text-cinema-dot.active {
+      width: 20px;
+      background: rgba(56,189,248,0.8);
+      box-shadow: 0 0 8px rgba(56,189,248,0.5);
+    }
+
+    #oc-pixi-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 1.5rem;
+      overflow: hidden;
     }
 
     @keyframes pulse {
@@ -1715,6 +1814,8 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
   <script>
     const API_URL = window.API_URL || 'https://owsdatabase.onrender.com';
     (function initOwsProjectGuard() {
@@ -7243,30 +7344,138 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       return Math.max(4200, Math.min(9800, readMs + 1500));
     }
 
+    // PixiJS ambient particles for text reader
+    let _ocReaderPixi = null;
+    function _startReaderPixi(container) {
+      if (!window.PIXI || !container) return;
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'oc-pixi-canvas';
+        canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0;border-radius:1.5rem;';
+        container.style.position = 'relative';
+        container.insertBefore(canvas, container.firstChild);
+        const app = new PIXI.Application();
+        app.init({ view: canvas, resizeTo: container, backgroundAlpha: 0, antialias: true }).then(() => {
+          _ocReaderPixi = app;
+          const particles = [];
+          const colors = [0x38bdf8, 0x818cf8, 0x34d399, 0xf472b6, 0xfbbf24];
+          for (let i = 0; i < 22; i++) {
+            const g = new PIXI.Graphics();
+            const color = colors[i % colors.length];
+            const r = 1 + Math.random() * 1.8;
+            g.circle(0, 0, r).fill({ color, alpha: 0.55 });
+            g.x = Math.random() * app.renderer.width;
+            g.y = Math.random() * app.renderer.height;
+            g.vx = (Math.random() - 0.5) * 0.3;
+            g.vy = -0.08 - Math.random() * 0.22;
+            g.alpha = 0.15 + Math.random() * 0.35;
+            particles.push(g);
+            app.stage.addChild(g);
+          }
+          app.ticker.add(() => {
+            for (const p of particles) {
+              p.x += p.vx; p.y += p.vy;
+              if (p.y < -10) { p.y = app.renderer.height + 10; p.x = Math.random() * app.renderer.width; }
+              if (p.x < -10) p.x = app.renderer.width + 10;
+              if (p.x > app.renderer.width + 10) p.x = -10;
+            }
+          });
+        }).catch(() => {});
+      } catch (_e) {}
+    }
+    function _stopReaderPixi() {
+      if (_ocReaderPixi) { try { _ocReaderPixi.destroy(true); } catch (_e) {} _ocReaderPixi = null; }
+    }
+
     function renderTextSegment(segment) {
       const readerContainer = document.getElementById('text-reader-container');
       if (!readerContainer) return;
+      _stopReaderPixi();
 
+      const totalSegs = textReaderState.segments?.length || segment.chapterTotal;
+      const curIdx = textReaderState.segmentIndex ?? 0;
       const partHint = segment.partLabel ? ` · Parte ${segment.partLabel}` : '';
+      const hasPrev = curIdx > 0;
+      const hasNext = curIdx < totalSegs - 1;
+
+      // Build progress dots
+      const maxDots = Math.min(totalSegs, 12);
+      const dots = Array.from({ length: maxDots }, (_, i) => {
+        const active = i === Math.min(curIdx, maxDots - 1);
+        return `<div class="text-cinema-dot${active ? ' active' : ''}"></div>`;
+      }).join('');
+
       readerContainer.className = 'absolute inset-0 z-[80] bg-[#02030b] text-gray-200 flex items-center justify-center px-4 md:px-8';
       readerContainer.classList.remove('hidden');
       readerContainer.innerHTML = `
-        <button onclick="closeCinema()" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white transition">
-          <i class="fas fa-xmark"></i>
+        <button onclick="closeCinema()" class="absolute top-5 right-5 z-[90] w-10 h-10 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 text-white/70 hover:text-white transition-all hover:scale-110 flex items-center justify-center">
+          <i class="fas fa-xmark text-sm"></i>
         </button>
-        <div class="text-cinema-card">
+        <div class="text-cinema-card" id="oc-reader-card">
           <div id="text-cinema-stage" class="text-cinema-stage">
             <p class="text-cinema-meta">CAPÍTULO ${segment.chapterNumber} DE ${segment.chapterTotal}${partHint}</p>
-            <h2 class="text-cinema-title">${segment.title}</h2>
-            <div class="text-cinema-body">${renderSegmentMarkup(segment.text)}</div>
+            <h2 class="text-cinema-title" id="oc-reader-title">${segment.title}</h2>
+            <div class="text-cinema-divider" id="oc-reader-divider"></div>
+            <div class="text-cinema-body" id="oc-reader-body">${renderSegmentMarkup(segment.text)}</div>
+            <nav class="text-cinema-nav">
+              <button class="text-cinema-nav-btn" onclick="prevTextSegment()" ${hasPrev ? '' : 'disabled style="opacity:0.3;cursor:default"'}>
+                <i class="fas fa-chevron-left text-xs"></i> Anterior
+              </button>
+              <div class="text-cinema-progress">${dots}</div>
+              <button class="text-cinema-nav-btn next" onclick="nextTextSegment()">
+                ${hasNext ? 'Siguiente <i class="fas fa-chevron-right text-xs"></i>' : 'Finalizar <i class="fas fa-flag-checkered text-xs"></i>'}
+              </button>
+            </nav>
           </div>
         </div>
       `;
 
+      // PixiJS ambient particles
+      const card = document.getElementById('oc-reader-card');
+      if (card) _startReaderPixi(card);
+
+      // GSAP entrance
       requestAnimationFrame(() => {
         const stage = document.getElementById('text-cinema-stage');
-        if (stage) stage.classList.add('active');
+        if (stage) {
+          stage.classList.add('active');
+          if (window.gsap) {
+            gsap.fromTo('#oc-reader-title', { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out', delay: 0.08 });
+            gsap.fromTo('#oc-reader-divider', { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.22 });
+            gsap.fromTo('#oc-reader-body', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.3 });
+          }
+          // AnimeJS shimmer on title
+          if (window.anime) {
+            anime({ targets: '#oc-reader-title', textShadow: ['0 0 0px rgba(56,189,248,0)', '0 0 28px rgba(56,189,248,0.35)', '0 0 0px rgba(56,189,248,0)'], duration: 1800, easing: 'easeInOutSine', delay: 400 });
+          }
+        }
       });
+    }
+
+    function prevTextSegment() {
+      if (textReaderState.segmentIndex > 0) {
+        clearTimeout(textReaderState.timer);
+        textReaderState.segmentIndex -= 1;
+        _animateReaderTransition('back');
+      }
+    }
+
+    function nextTextSegment() {
+      clearTimeout(textReaderState.timer);
+      textReaderState.segmentIndex += 1;
+      _animateReaderTransition('forward');
+    }
+
+    function _animateReaderTransition(dir = 'forward') {
+      const stage = document.getElementById('text-cinema-stage');
+      if (stage && window.gsap) {
+        gsap.to(stage, {
+          opacity: 0, x: dir === 'forward' ? -24 : 24, duration: 0.22, ease: 'power2.in',
+          onComplete: () => { stage.style.opacity = ''; stage.style.transform = ''; playTextSegment(); }
+        });
+      } else {
+        playTextSegment();
+      }
     }
 
     function playTextSegment() {
@@ -7370,6 +7579,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (cinemaHeader) cinemaHeader.classList.remove('hidden');
       if (cinemaControls) cinemaControls.classList.remove('hidden');
       if (textReader) textReader.classList.add('hidden');
+      _stopReaderPixi();
       videoState = { playing: false, currentTicket: null };
       renderTickets();
       if (document.fullscreenElement) {
@@ -8831,52 +9041,66 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function renderPaidTicketItem(ticket) {
       const s = getTicketStatus(ticket);
 
+      // Status color map
+      const statusColors = {
+        'PRÓXIMAMENTE': { border: 'border-yellow-500/30', bg: 'bg-yellow-950/20', badge: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40', icon: 'text-yellow-400' },
+        'FAST PASS':    { border: 'border-purple-500/40', bg: 'bg-purple-950/20', badge: 'bg-purple-500/20 text-purple-200 border-purple-500/40', icon: 'text-purple-400' },
+        'EN SALA':      { border: 'border-green-500/40',  bg: 'bg-green-950/20',  badge: 'bg-green-500/20 text-green-200 border-green-500/40',   icon: 'text-green-400' },
+        'VENCIDO':      { border: 'border-red-900/40',    bg: 'bg-red-950/15',    badge: 'bg-red-900/30 text-red-400 border-red-900/40',          icon: 'text-red-400' },
+        'USADO':        { border: 'border-white/5',       bg: '',                 badge: 'bg-gray-800 text-gray-500 border-gray-700',             icon: 'text-gray-500' },
+        'FINALIZADO':   { border: 'border-white/5',       bg: '',                 badge: 'bg-gray-800 text-gray-500 border-gray-700',             icon: 'text-gray-500' },
+      };
+      const sc = statusColors[s.status] || { border: 'border-white/10', bg: '', badge: 'bg-white/10 text-gray-300 border-white/15', icon: 'text-cyan-400' };
+
       let actionBtn = '';
       if (s.canWatch) {
-        // Si es 'direct' ticket usa watchMovie, si es 'precompra' usa showTicketDoorScreen
         const clickAction = ticket.source === 'direct' ? `watchMovie(${ticket.movieId}, '${ticket.id}')` : `showTicketDoorScreenById('${ticket.id}')`;
-        actionBtn = `
-            <button onclick="${clickAction}" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-black px-6 py-3 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-green-900/40 uppercase tracking-widest text-xs flex items-center gap-2">
-               ENTRAR <i class="fas fa-sign-in-alt"></i>
-            </button>`;
+        actionBtn = `<button onclick="${clickAction}" class="group/btn relative overflow-hidden bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black px-5 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-900/30 text-xs flex items-center gap-2 uppercase tracking-widest">
+          <span class="relative z-10 flex items-center gap-2"><i class="fas fa-play text-[10px]"></i>Ver ahora</span>
+          <span class="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
+        </button>`;
       } else if (s.canRefund) {
-        actionBtn = `
-            <button onclick="deleteTicket('${ticket.id}')" class="bg-yellow-600/20 text-yellow-500 hover:bg-yellow-600/40 border border-yellow-500/50 font-bold px-6 py-3 rounded-xl transition-all text-xs flex items-center gap-2">
-               REEMBOLSO <i class="fas fa-undo"></i>
-            </button>`;
+        actionBtn = `<button onclick="deleteTicket('${ticket.id}')" class="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/30 font-bold px-5 py-2.5 rounded-xl transition-all hover:scale-105 text-xs flex items-center gap-2 uppercase tracking-widest">
+          <i class="fas fa-undo text-[10px]"></i>Reembolso
+        </button>`;
       } else if (s.canDelete) {
-        actionBtn = `
-            <button onclick="deleteTicket('${ticket.id}')" class="bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/50 font-bold px-6 py-3 rounded-xl transition-all text-xs flex items-center gap-2">
-               ELIMINAR <i class="fas fa-trash"></i>
-            </button>`;
+        actionBtn = `<button onclick="deleteTicket('${ticket.id}')" class="bg-red-900/15 text-red-400/80 hover:bg-red-900/30 border border-red-900/30 font-bold px-5 py-2.5 rounded-xl transition-all text-xs flex items-center gap-2 uppercase tracking-widest">
+          <i class="fas fa-trash text-[10px]"></i>Eliminar
+        </button>`;
       } else {
-        actionBtn = `<span class="bg-gray-700 text-gray-400 px-4 py-2 rounded-lg text-xs font-bold uppercase">${s.status}</span>`;
+        actionBtn = `<span class="bg-white/5 text-gray-500 px-4 py-2 rounded-lg text-xs font-bold uppercase border border-white/8">${s.status}</span>`;
       }
 
       return `
-        <div class="glass rounded-2xl p-4 flex flex-col md:flex-row items-center gap-6 border border-white/5 hover:border-white/20 transition-all group">
-          <div class="relative w-full md:w-24 h-48 md:h-36 flex-shrink-0">
-             <img src="${ticket.poster}" class="w-full h-full object-cover rounded-xl shadow-lg border border-white/10" onerror="this.src='assets/OceanCinemas.png'">
-             <div class="absolute inset-x-0 bottom-0 bg-${s.class.includes('red') ? 'red' : (s.class.includes('yellow') ? 'yellow' : 'green')}-600 text-[10px] font-black text-white text-center py-1 rounded-b-xl shadow-lg">${s.status.split(' ')[0]}</div>
-          </div>
-          <div class="flex-1 w-full text-center md:text-left">
-            <h4 class="text-xl font-black text-white mb-1 group-hover:text-cyan-400 transition-colors">${ticket.title}</h4>
-            <p class="text-xs text-gray-400 mb-4 font-medium">${ticket.artist || 'Ocean Cinemas'}</p>
-            
-            <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-3">
-               <div class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-bold text-gray-300">
-                  <i class="far fa-clock text-yellow-400"></i>${ticket.horario || 'Fast Pass'}
-               </div>
-               ${s.msg ? `<div class="flex items-center gap-2 bg-${s.class.includes('red') ? 'red' : (s.class.includes('yellow') ? 'yellow' : 'purple')}-900/30 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-bold text-white"><i class="fas fa-info-circle"></i>${s.msg}</div>` : ''}
+        <div class="oc-ticket-card relative rounded-2xl border ${sc.border} ${sc.bg} overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:shadow-xl hover:shadow-black/40 group/card"
+             style="background:linear-gradient(135deg,rgba(10,14,28,0.95),rgba(6,9,20,0.98))">
+          <!-- Shimmer line -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          <div class="flex items-center gap-4 p-4">
+            <!-- Poster -->
+            <div class="relative flex-shrink-0 w-14 h-20 rounded-xl overflow-hidden shadow-lg border border-white/8">
+              <img src="${ticket.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" onerror="this.src='assets/OceanCinemas.png'">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
-            
-            <p class="text-xs text-gray-500 font-mono">ID: ${ticket.id}</p>
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h4 class="font-black text-white text-sm leading-tight truncate group-hover/card:text-cyan-300 transition-colors">${ticket.title}</h4>
+                <span class="flex-shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${sc.badge}">
+                  <i class="fas ${s.icon} ${sc.icon} text-[9px]"></i>${s.status.split(' ')[0]}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mb-2">${ticket.artist || 'Ocean Cinemas'}</p>
+              <div class="flex flex-wrap gap-2">
+                ${ticket.horario ? `<span class="flex items-center gap-1 text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="far fa-clock text-yellow-400/70 text-[9px]"></i>${ticket.horario}</span>` : ''}
+                ${ticket.puerta ? `<span class="flex items-center gap-1 text-[10px] text-cyan-400/80 bg-cyan-900/15 px-2 py-0.5 rounded-md border border-cyan-500/15"><i class="fas fa-door-open text-[9px]"></i>Puerta ${ticket.puerta}</span>` : ''}
+                ${s.msg ? `<span class="flex items-center gap-1 text-[10px] text-white/70 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="fas fa-info-circle text-[9px] ${sc.icon}"></i>${s.msg}</span>` : ''}
+              </div>
+            </div>
+            <!-- Action -->
+            <div class="flex-shrink-0">${actionBtn}</div>
           </div>
-          <div class="w-full md:w-auto flex justify-center">
-            ${actionBtn}
-          </div>
-        </div>
-        `;
+        </div>`;
     }
 
     function showTicketDoorScreenById(id) {
@@ -8886,6 +9110,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function renderMisTicketItem(ticket) {
       const movie = STATE.movies.find(m => m.id === ticket.movieId);
+      const upcoming = movie ? isMovieUpcoming(movie) : false;
       return `
         <div class="glass rounded-xl p-4 flex items-center gap-4">
           <div class="ticket-checkbox" onclick="toggleMisTicketSelection('${ticket.id}')" id="mis-checkbox-${ticket.id}">
@@ -8900,7 +9125,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           </div>
           <div class="text-right">
             <p class="text-lg font-bold text-yellow-400">${ticket.price} AB</p>
-            ${movie.proximamente ? '<span class="text-xs text-yellow-500">PRÓXIMAMENTE</span>' : ''}
+            ${upcoming ? '<span class="text-xs text-yellow-500">PRÓXIMAMENTE</span>' : ''}
           </div>
         </div>
       `;
