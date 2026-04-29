@@ -1742,7 +1742,7 @@
     const OCEAN_TICKET_PRICE = 50;
     const OCEAN_REWARD_STATE_KEY = 'ocean_cinemas_rewards_v2';
     const OCEAN_CINEMAS_ACCOUNTS_KEY = 'ocean_cinemas_accounts_v1';
-    const OCEAN_CINEMAS_SESSION_KEY = 'ocean_cinemas_session_v1';
+    const OCEAN_CINEMAS_SESSION_KEY = 'ocean_cinemas_session_v2'; // v2 = server-backed token
     const OCEAN_DEFAULT_TIDES_BALANCE = 1200;
     const OCEAN_PLAN_MONTH_DAYS = 30;
     const OCEAN_MEMBERSHIP_PLANS = {
@@ -5218,7 +5218,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function getCurrentSessionAccount() {
       const currentUser = normalizeUserHandle(STATE?.cinemasSession?.username);
       if (!currentUser) return null;
-      return STATE.cinemasAccounts.find(acc => normalizeUserHandle(acc.username) === currentUser) || null;
+      // Try local cache first, fallback to session data
+      const cached = STATE.cinemasAccounts.find(acc => normalizeUserHandle(acc.username) === currentUser);
+      if (cached) return cached;
+      // Build minimal account from session if not in cache
+      if (STATE.cinemasSession?.username) {
+        return { username: currentUser, planId: 'free', tidesBalance: OCEAN_DEFAULT_TIDES_BALANCE };
+      }
+      return null;
     }
 
     function getCurrentPlan() {
@@ -5256,57 +5263,88 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
     function saveCinemasAccountState() {
-      localStorage.setItem(OCEAN_CINEMAS_ACCOUNTS_KEY, JSON.stringify(STATE.cinemasAccounts));
+      // Session only — accounts live on the server now
       localStorage.setItem(OCEAN_CINEMAS_SESSION_KEY, JSON.stringify(STATE.cinemasSession));
     }
 
-    function applySessionState(username) {
+    function applySessionState(username, token, serverUser = null) {
       STATE.cinemasSession = {
         username: normalizeUserHandle(username),
+        token: token || null,
         linkedAt: Date.now()
       };
+      // Sync server user data into local account cache for plan/balance display
+      if (serverUser) {
+        const idx = STATE.cinemasAccounts.findIndex(a => normalizeUserHandle(a.username) === normalizeUserHandle(username));
+        const merged = {
+          username: normalizeUserHandle(username),
+          planId: serverUser.planId || 'free',
+          tidesBalance: serverUser.tidesBalance ?? OCEAN_DEFAULT_TIDES_BALANCE,
+          createdAt: Date.now()
+        };
+        if (idx >= 0) STATE.cinemasAccounts[idx] = { ...STATE.cinemasAccounts[idx], ...merged };
+        else STATE.cinemasAccounts.push(merged);
+        localStorage.setItem(OCEAN_CINEMAS_ACCOUNTS_KEY, JSON.stringify(STATE.cinemasAccounts));
+      }
       saveCinemasAccountState();
       updateVipDisplay();
     }
 
-    function registerCinemasAccount({ username, email, password }) {
+    async function registerCinemasAccount({ username, password }) {
       const cleanUser = normalizeUserHandle(username);
-      const cleanEmail = normalizeTextValue(email).toLowerCase();
       const cleanPassword = normalizeTextValue(password);
-      if (!cleanUser || !cleanEmail || !cleanPassword) {
-        return { ok: false, error: 'Completa todos los campos para crear la cuenta.' };
+      if (!cleanUser || !cleanPassword) return { ok: false, error: 'Completa usuario y contrasena.' };
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: cleanUser, password: cleanPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) return { ok: false, error: data.error || 'Error al registrar.' };
+        applySessionState(data.user.username, data.token, data.user);
+        return { ok: true, account: data.user };
+      } catch (e) {
+        return { ok: false, error: 'No se pudo conectar con el servidor.' };
       }
-      const exists = STATE.cinemasAccounts.some(acc => normalizeUserHandle(acc.username) === cleanUser || normalizeTextValue(acc.email).toLowerCase() === cleanEmail);
-      if (exists) {
-        return { ok: false, error: 'Ese usuario o correo ya existe en Ocean Cinemas.' };
-      }
-
-      const account = {
-        username: cleanUser,
-        email: cleanEmail,
-        password: cleanPassword,
-        planId: 'free',
-        tidesBalance: OCEAN_DEFAULT_TIDES_BALANCE,
-        planStartedAt: Date.now(),
-        planExpiresAt: null,
-        createdAt: Date.now()
-      };
-      STATE.cinemasAccounts.push(account);
-      applySessionState(cleanUser);
-      return { ok: true, account };
     }
 
-    function loginCinemasAccount({ username, password }) {
+    async function loginCinemasAccount({ username, password }) {
       const cleanUser = normalizeUserHandle(username);
       const cleanPassword = normalizeTextValue(password);
-      const account = STATE.cinemasAccounts.find(acc =>
-        normalizeUserHandle(acc.username) === cleanUser && String(acc.password || '') === cleanPassword
-      );
-      if (!account) {
-        return { ok: false, error: 'Credenciales invalidas de Ocean Cinemas.' };
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: cleanUser, password: cleanPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) return { ok: false, error: data.error || 'Credenciales invalidas.' };
+        applySessionState(data.user.username, data.token, data.user);
+        return { ok: true, account: data.user };
+      } catch (e) {
+        return { ok: false, error: 'No se pudo conectar con el servidor.' };
       }
-      applySessionState(account.username);
-      return { ok: true, account };
+    }
+
+    async function verifyCinemasSession() {
+      const session = STATE.cinemasSession;
+      if (!session?.token) return;
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/auth/me`, {
+          headers: { 'Authorization': `Bearer ${session.token}` }
+        });
+        if (!res.ok) {
+          // Token expired or invalid — clear session silently
+          STATE.cinemasSession = null;
+          saveCinemasAccountState();
+          updateVipDisplay();
+          return;
+        }
+        const user = await res.json();
+        // Refresh local account data with server data
+        applySessionState(user.username, session.token, user);
+      } catch (_e) { /* offline — keep session as-is */ }
     }
 
     function activateCinemasPlan(planId) {
@@ -5522,6 +5560,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       updateBalanceDisplay();
       updateRecommendations();
       updateVipDisplay();
+      // Silently verify session token in background — no prompt if valid
+      verifyCinemasSession().catch(() => {});
     }
 
     function updateBalanceDisplay() {
@@ -5936,9 +5976,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
                 <p class="text-sm text-gray-300 mb-4">${isRegister ? 'La pantalla cambio para que puedas crear correctamente tu cuenta de Ocean Cinemas.' : 'Ingresa tus credenciales de Ocean Cinemas para continuar.'}</p>
                 <div class="space-y-3">
                   <input id="cinemas-auth-user" type="text" placeholder="Usuario Ocean Cinemas" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
-                  ${isRegister ? '<input id="cinemas-auth-email" type="email" placeholder="Correo" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">' : ''}
                   <input id="cinemas-auth-pass" type="password" placeholder="Contrasena" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
-                  <button onclick="${isRegister ? `createCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})` : `loginCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})`}" class="w-full py-3 rounded-xl font-black bg-gradient-to-r from-cyan-500 to-blue-500 text-white">${isRegister ? 'Crear cuenta' : 'Iniciar sesion'}</button>
+                  <button id="${isRegister ? 'cinemas-auth-register-btn' : 'cinemas-auth-login-btn'}" onclick="${isRegister ? `createCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})` : `loginCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})`}" class="w-full py-3 rounded-xl font-black bg-gradient-to-r from-cyan-500 to-blue-500 text-white">${isRegister ? 'Crear cuenta' : 'Iniciar sesion'}</button>
                   <button onclick="showPrecompraAuthGateway(${movieId ? Number(movieId) : 'null'}, '${isRegister ? 'login' : 'register'}')" class="w-full py-3 rounded-xl font-bold bg-white/5 border border-white/15 text-gray-200">
                     ${isRegister ? 'Ya tengo cuenta, volver a inicio de sesion' : 'No tengo cuenta, crear ahora'}
                   </button>
@@ -5963,10 +6002,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       openPrecompraScreen(movieId, true);
     }
 
-    function loginCinemasAccountFromPrecompra(movieId = null) {
+    async function loginCinemasAccountFromPrecompra(movieId = null) {
       const user = document.getElementById('cinemas-auth-user')?.value;
       const pass = document.getElementById('cinemas-auth-pass')?.value;
-      const result = loginCinemasAccount({ username: user, password: pass });
+      const btn = document.querySelector('#cinemas-auth-login-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Iniciando...'; }
+      const result = await loginCinemasAccount({ username: user, password: pass });
+      if (btn) { btn.disabled = false; btn.textContent = 'Iniciar sesion'; }
       if (!result.ok) {
         showToast(`❌ ${result.error}`);
         return;
@@ -5975,11 +6017,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       showPrecompraAuthGateway(movieId, 'login');
     }
 
-    function createCinemasAccountFromPrecompra(movieId = null) {
+    async function createCinemasAccountFromPrecompra(movieId = null) {
       const user = document.getElementById('cinemas-auth-user')?.value;
-      const email = document.getElementById('cinemas-auth-email')?.value;
       const pass = document.getElementById('cinemas-auth-pass')?.value;
-      const created = registerCinemasAccount({ username: user, email, password: pass });
+      const btn = document.querySelector('#cinemas-auth-register-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Creando...'; }
+      const created = await registerCinemasAccount({ username: user, password: pass });
+      if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
       if (!created.ok) {
         showToast(`❌ ${created.error}`);
         return;
