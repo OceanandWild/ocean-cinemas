@@ -5715,8 +5715,47 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       document.getElementById('plan-checkout-name').textContent = plan.name;
       document.getElementById('plan-checkout-price').textContent = `${plan.monthlyTides} Tides`;
 
+      // Check active subscription FIRST — before loading cards
+      if (STATE.oceanPayToken) {
+        try {
+          const subRes = await fetch(`${API_URL}/ocean-cinemas/subscriptions/status`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${STATE.oceanPayToken}` }
+          });
+          if (subRes.ok) {
+            const subData = await subRes.json();
+            if (subData.active) {
+              // Sync plan locally
+              const account = getCurrentSessionAccount();
+              if (account) {
+                const planName = String(subData.active.plan_name || '').toLowerCase();
+                const activePlanId = (planName.includes('abisal') || planName.includes('abyssal')) ? 'abyssal' : 'free';
+                account.planId = activePlanId;
+                account.planExpiresAt = subData.active.end_date ? new Date(subData.active.end_date).getTime() : null;
+                saveCinemasAccountState();
+              }
+              // Show already-active state in checkout
+              const errEl = document.getElementById('plan-checkout-error');
+              if (errEl) {
+                errEl.innerHTML = `<i class="fas fa-check-circle mr-2 text-cyan-400"></i>Ya tienes una suscripción activa de <b>${subData.active.plan_name || plan.name}</b>. No se realizará ningún cobro.`;
+                errEl.className = errEl.className.replace('bg-red-900/40 border-red-500/40 text-red-300', '') + ' bg-cyan-900/30 border border-cyan-500/40 text-cyan-200 rounded-xl p-3 text-sm flex items-center';
+                errEl.classList.remove('hidden');
+              }
+              const btn = document.getElementById('plan-checkout-confirm-btn');
+              if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Suscripción ya activa';
+                btn.className = btn.className.replace('from-cyan-500', 'from-cyan-800').replace('to-blue-500', 'to-blue-800');
+              }
+              updateVipDisplay();
+              renderVipPlans();
+              return; // Don't load cards — subscription already active
+            }
+          }
+        } catch (_) {}
+      }
+
       // Perks
-      const perksEl = document.getElementById('plan-checkout-perks');
       if (perksEl) {
         perksEl.innerHTML = plan.perks.map(p => `
           <div class="flex items-start gap-2 text-sm text-gray-300">
@@ -5892,12 +5931,20 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const plan = getCurrentPlan();
       const tides = Number(account.tidesBalance || 0).toLocaleString();
       v.classList.remove('hidden');
-      v.innerHTML = `<i class="fas fa-wave-square text-cyan-300"></i><span>${plan.name}</span><span class="text-cyan-200/80">${tides} Tides</span>`;
+
+      // Show plan name with active indicator if paid plan
+      const isPaid = plan.id !== 'free';
+      v.innerHTML = `
+        <i class="fas fa-wave-square ${isPaid ? 'text-cyan-300' : 'text-gray-400'}"></i>
+        <span class="${isPaid ? 'text-cyan-200 font-black' : ''}">${plan.name}</span>
+        ${isPaid ? '<span class="text-xs text-cyan-400/80 font-bold uppercase tracking-wider">Activo</span>' : ''}
+        <span class="text-cyan-200/80">${tides} Tides</span>
+      `;
 
       const statusWrap = document.getElementById('vip-status-container');
       const statusText = document.getElementById('vip-expiry-display');
       if (statusWrap && statusText) {
-        if (account.planExpiresAt) {
+        if (account.planExpiresAt && isPaid) {
           statusWrap.classList.remove('hidden');
           statusText.textContent = new Date(account.planExpiresAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
         } else {
@@ -5912,6 +5959,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       modal.classList.remove('hidden');
       renderVipPlans();
       updateVipDisplay();
+      // Sync subscription status from server so plan cards reflect reality
+      if (STATE.oceanPayLinked) {
+        refreshSyncState().then(() => {
+          renderVipPlans();
+          updateVipDisplay();
+        }).catch(() => {});
+      }
     }
 
     function closeVipModal() {
