@@ -4023,18 +4023,19 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
           duration: 16,
           price: 0,
           poster: 'assets/la_vida_oceano.png',
-          description: 'Una serie de comedia submarina sobre un tiburon travieso y su grupo de amigos que siempre terminan metidos en problemas imposibles. Temporada 1 en preparacion.',
+          description: 'Una serie de comedia submarina sobre un tiburon travieso y su grupo de amigos que siempre terminan metidos en problemas imposibles. Temporada 1 proximamente.',
           type: 'series_container',
           sala: 'Sala Brisa Azul',
           puerta: 'VO',
-          proximamente: true,
+          releaseDate: '2026-05-02T20:00:00.000Z',
+          precompraAvailableFrom: '2026-05-02T20:00:00.000Z',
           episodes: [911, 912],
           seasons: [
             {
               number: 1,
               title: 'Temporada 1',
               year: 2026,
-              status: 'en_preparacion',
+              status: 'proximamente',
               episodes: [911, 912]
             }
           ]
@@ -4048,6 +4049,7 @@ Era el prólogo de una guerra más grande que el propio cielo.` }
           category: 'nature',
           season: 1,
           episode: 1,
+          releaseDate: '2026-05-02T20:00:00.000Z',
           duration: 7,
           price: 50,
           poster: 'assets/la_vida_oceano.png',
@@ -4303,6 +4305,7 @@ Y, claramente, comienzo de nuevos problemas.`
           category: 'nature',
           season: 1,
           episode: 2,
+          releaseDate: '2026-05-02T20:00:00.000Z',
           duration: 9,
           price: 50,
           poster: 'assets/la_vida_oceano.png',
@@ -8599,6 +8602,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           id: generateTicketId(),
           movieId: ep.id,
           movieTitle: ep.title,
+          title: ep.title,
+          artist: ep.artist || series.artist || 'Ocean Cinemas',
+          poster: ep.poster || series.poster || 'assets/OceanCinemas.png',
           purchaseDate: new Date().toISOString(),
           price: getPriceWithPlan(ep.price || OCEAN_TICKET_PRICE, ep).finalPrice,
           sala: ep.sala || series.sala,
@@ -9069,6 +9075,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function renderPaidTicketItem(ticket) {
       const s = getTicketStatus(ticket);
+      // Resolve title/poster/artist from movie if missing on ticket
+      const movie = STATE.movies.find(x => x.id === ticket.movieId);
+      const displayTitle = ticket.title || ticket.movieTitle || movie?.title || 'Sin título';
+      const displayPoster = ticket.poster || movie?.poster || 'assets/OceanCinemas.png';
+      const displayArtist = ticket.artist || movie?.artist || 'Ocean Cinemas';
 
       // Status color map
       const statusColors = {
@@ -9108,18 +9119,18 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           <div class="flex items-center gap-4 p-4">
             <!-- Poster -->
             <div class="relative flex-shrink-0 w-14 h-20 rounded-xl overflow-hidden shadow-lg border border-white/8">
-              <img src="${ticket.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" onerror="this.src='assets/OceanCinemas.png'">
+              <img src="${displayPoster}" class="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" onerror="this.src='assets/OceanCinemas.png'">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
             <!-- Info -->
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2 mb-1">
-                <h4 class="font-black text-white text-sm leading-tight truncate group-hover/card:text-cyan-300 transition-colors">${ticket.title}</h4>
+                <h4 class="font-black text-white text-sm leading-tight truncate group-hover/card:text-cyan-300 transition-colors">${displayTitle}</h4>
                 <span class="flex-shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${sc.badge}">
                   <i class="fas ${s.icon} ${sc.icon} text-[9px]"></i>${s.status.split(' ')[0]}
                 </span>
               </div>
-              <p class="text-xs text-gray-500 mb-2">${ticket.artist || 'Ocean Cinemas'}</p>
+              <p class="text-xs text-gray-500 mb-2">${displayArtist}</p>
               <div class="flex flex-wrap gap-2">
                 ${ticket.horario ? `<span class="flex items-center gap-1 text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="far fa-clock text-yellow-400/70 text-[9px]"></i>${ticket.horario}</span>` : ''}
                 ${ticket.puerta ? `<span class="flex items-center gap-1 text-[10px] text-cyan-400/80 bg-cyan-900/15 px-2 py-0.5 rounded-md border border-cyan-500/15"><i class="fas fa-door-open text-[9px]"></i>Puerta ${ticket.puerta}</span>` : ''}
