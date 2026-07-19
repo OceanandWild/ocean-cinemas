@@ -33,150 +33,54 @@
       --accent: #22d3ee;
     }
 
-    /* === INTRO ANIMATION (NUEVA) === */
+    /* === INTRO ANIMATION === */
     #intro-animation {
       position: fixed;
       inset: 0;
-      background: linear-gradient(180deg, #000000 0%, #001220 40%, #001f3f 100%);
+      background: linear-gradient(180deg, #050b14 0%, #001828 30%, #002a4a 60%, #001828 85%, #020617 100%);
+      background-size: 100% 200%;
+      animation: introBgShift 8s ease-in-out infinite alternate, curtainReveal 1.6s cubic-bezier(0.77, 0, 0.175, 1) 5.5s forwards;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       overflow: hidden;
-      animation: curtainReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) 4.5s forwards;
+    }
+
+    @keyframes introBgShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 0% 100%; }
     }
 
     @keyframes curtainReveal {
-      0% {
-        clip-path: inset(0 0 0 0);
-      }
-
-      100% {
-        clip-path: inset(0 0 100% 0);
-        visibility: hidden;
-      }
+      0% { clip-path: inset(0 0 0 0); }
+      100% { clip-path: inset(0 0 100% 0); visibility: hidden; }
     }
 
+    /* Bioluminescent particles layer */
     #intro-animation::before {
       content: '';
       position: absolute;
-      width: 100%;
-      height: 200%;
+      inset: 0;
       background-image:
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-        radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1) 1.5px, transparent 1.5px);
-      background-size: 600px 600px;
-      animation: bubblesUp 10s linear infinite;
-      opacity: 0.6;
+        radial-gradient(2px 2px at 15% 20%, rgba(0,255,200,0.2) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 30% 65%, rgba(0,229,255,0.15) 50%, transparent 50%),
+        radial-gradient(2.5px 2.5px at 55% 30%, rgba(0,255,200,0.12) 50%, transparent 50%),
+        radial-gradient(1px 1px at 70% 75%, rgba(0,229,255,0.18) 50%, transparent 50%),
+        radial-gradient(2px 2px at 85% 40%, rgba(0,255,200,0.1) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 45% 85%, rgba(0,229,255,0.14) 50%, transparent 50%),
+        radial-gradient(2px 2px at 10% 80%, rgba(0,255,200,0.12) 50%, transparent 50%),
+        radial-gradient(1px 1px at 90% 15%, rgba(0,229,255,0.16) 50%, transparent 50%);
+      animation: introParticles 12s ease-in-out infinite alternate;
     }
 
-    @keyframes bubblesUp {
-      from {
-        transform: translateY(0);
-      }
-
-      to {
-        transform: translateY(-50%);
-      }
+    @keyframes introParticles {
+      0% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 0.7; transform: translateY(-10px); }
+      100% { opacity: 0.4; transform: translateY(0); }
     }
 
-    #intro-ocean {
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      filter: drop-shadow(0 0 60px rgba(0, 255, 255, 0.4));
-      animation: logoFloat 4s ease-in-out infinite, logoGlow 3s ease-in-out infinite alternate;
-      z-index: 10;
-    }
-
-    @keyframes logoFloat {
-
-      0%,
-      100% {
-        transform: translateY(0) scale(1);
-      }
-
-      50% {
-        transform: translateY(-20px) scale(1.05);
-      }
-    }
-
-    @keyframes logoGlow {
-      from {
-        filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.3));
-      }
-
-      to {
-        filter: drop-shadow(0 0 80px rgba(0, 255, 255, 0.8));
-      }
-    }
-
-    #intro-text {
-      position: relative;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 1000px;
-    }
-
-    #intro-o {
-      font-size: 8rem;
-      font-weight: 900;
-      background: conic-gradient(from 0deg, #00d2ff, #3a7bd5, #00d2ff);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 30px rgba(0, 210, 255, 0.6));
-      animation: spinO 4s linear infinite, appearO 1s ease-out forwards;
-      opacity: 0;
-      transform: scale(0) rotate(-180deg);
-    }
-
-    @keyframes appearO {
-      to {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-      }
-    }
-
-    @keyframes spinO {
-      to {
-        filter: hue-rotate(360deg) drop-shadow(0 0 40px rgba(0, 210, 255, 0.8));
-      }
-    }
-
-    #intro-rest {
-      font-size: 5rem;
-      font-weight: 800;
-      color: white;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-left: 1rem;
-      opacity: 0;
-      transform: translateX(-50px);
-      background: linear-gradient(90deg, #fff, #a5f3fc, #fff);
-      background-clip: text;
-      -webkit-background-clip: text;
-      background-size: 200% auto;
-      animation: slideText 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards, shineText 3s linear infinite;
-      text-shadow: 0 0 20px rgba(0, 100, 255, 0.5);
-    }
-
-    @keyframes slideText {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes shineText {
-      to {
-        background-position: 200% center;
-      }
-    }
-
+    /* Light rays sweep */
     #intro-animation::after {
       content: '';
       position: absolute;
@@ -184,19 +88,155 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.03) 20deg, transparent 40deg);
-      animation: rotateRays 20s linear infinite;
+      background: conic-gradient(from 180deg at 50% 50%,
+        transparent 0deg, rgba(0,229,255,0.04) 15deg, transparent 30deg,
+        transparent 90deg, rgba(0,229,255,0.03) 105deg, transparent 120deg,
+        transparent 180deg, rgba(0,229,255,0.04) 195deg, transparent 210deg,
+        transparent 270deg, rgba(0,229,255,0.03) 285deg, transparent 300deg);
+      animation: rotateRays 30s linear infinite;
       pointer-events: none;
     }
 
     @keyframes rotateRays {
-      from {
-        transform: rotate(0deg);
-      }
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
 
-      to {
-        transform: rotate(360deg);
-      }
+    /* Logo ring glow */
+    .intro-ring {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,229,255,0.08);
+      animation: ringPulse 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    .intro-ring::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent, rgba(0,229,255,0.06), transparent, rgba(0,229,255,0.06), transparent);
+      animation: ringSpin 6s linear infinite;
+      mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+    }
+
+    @keyframes ringSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes ringPulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.08); opacity: 1; }
+    }
+
+    /* Logo image */
+    #intro-ocean {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      filter: drop-shadow(0 0 80px rgba(0, 255, 255, 0.4));
+      animation: logoFloat 4s ease-in-out infinite, logoGlow 3s ease-in-out infinite alternate;
+      z-index: 10;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.03); }
+    }
+
+    @keyframes logoGlow {
+      from { filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.3)); }
+      to { filter: drop-shadow(0 0 100px rgba(0, 255, 255, 0.8)); }
+    }
+
+    /* Intro wordmark */
+    #intro-text {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 180px;
+    }
+
+    #intro-o {
+      font-size: 6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00e5ff, #0070ff, #00e5ff);
+      background-size: 200% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px rgba(0, 200, 255, 0.5));
+      animation: introOWord 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both, introOGlow 3s ease-in-out 1.5s infinite;
+      opacity: 0;
+      transform: scale(0) rotate(-180deg);
+    }
+
+    @keyframes introOWord {
+      to { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes introOGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(0,200,255,0.3)); }
+      50% { filter: drop-shadow(0 0 50px rgba(0,200,255,0.7)); }
+    }
+
+    #intro-rest {
+      font-size: 3.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      margin-left: 0.8rem;
+      opacity: 0;
+      transform: translateX(-40px);
+      background: linear-gradient(90deg, #e2e8f0, #a5f3fc, #e2e8f0);
+      background-size: 200% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: introRestText 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards, introShine 3s linear 1.5s infinite;
+    }
+
+    @keyframes introRestText {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes introShine {
+      to { background-position: 200% center; }
+    }
+
+    /* Tagline */
+    .intro-tagline {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(0,229,255,0.3);
+      font-weight: 600;
+      animation: introTagline 1s ease 2.5s both;
+    }
+
+    @keyframes introTagline {
+      to { opacity: 1; color: rgba(0,229,255,0.5); }
+    }
+
+    /* Wave curtain bottom */
+    .intro-curtain {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(180deg, transparent, #020617);
+      pointer-events: none;
     }
 
     /* === OCEAN BACKGROUND LAYER === */
@@ -231,127 +271,6 @@
       0% { opacity: 0.4; transform: translateY(0); }
       50% { opacity: 0.7; transform: translateY(-8px); }
       100% { opacity: 0.4; transform: translateY(0); }
-    }
-
-    /* === INTRO ENHANCEMENTS === */
-    .intro-rays {
-      position: absolute;
-      top: -20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120%;
-      height: 140%;
-      background: conic-gradient(from 180deg at 50% 50%,
-        transparent 0deg, rgba(0,229,255,0.03) 15deg, transparent 30deg,
-        transparent 90deg, rgba(0,229,255,0.02) 105deg, transparent 120deg,
-        transparent 180deg, rgba(0,229,255,0.03) 195deg, transparent 210deg,
-        transparent 270deg, rgba(0,229,255,0.02) 285deg, transparent 300deg);
-      animation: rotateRays 25s linear infinite;
-      pointer-events: none;
-    }
-
-    .intro-kelp {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 120px;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .intro-kelp::before,
-    .intro-kelp::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      width: 25px;
-      border-radius: 50% 50% 0 0;
-      background: rgba(0,80,60,0.25);
-      animation: kelpSway 4s ease-in-out infinite alternate;
-    }
-
-    .intro-kelp::before { left: 15%; height: 80px; animation-delay: -1s; }
-    .intro-kelp::after { right: 18%; height: 60px; animation-delay: -2.5s; }
-
-    @keyframes kelpSway {
-      0% { transform: skewX(-3deg); }
-      100% { transform: skewX(3deg); }
-    }
-
-    .intro-jellyfish {
-      position: absolute;
-      width: 30px;
-      height: 40px;
-      opacity: 0.2;
-      animation: jellyFloat 8s ease-in-out infinite;
-    }
-
-    .intro-jellyfish::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 28px;
-      height: 18px;
-      border-radius: 50% 50% 30% 30%;
-      background: radial-gradient(ellipse, rgba(180,0,255,0.3), rgba(0,229,255,0.15));
-    }
-
-    .intro-jellyfish::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 20px;
-      background: linear-gradient(180deg, rgba(180,0,255,0.2), transparent);
-      box-shadow: -6px 0 0 rgba(180,0,255,0.15), 6px 0 0 rgba(180,0,255,0.15);
-    }
-
-    @keyframes jellyFloat {
-      0%, 100% { transform: translateY(0) translateX(0); }
-      25% { transform: translateY(-15px) translateX(5px); }
-      50% { transform: translateY(-5px) translateX(-3px); }
-      75% { transform: translateY(-20px) translateX(2px); }
-    }
-
-    .intro-waves {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      pointer-events: none;
-    }
-
-    .intro-waves::before,
-    .intro-waves::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: -10%;
-      width: 120%;
-      height: 40px;
-      border-radius: 50% 50% 0 0;
-      opacity: 0.08;
-    }
-
-    .intro-waves::before {
-      background: rgba(0,229,255,0.3);
-      animation: waveMove 6s ease-in-out infinite;
-    }
-
-    .intro-waves::after {
-      background: rgba(0,200,230,0.2);
-      animation: waveMove 8s ease-in-out infinite reverse;
-      bottom: -5px;
-    }
-
-    @keyframes waveMove {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(3%); }
     }
 
     /* === COMPONENTS === */
@@ -1445,16 +1364,14 @@
 
   <!-- INTRO ANIMATION -->
   <div id="intro-animation">
-    <div class="intro-rays"></div>
-    <div class="intro-kelp"></div>
-    <div class="intro-jellyfish" style="left:20%; top:35%;"></div>
-    <div class="intro-jellyfish" style="right:25%; top:50%; animation-delay:-3s;"></div>
-    <div class="intro-waves"></div>
+    <div class="intro-ring"></div>
     <img id="intro-ocean" src="assets/ocean-intro.png" alt="Ocean">
     <div id="intro-text">
       <span id="intro-o">O</span>
       <span id="intro-rest">cean Cinemas</span>
     </div>
+    <div class="intro-tagline">Historias Sin Límites</div>
+    <div class="intro-curtain"></div>
   </div>
 
   <!-- NAVIGATION -->
@@ -1536,7 +1453,7 @@
         <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
           <span class="hero-badge--new"><i class="fas fa-bolt mr-1"></i>NUEVO</span>
           <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-red-300 via-pink-200 to-white bg-clip-text text-transparent leading-tight mt-4">
-            SUPPORT<br>OUR VISION
+            APOYA<br>NUESTRA VISIÓN
           </h1>
           <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
             Únete a nuestro Patreon y ayuda a crear historias que importan. Contenido exclusivo, acceso anticipado y más.
@@ -1560,9 +1477,23 @@
           </h1>
           <div class="hero-synopsis-gate mt-6 mb-8 max-w-2xl rounded-xl p-4" id="hero-synopsis-gate">
             <div class="hero-synopsis-content">
-              <p class="text-gray-200 text-lg leading-relaxed">
-                Una inteligencia artificial desarrolla conciencia y enfrenta la responsabilidad moral de sus propias decisiones. En un mundo que la considera una herramienta, ella exige ser reconocida como persona.
+              <p class="text-gray-200 text-sm md:text-base leading-relaxed">
+                En un universo devastado por guerras, emperadores de otros planetas y amenazas inimaginables, Kael carga con un poder tan extraordinario como peligroso: una ira consciente capaz de destruir mundos... o proteger aquello que más ama.
               </p>
+              <p class="text-gray-300 text-sm leading-relaxed mt-3">
+                Tras convertirse en el único refugio de un niño huérfano llamado Liam, ambos emprenden un camino marcado por el miedo, la culpa y el aprendizaje. Mientras Kael lucha por controlar la oscuridad que habita en su interior, Liam intenta comprender a un padre que, unas veces, es el lugar más seguro del mundo y, otras, la persona que más teme.
+              </p>
+              <p class="text-gray-300 text-sm leading-relaxed mt-3">
+                Cada episodio explora las heridas invisibles que deja el trauma, la dificultad de confiar después del miedo y el profundo vínculo entre un padre y un hijo que intentan sanar juntos en un mundo que nunca les da descanso.
+              </p>
+              <p class="text-gray-300 text-sm leading-relaxed mt-3">
+                Pero, mientras ambos reconstruyen poco a poco su relación, nuevas amenazas comienzan a acercarse. Algunas tienen forma de emperadores capaces de destruir planetas. Otras son invisibles, capaces de atacar la mente, sembrar dudas y romper la confianza desde dentro.
+              </p>
+              <p class="text-cyan-300 text-sm font-bold mt-4">
+                Esta es la historia de dos personas que no intentan salvar al universo.<br>
+                Solo intentan no perderse el uno al otro.
+              </p>
+              <p class="text-cyan-400/60 text-xs mt-2 italic">La historia apenas comienza...</p>
             </div>
             <div class="hero-synopsis-overlay" id="heroSynLocked" style="display:none;">
               <i class="fas fa-lock text-3xl text-cyan-400 mb-3"></i>
