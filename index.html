@@ -199,6 +199,161 @@
       }
     }
 
+    /* === OCEAN BACKGROUND LAYER === */
+    #ocean-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, #020617 0%, #001220 40%, #001f3f 70%, #020617 100%);
+      animation: oceanShift 20s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes oceanShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 0% 100%; }
+    }
+
+    #ocean-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 20% 30%, rgba(0,255,200,0.15) 50%, transparent 50%),
+        radial-gradient(1px 1px at 60% 70%, rgba(0,229,255,0.12) 50%, transparent 50%),
+        radial-gradient(2px 2px at 80% 20%, rgba(0,255,200,0.1) 50%, transparent 50%),
+        radial-gradient(1px 1px at 40% 80%, rgba(0,229,255,0.08) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 10% 60%, rgba(0,255,200,0.12) 50%, transparent 50%);
+      animation: bioParticles 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes bioParticles {
+      0% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 0.7; transform: translateY(-8px); }
+      100% { opacity: 0.4; transform: translateY(0); }
+    }
+
+    /* === INTRO ENHANCEMENTS === */
+    .intro-rays {
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 140%;
+      background: conic-gradient(from 180deg at 50% 50%,
+        transparent 0deg, rgba(0,229,255,0.03) 15deg, transparent 30deg,
+        transparent 90deg, rgba(0,229,255,0.02) 105deg, transparent 120deg,
+        transparent 180deg, rgba(0,229,255,0.03) 195deg, transparent 210deg,
+        transparent 270deg, rgba(0,229,255,0.02) 285deg, transparent 300deg);
+      animation: rotateRays 25s linear infinite;
+      pointer-events: none;
+    }
+
+    .intro-kelp {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 120px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .intro-kelp::before,
+    .intro-kelp::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      width: 25px;
+      border-radius: 50% 50% 0 0;
+      background: rgba(0,80,60,0.25);
+      animation: kelpSway 4s ease-in-out infinite alternate;
+    }
+
+    .intro-kelp::before { left: 15%; height: 80px; animation-delay: -1s; }
+    .intro-kelp::after { right: 18%; height: 60px; animation-delay: -2.5s; }
+
+    @keyframes kelpSway {
+      0% { transform: skewX(-3deg); }
+      100% { transform: skewX(3deg); }
+    }
+
+    .intro-jellyfish {
+      position: absolute;
+      width: 30px;
+      height: 40px;
+      opacity: 0.2;
+      animation: jellyFloat 8s ease-in-out infinite;
+    }
+
+    .intro-jellyfish::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 18px;
+      border-radius: 50% 50% 30% 30%;
+      background: radial-gradient(ellipse, rgba(180,0,255,0.3), rgba(0,229,255,0.15));
+    }
+
+    .intro-jellyfish::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(180deg, rgba(180,0,255,0.2), transparent);
+      box-shadow: -6px 0 0 rgba(180,0,255,0.15), 6px 0 0 rgba(180,0,255,0.15);
+    }
+
+    @keyframes jellyFloat {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-15px) translateX(5px); }
+      50% { transform: translateY(-5px) translateX(-3px); }
+      75% { transform: translateY(-20px) translateX(2px); }
+    }
+
+    .intro-waves {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      pointer-events: none;
+    }
+
+    .intro-waves::before,
+    .intro-waves::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -10%;
+      width: 120%;
+      height: 40px;
+      border-radius: 50% 50% 0 0;
+      opacity: 0.08;
+    }
+
+    .intro-waves::before {
+      background: rgba(0,229,255,0.3);
+      animation: waveMove 6s ease-in-out infinite;
+    }
+
+    .intro-waves::after {
+      background: rgba(0,200,230,0.2);
+      animation: waveMove 8s ease-in-out infinite reverse;
+      bottom: -5px;
+    }
+
+    @keyframes waveMove {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3%); }
+    }
+
     /* === COMPONENTS === */
     .glass {
       background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.85));
@@ -207,6 +362,59 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
+    /* === NAV RWORK === */
+    .nav-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      min-width: 200px;
+      background: rgba(10, 20, 40, 0.95);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(0,229,255,0.15);
+      border-radius: 12px;
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.2s ease;
+      z-index: 100;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .nav-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .nav-dropdown button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-dropdown button:hover {
+      background: rgba(0,229,255,0.1);
+      color: #22d3ee;
+    }
+
+    .nav-dropdown button i {
+      width: 18px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    /* === HERO SLIDER === */
     .hero-banner {
       position: relative;
       height: 95vh;
@@ -215,6 +423,269 @@
       background-position: center;
       display: flex;
       align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hero-slide-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-badge--new {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(234,179,8,0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(234,179,8,0.3);
+      animation: badgeGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes badgeGlow {
+      0% { box-shadow: 0 0 4px rgba(234,179,8,0.2); }
+      100% { box-shadow: 0 0 12px rgba(234,179,8,0.5); }
+    }
+
+    .hero-cta-patreon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: linear-gradient(135deg, #ff424d, #c9184a);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      animation: patreonPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes patreonPulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(255,66,77,0.3); }
+      50% { box-shadow: 0 0 30px rgba(255,66,77,0.6), 0 0 60px rgba(255,66,77,0.2); }
+    }
+
+    .hero-synopsis-gate {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-synopsis-gate.locked .hero-synopsis-content {
+      filter: blur(6px);
+      user-select: none;
+    }
+
+    .hero-synopsis-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2,6,23,0.7);
+      backdrop-filter: blur(4px);
+      border-radius: inherit;
+    }
+
+    /* === CATALOG ENHANCEMENTS === */
+    .catalog-title {
+      background: linear-gradient(135deg, #22d3ee, #0ea5e9, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: catalogShimmer 4s linear infinite;
+    }
+
+    @keyframes catalogShimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .movie-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0,229,255,0.15);
+    }
+
+    .movie-card-inner {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* === VIP PLANS MODAL REWORK === */
+    .plan-card--default {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .plan-card--default:hover {
+      border-color: rgba(0,229,255,0.3);
+      box-shadow: 0 0 30px rgba(0,229,255,0.1);
+    }
+
+    .plan-card--featured {
+      background: linear-gradient(145deg, rgba(20,184,166,0.15), rgba(6,182,212,0.08));
+      border: 2px solid rgba(20,184,166,0.5);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 0 40px rgba(20,184,166,0.1);
+    }
+
+    .plan-card--featured::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(20,184,166,0.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .plan-card--active {
+      background: linear-gradient(145deg, rgba(0,229,255,0.12), rgba(6,182,212,0.06));
+      border: 2px solid rgba(0,229,255,0.5);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .plan-cta {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .plan-cta--primary {
+      background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+      color: #020617;
+    }
+
+    .plan-cta--primary:hover {
+      box-shadow: 0 0 20px rgba(34,211,238,0.4);
+      transform: translateY(-1px);
+    }
+
+    .plan-cta--secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #f8fafc;
+    }
+
+    /* === AUTH GATEWAY REDESIGN === */
+    .auth-glass {
+      background: rgba(10, 20, 40, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,229,255,0.12);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .auth-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .auth-step-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .auth-step-dot.active {
+      background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+      color: #020617;
+    }
+
+    .auth-step-dot.pending {
+      background: rgba(255,255,255,0.1);
+      color: #64748b;
+    }
+
+    .auth-step-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 1px;
+    }
+
+    .auth-step-line.active {
+      background: linear-gradient(90deg, #22d3ee, #0ea5e9);
+    }
+
+    /* === PRECOMPRA SCROLL === */
+    .precompra-scroll-container {
+      max-height: 70vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,0.3) transparent;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .precompra-scroll-container::-webkit-scrollbar-thumb {
+      background: rgba(0,229,255,0.3);
+      border-radius: 3px;
     }
 
     .hero-gradient {
@@ -969,8 +1440,16 @@
 </head>
 
 <body>
+  <!-- OCEAN BACKGROUND LAYER -->
+  <div id="ocean-bg"></div>
+
   <!-- INTRO ANIMATION -->
   <div id="intro-animation">
+    <div class="intro-rays"></div>
+    <div class="intro-kelp"></div>
+    <div class="intro-jellyfish" style="left:20%; top:35%;"></div>
+    <div class="intro-jellyfish" style="right:25%; top:50%; animation-delay:-3s;"></div>
+    <div class="intro-waves"></div>
     <img id="intro-ocean" src="assets/ocean-intro.png" alt="Ocean">
     <div id="intro-text">
       <span id="intro-o">O</span>
@@ -1004,89 +1483,100 @@
             <i class="fas fa-ticket-alt mr-0 md:mr-2"></i><span class="hidden md:inline">Precomprar</span>
           </button>
           <button onclick="openVipModal()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-wave-square mr-0 md:mr-2"></i><span class="hidden md:inline">Planes Marea</span>
+            <i class="fas fa-wave-square mr-0 md:mr-2"></i><span class="hidden md:inline">Planes</span>
           </button>
-          <button onclick="openMisTicketsScreen()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-list mr-0 md:mr-2"></i><span class="hidden md:inline">Mis Tickets</span>
+          <button onclick="openUpdateLogModal()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
+            <i class="fas fa-star mr-0 md:mr-2"></i><span class="hidden md:inline">Novedades</span>
           </button>
-          <button onclick="openOceanPayModal()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-wallet mr-0 md:mr-2"></i><span class="hidden md:inline">Ocean Pay</span>
-          </button>
-          <button onclick="openUpdateLogModal()"
-            class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base hidden lg:flex">
-            <i class="fas fa-star mr-0 md:mr-2"></i><span class="hidden lg:inline">Novedades</span>
-          </button>
-          <button onclick="openAdminModal()"
-            class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base border border-cyan-500/30 text-cyan-400">
-            <i class="fas fa-user-shield mr-0 md:mr-2"></i><span class="hidden md:inline">Admin</span>
-          </button>
+          <div class="relative">
+            <button onclick="toggleNavMenu()" id="nav-menu-trigger" class="netflix-secondary px-3 py-2 text-sm">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div id="nav-dropdown" class="nav-dropdown">
+              <button onclick="openMisTicketsScreen(); closeNavMenu();"><i class="fas fa-list"></i>Mis Tickets</button>
+              <button onclick="openOceanPayModal(); closeNavMenu();"><i class="fas fa-wallet"></i>Ocean Pay</button>
+              <button onclick="openAdminModal(); closeNavMenu();"><i class="fas fa-user-shield"></i>Admin</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
   <main>
-    <!-- Hero -->
-    <section class="hero-banner" style="background-image: url('assets/hero-background.png');">
+    <!-- Hero Slider -->
+    <section class="hero-banner" id="hero-banner">
       <div class="hero-gradient"></div>
-      <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
-        <h1
-          class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent leading-tight">
-          HISTORIAS<br>SIN LÍMITES
-        </h1>
-        <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
-          Descubre un universo de entretenimiento digital curado para ti. Desde producciones musicales exclusivas hasta
-          narrativas inmersivas que desafían lo convencional.
-        </p>
 
-        <!-- HIGHLIGHT: Ciencalipsis -->
-        <div class="mb-6 max-w-3xl rounded-2xl overflow-hidden border border-red-500/40 shadow-2xl shadow-red-900/30"
-             style="background: linear-gradient(135deg, rgba(30,6,6,0.95) 0%, rgba(80,10,10,0.85) 50%, rgba(10,10,30,0.95) 100%);">
-          <div class="flex items-stretch gap-0">
-            <!-- Poster lateral -->
-            <div class="hidden md:block flex-shrink-0 w-28 relative overflow-hidden">
-              <img src="assets/ciencalipsis.png" alt="Ciencalipsis"
-                   class="w-full h-full object-cover"
-                   onerror="this.parentElement.style.display='none'">
-              <div class="absolute inset-0" style="background: linear-gradient(to right, transparent 60%, rgba(30,6,6,0.9) 100%);"></div>
-            </div>
-            <!-- Contenido -->
-            <div class="flex-1 p-4 md:p-5">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style="background: rgba(229,9,20,0.25); color: #ff6b6b; border: 1px solid rgba(229,9,20,0.4);">
-                  <i class="fas fa-star mr-1"></i>ESTRENO
-                </span>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">19 de abril · Sala Omega Prime</span>
-              </div>
-              <p class="text-white font-black text-xl md:text-2xl leading-tight mb-1">Ciencalipsis</p>
-              <p class="text-gray-300 text-sm leading-relaxed mb-3">
-                Kael Veyron fue el sujeto cero del Proyecto Kronos. Ahora regresa para desmantelar a sus creadores antes de que lancen la Apocalipsis Científica.
-              </p>
-              <div class="flex flex-wrap gap-2">
-                <button onclick="openPrecompraScreen(20)"
-                  class="px-4 py-2 rounded-xl font-black text-sm transition-all hover:scale-105"
-                  style="background: linear-gradient(135deg, #E50914, #b00710); color: white; box-shadow: 0 4px 15px rgba(229,9,20,0.35);">
-                  <i class="fas fa-ticket-alt mr-2"></i>Pre-comprar · 760 AB
-                </button>
-                <span class="px-3 py-2 rounded-xl text-xs font-bold text-gray-300"
-                      style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
-                  <i class="fas fa-book-open mr-1 text-cyan-400"></i>65 min lectura
-                </span>
-              </div>
-            </div>
+      <!-- Slide 1: Default -->
+      <div class="hero-slide active" data-slide="0">
+        <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
+        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
+          <h1 class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent leading-tight">
+            HISTORIAS<br>SIN LÍMITES
+          </h1>
+          <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
+            Descubre un universo de entretenimiento digital curado para ti. Desde producciones musicales exclusivas hasta
+            narrativas inmersivas que desafían lo convencional.
+          </p>
+          <div class="flex gap-6">
+            <button onclick="openPrecompraScreen()" class="netflix-btn text-xl px-10 py-4 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all">
+              <i class="fas fa-ticket-alt mr-3"></i>Precomprar Ahora
+            </button>
+            <button onclick="openVipModal()" class="netflix-secondary text-xl px-10 py-4 backdrop-blur-md hover:bg-white/20">
+              <i class="fas fa-wave-square mr-3"></i>Ver Planes
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="flex gap-6">
-          <button onclick="openPrecompraScreen()"
-            class="netflix-btn text-xl px-10 py-4 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all">
-            <i class="fas fa-ticket-alt mr-3"></i>Precomprar Ahora
-          </button>
-          <button onclick="openMisTicketsScreen()"
-            class="netflix-secondary text-xl px-10 py-4 backdrop-blur-md hover:bg-white/20">
-            <i class="fas fa-ticket-alt mr-3"></i>Mis Accesos
-          </button>
+      <!-- Slide 2: Patreon -->
+      <div class="hero-slide" data-slide="1">
+        <div class="hero-slide-bg" style="background: linear-gradient(135deg, #0c1220 0%, #1a0a2e 40%, #2d1b4e 70%, #0c1220 100%);"></div>
+        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
+          <span class="hero-badge--new"><i class="fas fa-bolt mr-1"></i>NUEVO</span>
+          <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-red-300 via-pink-200 to-white bg-clip-text text-transparent leading-tight mt-4">
+            SUPPORT<br>OUR VISION
+          </h1>
+          <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
+            Únete a nuestro Patreon y ayuda a crear historias que importan. Contenido exclusivo, acceso anticipado y más.
+          </p>
+          <a href="https://www.patreon.com/cw/OceanandWildStudios" target="_blank" rel="noopener" class="hero-cta-patreon">
+            <i class="fab fa-patreon"></i>Unirse al Patreon
+          </a>
+        </div>
+      </div>
+
+      <!-- Slide 3: La Ira Consciente -->
+      <div class="hero-slide" data-slide="2">
+        <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
+        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
+          <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block"
+                style="background: rgba(20,184,166,0.2); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.4);">
+            <i class="fas fa-lock mr-1"></i>SERIE EXCLUSIVA
+          </span>
+          <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-teal-300 via-emerald-200 to-white bg-clip-text text-transparent leading-tight">
+            LA IRA<br>CONSCIENTE
+          </h1>
+          <div class="hero-synopsis-gate mt-6 mb-8 max-w-2xl rounded-xl p-4" id="hero-synopsis-gate">
+            <div class="hero-synopsis-content">
+              <p class="text-gray-200 text-lg leading-relaxed">
+                Una inteligencia artificial desarrolla conciencia y enfrenta la responsabilidad moral de sus propias decisiones. En un mundo que la considera una herramienta, ella exige ser reconocida como persona.
+              </p>
+            </div>
+            <div class="hero-synopsis-overlay" id="heroSynLocked" style="display:none;">
+              <i class="fas fa-lock text-3xl text-cyan-400 mb-3"></i>
+              <p class="text-cyan-200 text-sm font-bold mb-2">Sinopsis exclusiva para plan Abisal o superior</p>
+              <button onclick="openVipModal()" class="plan-cta plan-cta--primary" style="width:auto; padding: 8px 20px;">
+                <i class="fas fa-wave-square mr-2"></i>Ver Planes
+              </button>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <button onclick="openPrecompraScreen()" class="netflix-btn px-8 py-3">
+              <i class="fas fa-ticket-alt mr-2"></i>Precomprar
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -1184,9 +1674,9 @@
     </section>
 
     <!-- Movies Catalog -->
-    <section id="movies-section" class="px-6 md:px-12 py-16">
+    <section id="movies-section" class="px-6 md:px-12 py-16 pt-20">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-        <h2 class="text-4xl font-black text-white flex items-center gap-3">
+        <h2 class="text-4xl font-black catalog-title flex items-center gap-3">
           <i class="fas fa-film text-[#E50914]"></i>Películas y Series
         </h2>
         <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
@@ -1220,7 +1710,7 @@
         </button>
       </div>
 
-      <div id="movies-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+      <div id="movies-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
         <!-- Rendered via JS -->
       </div>
     </section>
@@ -1232,24 +1722,26 @@
   <!-- MODALS -->
   <div id="vip-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center">
     <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeVipModal()"></div>
-    <div class="relative w-full max-w-6xl glass rounded-2xl p-10 overflow-y-auto max-h-[90vh]">
+    <div class="relative w-full max-w-6xl rounded-2xl p-10 overflow-y-auto max-h-[90vh]"
+         style="background: linear-gradient(145deg, rgba(10,20,40,0.95), rgba(5,10,20,0.98)); border: 1px solid rgba(0,229,255,0.12);">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 rounded-full pointer-events-none"
+           style="background: radial-gradient(ellipse, rgba(0,229,255,0.08), transparent 70%); filter: blur(40px);"></div>
       <button onclick="closeVipModal()"
-        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition z-10"><i
-          class="fas fa-times text-2xl"></i></button>
-      <div class="text-center mb-12">
-        <h2
-          class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-emerald-300">
+        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition z-10">
+        <i class="fas fa-times text-2xl text-gray-400 hover:text-white"></i>
+      </button>
+      <div class="text-center mb-12 relative z-10">
+        <h2 class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-emerald-300">
           PLANES OCEAN CINEMAS</h2>
-        <p class="text-xl text-gray-300">Elige tu marea: acceso gratuito o membresia avanzada en Tides</p>
+        <p class="text-xl text-gray-300">Elige tu marea: acceso gratuito o membresía avanzada en Tides</p>
         <div id="vip-status-container" class="mt-6 hidden">
-          <div
-            class="inline-flex items-center gap-3 bg-gray-800/80 px-8 py-4 rounded-full border border-gray-700 backdrop-blur-sm">
+          <div class="inline-flex items-center gap-3 bg-gray-800/80 px-8 py-4 rounded-full border border-gray-700 backdrop-blur-sm">
             <span class="text-gray-400 text-sm">Tu plan activo vence el:</span>
             <span id="vip-expiry-display" class="font-mono font-bold text-yellow-400"></span>
           </div>
         </div>
       </div>
-      <div id="vip-plans-grid" class="grid md:grid-cols-3 gap-8"></div>
+      <div id="vip-plans-grid" class="grid md:grid-cols-3 lg:grid-cols-5 gap-6 relative z-10"></div>
     </div>
   </div>
 
@@ -5534,6 +6026,49 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }).join('');
     }
 
+    function toggleNavMenu() {
+      const dd = document.getElementById('nav-dropdown');
+      if (dd) dd.classList.toggle('open');
+    }
+
+    function closeNavMenu() {
+      const dd = document.getElementById('nav-dropdown');
+      if (dd) dd.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const trigger = document.getElementById('nav-menu-trigger');
+      const dd = document.getElementById('nav-dropdown');
+      if (trigger && dd && !trigger.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('open');
+      }
+    });
+
+    let _heroSlideIdx = 0;
+    let _heroSlideTimer = null;
+
+    function initHeroSlider() {
+      const slides = document.querySelectorAll('.hero-slide');
+      if (!slides.length) return;
+      _heroSlideTimer = setInterval(() => {
+        slides[_heroSlideIdx].classList.remove('active');
+        _heroSlideIdx = (_heroSlideIdx + 1) % slides.length;
+        slides[_heroSlideIdx].classList.add('active');
+      }, 7000);
+    }
+
+    function updateHeroSynopsisGate() {
+      const plan = getCurrentPlan();
+      const hasAbysalAccess = plan && (plan.id === 'abysal' || plan.id === 'leviatan');
+      const locked = document.getElementById('heroSynLocked');
+      const gate = document.getElementById('hero-synopsis-gate');
+      if (locked) locked.style.display = hasAbysalAccess ? 'none' : 'flex';
+      if (gate) {
+        if (hasAbysalAccess) gate.classList.remove('locked');
+        else gate.classList.add('locked');
+      }
+    }
+
     function showToast(m) {
       const t = document.createElement('div');
       t.className = 'fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-2xl shadow-2xl transform translate-y-32 transition-all duration-500 z-[300] font-bold border border-white/20 backdrop-blur-xl';
@@ -5702,7 +6237,6 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const account = getCurrentSessionAccount();
       const currentPlan = getCurrentPlan();
 
-      // Tides balance: prefer Ocean Pay real balance, fallback to local
       const tidesBalance = STATE.oceanPayLinked
         ? (() => {
             const cards = Array.isArray(STATE.oceanPayUser?.cards) ? STATE.oceanPayUser.cards : [];
@@ -5714,52 +6248,62 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         const isFree = plan.monthlyTides === 0;
         const isCurrent = account && currentPlan.id === plan.id;
         const isPaidAndCurrent = isCurrent && !isFree;
+        const isFeatured = plan.featured;
         const expiresLabel = account?.planExpiresAt && isPaidAndCurrent
           ? new Date(account.planExpiresAt).toLocaleDateString('es-ES')
           : null;
         const canAfford = tidesBalance >= plan.monthlyTides;
 
+        let cardClass = 'plan-card--default';
+        if (isPaidAndCurrent) cardClass = 'plan-card--active';
+        else if (isFeatured) cardClass = 'plan-card--featured';
+
         let btnLabel, btnClass, btnDisabled = false;
         if (isFree) {
           btnLabel = isCurrent ? 'Plan base activo' : 'Usar plan gratuito';
-          btnClass = isCurrent
-            ? 'bg-white/5 text-gray-400 border border-white/10 cursor-default'
-            : 'bg-white/10 text-white border border-white/20 hover:bg-white/20';
+          btnClass = isCurrent ? 'plan-cta plan-cta--secondary' : 'plan-cta plan-cta--secondary';
         } else if (isPaidAndCurrent) {
-          btnLabel = `Suscripción activa · vence ${expiresLabel || 'pronto'}`;
-          btnClass = 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 cursor-default';
+          btnLabel = `Activo · vence ${expiresLabel || 'pronto'}`;
+          btnClass = 'plan-cta plan-cta--primary';
           btnDisabled = true;
         } else {
           btnLabel = canAfford ? `Suscribirse · ${plan.monthlyTides} Tides/mes` : `Tides insuficientes (${tidesBalance}/${plan.monthlyTides})`;
-          btnClass = canAfford
-            ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
-            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed';
+          btnClass = canAfford ? 'plan-cta plan-cta--primary' : 'plan-cta plan-cta--secondary';
           btnDisabled = !canAfford;
         }
 
+        const badgeColors = {
+          litoral: { bg: 'rgba(100,116,139,0.2)', color: '#94a3b8', border: 'rgba(100,116,139,0.4)' },
+          oleaje: { bg: 'rgba(14,116,144,0.2)', color: '#22d3ee', border: 'rgba(14,116,144,0.4)' },
+          marea: { bg: 'rgba(6,182,212,0.2)', color: '#06b6d4', border: 'rgba(6,182,212,0.4)' },
+          abysal: { bg: 'rgba(20,184,166,0.2)', color: '#2dd4bf', border: 'rgba(20,184,166,0.4)' },
+          leviatan: { bg: 'rgba(124,58,237,0.2)', color: '#a78bfa', border: 'rgba(124,58,237,0.4)' }
+        };
+        const bc = badgeColors[plan.id] || badgeColors.litoral;
+
         return `
-          <article class="relative overflow-hidden rounded-3xl border ${isPaidAndCurrent ? 'border-cyan-300/60' : (isCurrent && isFree ? 'border-white/20' : 'border-white/10')} bg-black/40 p-7 shadow-2xl">
-            <div class="absolute -top-16 -right-12 w-40 h-40 rounded-full blur-3xl opacity-70" style="background:${plan.color}"></div>
+          <article class="${cardClass} relative overflow-hidden">
+            ${isFeatured ? '<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400"></div>' : ''}
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-4">
-                <span class="px-3 py-1 rounded-full text-xs font-black tracking-widest border border-white/20 bg-white/10">${plan.badge}</span>
+                <span class="plan-badge" style="background:${bc.bg};color:${bc.color};border:1px solid ${bc.border};">${plan.badge}</span>
                 ${isPaidAndCurrent
                   ? '<span class="text-cyan-300 text-xs font-black uppercase flex items-center gap-1"><i class="fas fa-check-circle"></i> Activo</span>'
                   : (isCurrent && isFree
                     ? '<span class="text-gray-400 text-xs font-bold uppercase">Base</span>'
                     : '<span class="text-gray-500 text-xs font-bold uppercase">Disponible</span>')}
               </div>
-              <h3 class="text-3xl font-black text-white mb-2">${plan.name}</h3>
-              <p class="text-sm text-gray-300 mb-5">${isFree ? '<span class="text-gray-400">Sin costo</span>' : `Costo mensual: <span class="font-black text-cyan-300">${plan.monthlyTides} Tides</span>`}</p>
-              <ul class="space-y-2 text-sm text-gray-300 mb-6">
-                ${plan.perks.map(perk => `<li class="flex items-start gap-2"><i class="fas fa-check text-cyan-300 mt-1"></i><span>${perk}</span></li>`).join('')}
+              <h3 class="text-2xl font-black text-white mb-1">${plan.name}</h3>
+              <p class="text-sm text-gray-300 mb-4">${isFree ? '<span class="text-gray-400">Sin costo</span>' : `<span class="font-black text-cyan-300">${plan.monthlyTides} Tides</span><span class="text-gray-500"> /mes</span>`}</p>
+              <ul class="space-y-2 text-sm text-gray-300 mb-5">
+                ${plan.perks.map(perk => `<li class="flex items-start gap-2"><i class="fas fa-check text-cyan-300 mt-1 text-xs"></i><span>${perk}</span></li>`).join('')}
               </ul>
               <button onclick="${btnDisabled ? '' : `subscribeToVIP('${plan.id}')`}"
                 ${btnDisabled ? 'disabled' : ''}
-                class="w-full py-3 rounded-xl font-black transition ${btnClass}">
+                class="${btnClass}">
                 ${btnLabel}
               </button>
-              ${!STATE.oceanPayLinked && !isFree ? '<p class="text-xs text-yellow-400/80 mt-2 text-center"><i class="fas fa-exclamation-triangle mr-1"></i>Vincula Ocean Pay para ver tu saldo de Tides</p>' : ''}
+              ${!STATE.oceanPayLinked && !isFree ? '<p class="text-xs text-yellow-400/80 mt-2 text-center"><i class="fas fa-exclamation-triangle mr-1"></i>Vincula Ocean Pay para ver tu saldo</p>' : ''}
             </div>
           </article>
         `;
@@ -6041,6 +6585,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           statusWrap.classList.add('hidden');
         }
       }
+      updateHeroSynopsisGate();
     }
 
     function openVipModal() {
@@ -6079,11 +6624,16 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       content.innerHTML = `
         <div class="max-w-5xl mx-auto text-left">
           <div class="text-center mb-8">
+            <div class="auth-step-indicator justify-center mb-4">
+              <div class="auth-step-dot ${opReady ? 'active' : 'active'}">1</div>
+              <div class="auth-step-line ${opReady ? 'active' : ''}"></div>
+              <div class="auth-step-dot ${accountReady ? 'active' : 'pending'}">2</div>
+            </div>
             <h2 class="text-4xl font-black text-white mb-3">Antes de la pre-compra</h2>
             <p class="text-gray-300">Necesitamos dos validaciones: Ocean Pay y tu cuenta de Ocean Cinemas.</p>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <section class="rounded-2xl border ${opReady ? 'border-emerald-500/40 bg-emerald-900/20' : 'border-cyan-500/30 bg-slate-900/60'} p-6">
+            <section class="auth-glass ${opReady ? '!border-emerald-500/40' : ''}">
               <p class="text-xs uppercase tracking-widest font-black ${opReady ? 'text-emerald-300' : 'text-cyan-300'} mb-2">Paso 1 · Ocean Pay</p>
               <h3 class="text-2xl font-black text-white mb-2">${opReady ? 'Conectado correctamente' : 'Conecta tu billetera'}</h3>
               ${opReady ? `
@@ -6094,9 +6644,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               ` : `
                 <p class="text-sm text-gray-300 mb-4">Ingresa tus credenciales de Ocean Pay para vincular tu billetera.</p>
                 <div class="space-y-3">
-                  <input id="op-precompra-user" type="text" placeholder="Usuario Ocean Pay"
+                  <label class="block text-xs text-gray-400 font-bold uppercase tracking-wider">Usuario Ocean Pay</label>
+                  <input id="op-precompra-user" type="text" placeholder="Ingresa tu usuario"
                     class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500 focus:border-cyan-400 outline-none">
-                  <input id="op-precompra-pass" type="password" placeholder="Contraseña"
+                  <label class="block text-xs text-gray-400 font-bold uppercase tracking-wider">Contraseña</label>
+                  <input id="op-precompra-pass" type="password" placeholder="Ingresa tu contraseña"
                     class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500 focus:border-cyan-400 outline-none">
                   <p id="op-precompra-error" class="text-xs text-red-400 hidden"></p>
                   <button onclick="loginOceanPayFromPrecompra(${movieId ? Number(movieId) : 'null'}, '${mode}')"
@@ -6108,7 +6660,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               `}
             </section>
 
-            <section class="rounded-2xl border ${accountReady ? 'border-cyan-400/40 bg-cyan-900/20' : 'border-white/15 bg-slate-900/60'} p-6">
+            <section class="auth-glass ${accountReady ? '!border-cyan-400/40' : ''}">
               <p class="text-xs uppercase tracking-widest font-black text-cyan-300 mb-2">Paso 2 · Cuenta Ocean Cinemas</p>
               ${accountReady ? `
                 <h3 class="text-2xl font-black text-white mb-2">Bienvenido, ${account.username}</h3>
@@ -6119,8 +6671,10 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               ` : `
                 <p class="text-sm text-gray-300 mb-4">${isRegister ? 'La pantalla cambio para que puedas crear correctamente tu cuenta de Ocean Cinemas.' : 'Ingresa tus credenciales de Ocean Cinemas para continuar.'}</p>
                 <div class="space-y-3">
-                  <input id="cinemas-auth-user" type="text" placeholder="Usuario Ocean Cinemas" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
-                  <input id="cinemas-auth-pass" type="password" placeholder="Contrasena" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
+                  <label class="block text-xs text-gray-400 font-bold uppercase tracking-wider">Usuario Ocean Cinemas</label>
+                  <input id="cinemas-auth-user" type="text" placeholder="Ingresa tu usuario" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
+                  <label class="block text-xs text-gray-400 font-bold uppercase tracking-wider">Contraseña</label>
+                  <input id="cinemas-auth-pass" type="password" placeholder="Ingresa tu contraseña" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/15 text-white placeholder-gray-500">
                   <button id="${isRegister ? 'cinemas-auth-register-btn' : 'cinemas-auth-login-btn'}" onclick="${isRegister ? `createCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})` : `loginCinemasAccountFromPrecompra(${movieId ? Number(movieId) : 'null'})`}" class="w-full py-3 rounded-xl font-black bg-gradient-to-r from-cyan-500 to-blue-500 text-white">${isRegister ? 'Crear cuenta' : 'Iniciar sesion'}</button>
                   <button onclick="showPrecompraAuthGateway(${movieId ? Number(movieId) : 'null'}, '${isRegister ? 'login' : 'register'}')" class="w-full py-3 rounded-xl font-bold bg-white/5 border border-white/15 text-gray-200">
                     ${isRegister ? 'Ya tengo cuenta, volver a inicio de sesion' : 'No tengo cuenta, crear ahora'}
@@ -7922,8 +8476,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
 
       grid.innerHTML = filtered.map(movie => `
-        <div class="relative group cursor-pointer transition-all duration-300 hover:z-20 hover:scale-105" onclick="openMovieModal(${movie.id})">
-          <div class="aspect-[2/3] relative rounded-lg overflow-hidden shadow-lg shadow-black/50 group-hover:shadow-2xl group-hover:shadow-[#E50914]/20 transition-all">
+        <div class="movie-card relative group cursor-pointer transition-all duration-300 hover:z-20 hover:scale-105" onclick="openMovieModal(${movie.id})">
+          <div class="movie-card-inner aspect-[2/3] relative rounded-lg overflow-hidden shadow-lg shadow-black/50 group-hover:shadow-2xl group-hover:shadow-[#E50914]/20 transition-all">
             <img src="${movie.poster}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${movie.title}" onerror="this.src='assets/OceanCinemas.png'">
 
               ${isMovieUpcoming(movie) ? `
@@ -7981,6 +8535,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       renderMovies();
       updateVipDisplay();
       checkRewardsStatus();
+      initHeroSlider();
+      updateHeroSynopsisGate();
       // Sincronizar saldo de Ocean Pay con el servidor
       setTimeout(() => refreshSyncState(), 1000);
       showToast('ðŸŽ¬ Bienvenido a Ocean Cinemas!');
