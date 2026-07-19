@@ -1762,36 +1762,93 @@
     const OCEAN_DEFAULT_TIDES_BALANCE = 1200;
     const OCEAN_PLAN_MONTH_DAYS = 30;
     const OCEAN_MEMBERSHIP_PLANS = {
-      free: {
-        id: 'free',
-        name: 'Corriente Libre',
+      litoral: {
+        id: 'litoral',
+        name: 'Litoral',
         badge: 'FREE',
         monthlyTides: 0,
         color: 'linear-gradient(135deg, rgba(71,85,105,0.9), rgba(30,41,59,0.95))',
         discountRate: 0,
         appliesToUpcoming: false,
         fastPassOverride: false,
-        rewardMultiplier: 1,
+        rewardMultiplier: 0,
+        featured: false,
         perks: [
-          'Acceso completo al catalogo base',
-          'Pre-compra estandar disponible',
-          'Modo lectura y recompensas diarias'
+          'Acceso al 50% del catálogo base',
+          'Pre-compra estándar disponible',
+          'Sin recompensas diarias'
         ]
       },
-      abyssal: {
-        id: 'abyssal',
-        name: 'Marea Abisal',
+      oleaje: {
+        id: 'oleaje',
+        name: 'Oleaje',
+        badge: 'OLEAJE',
+        monthlyTides: 60,
+        color: 'linear-gradient(135deg, rgba(14,116,144,0.9), rgba(8,145,178,0.7))',
+        discountRate: 0,
+        appliesToUpcoming: false,
+        fastPassOverride: false,
+        rewardMultiplier: 1,
+        featured: false,
+        perks: [
+          'Acceso completo al catálogo base',
+          'Pre-compra estándar disponible',
+          'Recompensas diarias (25 AquaBux)'
+        ]
+      },
+      marea: {
+        id: 'marea',
+        name: 'Marea',
+        badge: 'MAREA',
+        monthlyTides: 180,
+        color: 'linear-gradient(135deg, rgba(6,182,212,0.9), rgba(14,165,233,0.7))',
+        discountRate: 0.25,
+        appliesToUpcoming: false,
+        fastPassOverride: false,
+        rewardMultiplier: 2,
+        featured: false,
+        perks: [
+          'Acceso completo al catálogo base y extendido',
+          '25% de descuento en pre-compra',
+          'Fast Pass parcial habilitado',
+          'Recompensas diarias x2 (50 AquaBux)'
+        ]
+      },
+      abysal: {
+        id: 'abysal',
+        name: 'Abisal',
         badge: 'ABISAL',
-        monthlyTides: 520,
-        color: 'linear-gradient(135deg, rgba(8,47,73,0.95), rgba(6,182,212,0.55), rgba(20,184,166,0.65))',
+        monthlyTides: 400,
+        color: 'linear-gradient(135deg, rgba(20,184,166,0.95), rgba(6,182,212,0.55))',
         discountRate: 0.5,
         appliesToUpcoming: true,
         fastPassOverride: true,
-        rewardMultiplier: 2,
+        rewardMultiplier: 3,
+        featured: true,
         perks: [
-          '50% de descuento en todas las peliculas, incluidos estrenos proximos',
-          'Fast Pass habilitado incluso cuando el estreno aun esta en ventana de bloqueo',
-          'Recompensas diarias y de lectura duplicadas'
+          '50% de descuento en todas las películas, incluidos estrenos',
+          'Fast Pass habilitado incluso en ventana de bloqueo',
+          'Recompensas diarias y de lectura x3',
+          'Sinopsis exclusivas de series nuevas'
+        ]
+      },
+      leviatan: {
+        id: 'leviatan',
+        name: 'Leviatán',
+        badge: 'LEVIATÁN',
+        monthlyTides: 850,
+        color: 'linear-gradient(135deg, rgba(88,28,135,0.95), rgba(124,58,237,0.55))',
+        discountRate: 0.7,
+        appliesToUpcoming: true,
+        fastPassOverride: true,
+        rewardMultiplier: 4,
+        featured: false,
+        perks: [
+          '70% de descuento en todas las películas',
+          'Acceso anticipado 48h a estrenos',
+          'Fast Pass ilimitado siempre',
+          'Recompensas diarias x4 (100 AquaBux)',
+          'Contenido exclusivo detrás de cámaras'
         ]
       }
     };
@@ -5256,14 +5313,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (cached) return cached;
       // Build minimal account from session if not in cache
       if (STATE.cinemasSession?.username) {
-        return { username: currentUser, planId: 'free', tidesBalance: OCEAN_DEFAULT_TIDES_BALANCE };
+        return { username: currentUser, planId: 'litoral', tidesBalance: OCEAN_DEFAULT_TIDES_BALANCE };
       }
       return null;
     }
 
     function getCurrentPlan() {
       const account = getCurrentSessionAccount();
-      return getPlanById(account?.planId || 'free');
+      return getPlanById(account?.planId || 'litoral');
     }
 
     function isCinemasAccountLinked() {
@@ -5311,7 +5368,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         const idx = STATE.cinemasAccounts.findIndex(a => normalizeUserHandle(a.username) === normalizeUserHandle(username));
         const merged = {
           username: normalizeUserHandle(username),
-          planId: serverUser.planId || 'free',
+          planId: serverUser.planId || 'litoral',
           tidesBalance: serverUser.tidesBalance ?? OCEAN_DEFAULT_TIDES_BALANCE,
           createdAt: Date.now()
         };
@@ -5716,7 +5773,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         showPrecompraAuthGateway(null, 'login');
         return;
       }
-      if (planId === 'free') {
+      if (planId === 'litoral') {
         // Plan gratuito: activar localmente sin checkout
         const result = activateCinemasPlan(planId);
         if (!result.ok) { showToast(`? ${result.error}`); return; }
@@ -5762,7 +5819,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               const account = getCurrentSessionAccount();
               if (account) {
                 const planName = String(subData.active.plan_name || '').toLowerCase();
-                const activePlanId = (planName.includes('abisal') || planName.includes('abyssal')) ? 'abyssal' : 'free';
+                const activePlanId = planName.includes('leviat') ? 'leviatan' : planName.includes('abisal') ? 'abysal' : planName.includes('marea') ? 'marea' : planName.includes('oleaje') ? 'oleaje' : 'litoral';
                 account.planId = activePlanId;
                 account.planExpiresAt = subData.active.end_date ? new Date(subData.active.end_date).getTime() : null;
                 saveCinemasAccountState();
@@ -5966,7 +6023,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       v.classList.remove('hidden');
 
       // Show plan name with active indicator if paid plan
-      const isPaid = plan.id !== 'free';
+      const isPaid = plan.id !== 'litoral';
       v.innerHTML = `
         <i class="fas fa-wave-square ${isPaid ? 'text-cyan-300' : 'text-gray-400'}"></i>
         <span class="${isPaid ? 'text-cyan-200 font-black' : ''}">${plan.name}</span>
@@ -6136,8 +6193,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
                 <ul class="space-y-2 text-sm text-gray-300 mb-5">
                   ${plan.perks.map(perk => `<li class="flex items-start gap-2"><i class="fas fa-check text-cyan-300 mt-1"></i><span>${perk}</span></li>`).join('')}
                 </ul>
-                <button onclick="choosePlanAfterSignup('${plan.id}', ${movieId ? Number(movieId) : 'null'})" class="w-full py-3 rounded-xl font-black ${plan.id === 'free' ? 'bg-white/10 border border-white/20 text-white' : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'}">
-                  ${plan.id === 'free' ? 'Continuar en gratuito' : `Actualizar a ${plan.name}`}
+                <button onclick="choosePlanAfterSignup('${plan.id}', ${movieId ? Number(movieId) : 'null'})" class="w-full py-3 rounded-xl font-black ${plan.id === 'litoral' ? 'bg-white/10 border border-white/20 text-white' : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'}">
+                  ${plan.id === 'litoral' ? 'Continuar en gratuito' : `Actualizar a ${plan.name}`}
                 </button>
               </article>
             `).join('')}
@@ -6152,8 +6209,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         showToast(`? ${result.error}`);
         return;
       }
-      if (planId === 'free') {
-        showToast('? Continuas con Corriente Libre.');
+      if (planId === 'litoral') {
+        showToast('? Continuas con Litoral.');
       } else {
         showToast(`? Plan ${result.plan.name} activado con beneficios completos.`);
       }
@@ -6294,7 +6351,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               const account = getCurrentSessionAccount();
               if (account) {
                 const planName = String(activeSub.plan_name || '').toLowerCase();
-                const planId = (planName.includes('abisal') || planName.includes('abyssal')) ? 'abyssal' : 'free';
+                const planId = planName.includes('leviat') ? 'leviatan' : planName.includes('abisal') ? 'abysal' : planName.includes('marea') ? 'marea' : planName.includes('oleaje') ? 'oleaje' : 'litoral';
                 const endDate = activeSub.end_date || activeSub.next_payment;
                 account.planId = planId;
                 account.planExpiresAt = endDate ? new Date(endDate).getTime() : null;
