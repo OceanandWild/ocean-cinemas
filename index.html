@@ -337,11 +337,6 @@
     .hero-banner {
       position: relative;
       height: 95vh;
-      padding-top: 100px;
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      align-items: center;
       overflow: hidden;
     }
 
@@ -351,6 +346,9 @@
       opacity: 0;
       transition: opacity 0.8s ease;
       pointer-events: none;
+      display: flex;
+      align-items: center;
+      padding-top: 100px;
     }
 
     .hero-slide.active {
@@ -386,21 +384,33 @@
       100% { box-shadow: 0 0 12px rgba(234,179,8,0.5); }
     }
 
-    .hero-cta-patreon {
+.hero-cta-patreon {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 28px;
+      padding: 10px 18px;
       border-radius: 12px;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 0.95rem;
-      background: linear-gradient(135deg, #ff424d, #c9184a);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
+      color: #020617;
+      background: linear-gradient(135deg, #00b8d4, #0066cc);
+      border: 1px solid #0095b8;
+      box-shadow: 0 0 12px rgba(0,229,255,0.3);
       transition: all 0.3s ease;
-      animation: patreonPulse 3s ease-in-out infinite;
+      text-decoration: none;
+      color: #020617;
+    }
+    .hero-cta-patreon:hover {
+      box-shadow: 0 0 15px rgba(0,229,255,0.5);
+      transform: translateY(-2px);
+    }
+    .hero-cta-patreon:hover .fa-bolt {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes patreonPulse {
+      0% { box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+      50% { box-shadow: 0 0 25px rgba(0,229,255,0.6), 0 0 10px rgba(0,229,255,0.2); }
+      100% { box-shadow: 0 0 10px rgba(0,229,255,0.4); }
     }
 
     @keyframes patreonPulse {
@@ -1428,7 +1438,7 @@
       <!-- Slide 1: Default -->
       <div class="hero-slide active" data-slide="0">
         <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
-        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
+        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
           <h1 class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent leading-tight">
             HISTORIAS<br>SIN LÍMITES
           </h1>
@@ -1447,27 +1457,29 @@
         </div>
       </div>
 
-      <!-- Slide 2: Patreon -->
-      <div class="hero-slide" data-slide="1">
-        <div class="hero-slide-bg" style="background: linear-gradient(135deg, #0c1220 0%, #1a0a2e 40%, #2d1b4e 70%, #0c1220 100%);"></div>
-        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
-          <span class="hero-badge--new"><i class="fas fa-bolt mr-1"></i>NUEVO</span>
-          <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-red-300 via-pink-200 to-white bg-clip-text text-transparent leading-tight mt-4">
-            APOYA<br>NUESTRA VISIÓN
-          </h1>
-          <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
-            Únete a nuestro Patreon y ayuda a crear historias que importan. Contenido exclusivo, acceso anticipado y más.
-          </p>
-          <a href="https://www.patreon.com/cw/OceanandWildStudios" target="_blank" rel="noopener" class="hero-cta-patreon">
-            <i class="fab fa-patreon"></i>Unirse al Patreon
-          </a>
+<!-- Slide 2: Patreon -->
+        <div class="hero-slide" data-slide="1">
+          <div class="hero-slide-bg" style="background: linear-gradient(135deg, #00111a, #003344, #004466, #001220);"></div>
+          <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
+            <span class="hero-badge--new"><i class="fas fa-bolt mr-1"></i>NUEVO</span>
+            <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent leading-tight mt-4">
+              APOYA<br>NUESTRA VISIÓN
+            </h1>
+            <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
+              Únete a nuestro Patreon y apoya el futuro del cine. Contenido exclusivo, acceso anticipado y recompensas diarias.
+            </p>
+            <a href="https://www.patreon.com/cw/OceanandWildStudios" target="_blank" rel="noopener" class="hero-cta-patreon">
+              <i class="fas fa-bolt mr-1"></i>Unirse al Patreon
+            </a>
+          </div>
         </div>
+      </div>
       </div>
 
       <!-- Slide 3: La Ira Consciente -->
       <div class="hero-slide" data-slide="2">
         <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
-        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-24">
+        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
           <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block"
                 style="background: rgba(20,184,166,0.2); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.4);">
             <i class="fas fa-lock mr-1"></i>SERIE EXCLUSIVA
@@ -10192,3 +10204,32 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
 
 
+ 
+ . h e r o - c t a - p a t r e o n   {  
+     d i s p l a y :   i n l i n e - f l e x ;  
+     a l i g n - i t e m s :   c e n t e r ;  
+     g a p :   8 p x ;  
+     p a d d i n g :   1 0 p x   1 8 p x ;  
+     b o r d e r - r a d i u s :   1 2 p x ;  
+     f o n t - s i z e :   0 . 9 5 r e m ;  
+     f o n t - w e i g h t :   8 0 0 ;  
+     b a c k g r o u n d :   l i n e a r - g r a d i e n t ( 1 3 5 d e g ,   # 0 0 b 8 d 4 ,   # 0 0 6 6 c c ) ;  
+     c o l o r :   # 0 2 0 6 1 7 ;  
+     b o r d e r :   1 p x   s o l i d   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 3 ) ;  
+     b o x - s h a d o w :   0   4 p x   1 2 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 2 ) ;  
+     t r a n s i t i o n :   a l l   0 . 3 s   e a s e ;  
+ }  
+ . h e r o - c t a - p a t r e o n : h o v e r   {  
+     b o x - s h a d o w :   0   0   1 5 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 5 ) ;  
+     t r a n s f o r m :   t r a n s l a t e Y ( - 2 p x ) ;  
+ }  
+ . h e r o - c t a - p a t r e o n : h o v e r   . f a - b o l t   {  
+     a n i m a t i o n :   p a t r e o n P u l s e   2 s   e a s e - i n - o u t   i n f i n i t e ;  
+ }  
+ @ k e y f r a m e s   p a t r e o n P u l s e   {  
+     0 %   {   b o x - s h a d o w :   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 3 ) ;   }  
+     5 0 %   {   b o x - s h a d o w :   0   0   2 5 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 6 ) ,   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 2 ) ;   }  
+     1 0 0 %   {   b o x - s h a d o w :   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 4 ) ;   }  
+ }  
+  
+ 
