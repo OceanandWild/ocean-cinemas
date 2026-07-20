@@ -5788,9 +5788,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
     function canUseFastPassWithPlan(policy) {
-      if (policy?.fastPass?.enabled) return true;
       const plan = getCurrentPlan();
-      return Boolean(plan?.fastPassOverride);
+      if (!plan) return false;
+      // Litoral y Oleaje: nunca tienen Fast Pass
+      if (plan.rewardMultiplier < 2) return false;
+      // Abisal/Leviatan: fastPassOverride permite bypass
+      if (plan.fastPassOverride) return true;
+      // Marea: solo cuando el movie policy lo habilita
+      return Boolean(policy?.fastPass?.enabled);
     }
 
     function getPriceWithPlan(basePrice, movie) {
