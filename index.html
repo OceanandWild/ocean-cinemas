@@ -8222,6 +8222,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function initSearchAndFilter() {
       const searchInput = document.getElementById('search-input');
       const genreFilter = document.getElementById('genre-filter');
+      if (!searchInput || !genreFilter) return;
       const genres = [...new Set(STATE.movies.map(m => m.genre.split(' - ')[0]))];
       genres.forEach(g => {
         const option = document.createElement('option');
