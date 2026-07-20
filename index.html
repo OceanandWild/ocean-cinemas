@@ -10390,6 +10390,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
       // Only show series_container (not individual episodes) and movies
       let list = STATE.movies.filter(m => {
+        if (m.hidden) return false;
         const isSeries = m.type === 'series_container';
         const isMovie = m.type !== 'series_container' && m.type !== 'episode';
         if (precompraCategoryFilter === 'series_container' && !isSeries) return false;
