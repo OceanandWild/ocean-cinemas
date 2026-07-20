@@ -10846,34 +10846,56 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     // Early exit penalty system
     let exitWarnCount = parseInt(localStorage.getItem('oc_early_exits') || '0');
     
-    function detectEarlyExit(video) {
+    // ============================================================
+    // EARLY EXIT PENALTY SYSTEM — Backend-driven
+    // ============================================================
+    async function detectEarlyExit(video) {
       if (!video || !video.duration) return;
-      const progress = video.currentTime / video.duration;
-      if (progress < 0.95) {
-        exitWarnCount++;
-        localStorage.setItem('oc_early_exits', exitWarnCount);
-        
-        // Subtract AquaBux
-        const deduction = 15;
-        STATE.balance = Math.max(0, STATE.balance - deduction);
-        saveToStorage();
-        updateBalanceDisplay();
-        showNotification(`⚠️ Has abandonado la sala antes de finalizar. Penalización: -${deduction} AquaBux.`);
-        
-        if (exitWarnCount === 2) {
-          showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente 2 veces. Un abandono adicional causará la suspensión de 24h.');
-        } else if (exitWarnCount >= 3) {
-          // Suspend Account
-          const liftTime = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-          localStorage.setItem('oc_suspended_until', liftTime);
-          showNotification('🚨 Tu cuenta ha sido SUSPENDIDA temporalmente por comportamiento abusivo en las salas.');
-          alert('Tu cuenta de Ocean Cinemas ha sido suspendida por 24 horas.');
-          location.reload();
+      const currentTime = video.currentTime;
+      const duration = video.duration;
+      const watchedRatio = currentTime / duration;
+
+      // Get OC session token
+      const session = STATE.cinemasSession;
+      if (!session?.token) {
+        // Fallback: no session, just local notification
+        if (watchedRatio < 0.95) {
+          showNotification('⚠️ Vincula tu cuenta para registrar progreso de visualización.');
         }
-      } else {
-        // Mark as watched for series progress check
-        if (window._activeMovieId) {
-          localStorage.setItem(`oc_watched_${window._activeMovieId}`, 'true');
+        return;
+      }
+
+      const movieId = window._activeMovieId || 'unknown';
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/movies/exit`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ movieId, currentTime, duration, watchedRatio })
+        });
+        const data = await res.json();
+        if (!data.success) return;
+
+        if (!data.isEarly) {
+          // Watched till end - show congratulations
+          showNotification(`🎉 ¡Película completada! +${data.rewardAmount || 50} AquaBux`);
+          return;
+        }
+
+        // Show the main result message
+        showNotification(data.notification || data.message);
+
+        // If suspended: render waiting room
+        if (data.suspended) {
+          setTimeout(() => renderSuspensionWaitingRoom(data), 1500);
+        }
+      } catch (e) {
+        console.warn('[OC] detectEarlyExit fetch failed:', e);
+        // Graceful fallback - still show generic message
+        if (watchedRatio < 0.95) {
+          showNotification('⚠️ Has salido antes de finalizar la película.');
         }
       }
     }
@@ -10888,27 +10910,90 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
     }
 
-    // Check suspension at load time
-    function checkSuspensionState() {
-      const suspendedUntil = parseInt(localStorage.getItem('oc_suspended_until') || '0');
-      if (suspendedUntil && Date.now() < suspendedUntil) {
-        // Lock screen
-        document.body.innerHTML = `
-          <div class="fixed inset-0 bg-[#020512] flex flex-col items-center justify-center text-center p-8 z-[9999]">
-            <div class="w-24 h-24 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-6">
-              <i class="fas fa-user-slash text-red-500 text-4xl"></i>
-            </div>
-            <h1 class="text-3xl font-black text-white mb-2">Cuenta Suspendida Temporalmente</h1>
-            <p class="text-gray-400 max-w-md mb-6">Tu acceso a Ocean Cinemas ha sido restringido por comportamiento inadecuado al abandonar salas repetidamente.</p>
-            <div class="p-4 bg-white/5 border border-white/10 rounded-xl text-sm font-mono text-cyan-400 mb-6">
-              Tiempo restante: ${Math.ceil((suspendedUntil - Date.now()) / (60 * 1000))} minutos
-            </div>
-            <p class="text-xs text-gray-500">La suspensión finalizará automáticamente al concluir el periodo de 24 horas.</p>
+    // ============================================================
+    // SUSPENSION WAITING ROOM — Premium UI
+    // ============================================================
+    function renderSuspensionWaitingRoom(suspData) {
+      const suspUntil = suspData?.suspended_until ? new Date(suspData.suspended_until) : new Date(Date.now() + 24*3600*1000);
+      const reason = suspData?.reason || 'Salidas prematuras reiteradas';
+
+      const overlay = document.createElement('div');
+      overlay.id = 'oc-suspension-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+      overlay.innerHTML = `
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%, rgba(244,63,94,0.12) 0%, transparent 70%);pointer-events:none;"></div>
+        <div style="position:relative;z-index:2;text-align:center;max-width:560px;padding:3rem 2rem;">
+          <!-- Icon -->
+          <div style="width:100px;height:100px;border-radius:50%;background:rgba(244,63,94,0.1);border:2px solid rgba(244,63,94,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;">
+            <i class="fas fa-user-slash" style="font-size:2.5rem;color:#f43f5e;"></i>
           </div>
-        `;
+          <!-- Title -->
+          <h1 style="color:#fff;font-size:1.9rem;font-weight:900;margin:0 0 0.5rem;font-family:'Plus Jakarta Sans',sans-serif;">Cuenta Suspendida</h1>
+          <p style="color:#94a3b8;font-size:0.95rem;margin:0 0 0.35rem;">Tu acceso a Ocean Cinemas ha sido temporalmente restringido.</p>
+          <p style="color:#64748b;font-size:0.82rem;margin:0 0 2rem;">${reason}</p>
+
+          <!-- Countdown box -->
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(244,63,94,0.2);border-radius:20px;padding:1.75rem 2rem;margin-bottom:2rem;">
+            <p style="color:#64748b;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 0.75rem;">Tiempo restante</p>
+            <div id="oc-suspension-countdown" style="font-size:2.5rem;font-weight:900;color:#f43f5e;font-family:'Courier New',monospace;">--:--:--</div>
+            <p style="color:#475569;font-size:0.78rem;margin:0.5rem 0 0;">La suspensión finalizará el <strong style="color:#cbd5e1;">${suspUntil.toLocaleString('es-ES', {dateStyle:'medium',timeStyle:'short'})}</strong></p>
+          </div>
+
+          <!-- Info box -->
+          <div style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);border-radius:14px;padding:1.25rem 1.5rem;text-align:left;">
+            <h4 style="color:#fca5a5;margin:0 0 0.5rem;font-size:0.9rem;"><i class="fas fa-circle-exclamation" style="margin-right:6px;"></i>¿Por qué estás suspendido?</h4>
+            <p style="color:#94a3b8;font-size:0.82rem;margin:0;line-height:1.5;">Has salido de salas de cine antes de que termine la película en 3 o más ocasiones. Esta restricción protege la integridad del sistema de recompensas. Puedes ver el detalle completo en <strong style="color:#22d3ee;">Ocean Pay → Suspensiones</strong>.</p>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      // Start countdown ticker
+      function tick() {
+        const ms = suspUntil - Date.now();
+        if (ms <= 0) {
+          // Suspension lifted
+          document.getElementById('oc-suspension-countdown').textContent = '00:00:00';
+          overlay.innerHTML = `
+            <div style="text-align:center;padding:3rem;">
+              <i class="fas fa-unlock" style="font-size:4rem;color:#22d3ee;display:block;margin-bottom:1rem;"></i>
+              <h2 style="color:#fff;margin:0 0 0.5rem;">Suspensión levantada</h2>
+              <p style="color:#64748b;">Tu acceso ha sido restaurado. La página se recargará en 3 segundos...</p>
+            </div>`;
+          setTimeout(() => location.reload(), 3000);
+          return;
+        }
+        const h = Math.floor(ms / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        const s = Math.floor((ms % 60000) / 1000);
+        const el = document.getElementById('oc-suspension-countdown');
+        if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        setTimeout(tick, 1000);
+      }
+      tick();
+    }
+
+    // Check suspension state at load time (using backend)
+    async function checkSuspensionState() {
+      const session = STATE.cinemasSession;
+      if (!session?.token) return;
+      try {
+        const res = await fetch(`${API_URL}/ocean-cinemas/auth/me`, {
+          headers: { 'Authorization': `Bearer ${session.token}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const susp = data.suspension;
+        if (susp && susp.suspended && susp.suspendedUntil) {
+          renderSuspensionWaitingRoom({ suspended_until: new Date(susp.suspendedUntil), reason: susp.reason });
+        }
+      } catch (e) {
+        // Offline or error — don't block access
+        console.warn('[OC] checkSuspensionState failed:', e);
       }
     }
-    
+
     // Hook video play/close checks
     window.addEventListener('DOMContentLoaded', () => {
       checkSuspensionState();
