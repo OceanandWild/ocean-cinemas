@@ -1843,6 +1843,8 @@
         </div>
       </div>
     
+
+  <div id="cinema-room" class="fixed inset-0 bg-black z-[100] hidden flex flex-col">
     <video id="cinema-video" class="w-full h-full object-contain">
       <source id="video-source" src="" type="video/mp4">
     </video>
@@ -8553,11 +8555,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function togglePlay() {
       const video = document.getElementById('cinema-video');
+      if (!video || !video.src || video.readyState === 0) return;
       const btn = document.getElementById('play-pause-btn');
-      const icon = btn.querySelector('i');
+      const icon = btn ? btn.querySelector('i') : null;
 
       if (video.paused) {
-        video.play();
+        video.play().catch(() => {});
         icon.classList.remove('fa-play');
         icon.classList.add('fa-pause');
         showOverlayIndicator('pause', '');
@@ -10595,6 +10598,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       renderNotifications();
     });
   </script>
+
+  </div><!-- #cinema-room -->
 
 </body>
 
