@@ -447,7 +447,7 @@
       position: absolute;
       inset: 0;
       opacity: 0;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1);
       pointer-events: none;
       display: flex;
       align-items: center;
@@ -467,6 +467,139 @@
       pointer-events: none;
       background-size: cover;
       background-position: center;
+    }
+
+    /* Hero Nav Arrows */
+    .hero-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(2,5,18,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      font-size: 1.1rem;
+    }
+    .hero-arrow:hover {
+      background: rgba(34,211,238,0.18);
+      border-color: rgba(34,211,238,0.5);
+      transform: translateY(-50%) scale(1.1);
+    }
+    .hero-arrow-left  { left: 20px; }
+    .hero-arrow-right { right: 20px; }
+
+    /* Hero thumbnail dots */
+    .hero-nav-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-nav-thumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px 6px 8px;
+      border-radius: 999px;
+      background: rgba(2,5,18,0.65);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 36px;
+      overflow: hidden;
+      max-width: 36px;
+    }
+    .hero-nav-thumb:hover, .hero-nav-thumb.active {
+      max-width: 220px;
+      border-color: rgba(34,211,238,0.45);
+      background: rgba(2,5,18,0.85);
+    }
+    /* Progress bar inside active dot */
+    .hero-nav-thumb .thumb-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      flex-shrink: 0;
+      transition: background 0.3s;
+      position: relative;
+      overflow: visible;
+    }
+    .hero-nav-thumb.active .thumb-dot {
+      background: #22d3ee;
+      box-shadow: 0 0 8px rgba(34,211,238,0.7);
+    }
+    /* Progress ring – rendered as a line below the nav bar */
+    .hero-thumb-progress {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 2px;
+      background: #22d3ee;
+      border-radius: 2px;
+      width: 0%;
+      min-width: 10px;
+      transition: width 0.15s linear;
+      pointer-events: none;
+    }
+    .hero-nav-thumb .thumb-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-transform: uppercase;
+      overflow: hidden;
+    }
+    .hero-nav-thumb:hover .thumb-label,
+    .hero-nav-thumb.active .thumb-label {
+      opacity: 1;
+      color: #e0f7ff;
+    }
+
+    /* Progress bar under active dot */
+    .hero-nav-thumb .thumb-progress {
+      position: absolute;
+      bottom: -3px; left: 0;
+      height: 2px;
+      background: #22d3ee;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.15s linear;
+    }
+
+    /* Pause/Pin button */
+    .hero-pause-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(2,5,18,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+    .hero-pause-btn:hover { border-color: rgba(34,211,238,0.5); color: #22d3ee; }
+    .hero-pause-btn.paused {
+      background: rgba(34,211,238,0.15);
+      border-color: rgba(34,211,238,0.55);
+      color: #22d3ee;
     }
 
     .hero-badge--new {
@@ -1552,11 +1685,31 @@
     <section class="hero-banner" id="hero-banner">
       <div class="hero-gradient"></div>
 
-      
-      <div class="hero-dots flex gap-3 justify-center absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(0)" id="hero-dot-0"></button>
-        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(1)" id="hero-dot-1"></button>
-        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(2)" id="hero-dot-2"></button>
+      <!-- Hero arrows -->
+      <button class="hero-arrow hero-arrow-left" onclick="heroNavStep(-1)" aria-label="Anterior">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="hero-arrow hero-arrow-right" onclick="heroNavStep(1)" aria-label="Siguiente">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- Hero thumbnail nav + pause -->
+      <div class="hero-nav-bar" id="hero-nav-bar">
+        <button class="hero-nav-thumb active" id="hero-dot-0" onclick="setHeroSlide(0)" title="Historias sin Límites">
+          <span class="thumb-dot"><span class="hero-thumb-progress" id="hero-progress-0"></span></span>
+          <span class="thumb-label">Historias sin Límites</span>
+        </button>
+        <button class="hero-nav-thumb" id="hero-dot-1" onclick="setHeroSlide(1)" title="Patreon Creativo">
+          <span class="thumb-dot"></span>
+          <span class="thumb-label">Patreon Creativo</span>
+        </button>
+        <button class="hero-nav-thumb" id="hero-dot-2" onclick="setHeroSlide(2)" title="La Ira Consciente">
+          <span class="thumb-dot"></span>
+          <span class="thumb-label">La Ira Consciente</span>
+        </button>
+        <button class="hero-pause-btn" id="hero-pause-btn" onclick="toggleHeroPause()" title="Pausar / Reanudar rotación">
+          <i class="fas fa-pause" id="hero-pause-icon"></i>
+        </button>
       </div>
     
 <!-- Slide 1: Default -->
@@ -5998,15 +6151,93 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     let _heroSlideIdx = 0;
     let _heroSlideTimer = null;
+    let _heroPaused = false;
+    let _heroProgressInterval = null;
+    const HERO_INTERVAL_MS = 7000;
+
+    function _syncHeroDots(idx) {
+      document.querySelectorAll('.hero-nav-bar button.hero-nav-thumb').forEach((btn, i) => {
+        if (i === idx) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    function _startHeroProgress() {
+      const thumbBtns = document.querySelectorAll('.hero-nav-thumb');
+      // Reset all progress bars
+      thumbBtns.forEach(btn => {
+        const bar = btn.querySelector('.hero-thumb-progress');
+        if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; }
+      });
+      if (_heroPaused) return;
+      const activeBtn = thumbBtns[_heroSlideIdx];
+      if (!activeBtn) return;
+      const bar = activeBtn.querySelector('.hero-thumb-progress');
+      if (!bar) return;
+      requestAnimationFrame(() => {
+        bar.style.transition = `width ${HERO_INTERVAL_MS}ms linear`;
+        bar.style.width = '100%';
+      });
+    }
+
+    function _goToSlide(idx, resetTimer) {
+      const slides = document.querySelectorAll('.hero-slide');
+      if (!slides.length) return;
+      slides[_heroSlideIdx].classList.remove('active');
+      _heroSlideIdx = ((idx % slides.length) + slides.length) % slides.length;
+      slides[_heroSlideIdx].classList.add('active');
+      _syncHeroDots(_heroSlideIdx);
+      if (resetTimer) _startHeroProgress();
+    }
 
     function initHeroSlider() {
       const slides = document.querySelectorAll('.hero-slide');
       if (!slides.length) return;
+      _syncHeroDots(0);
+      _startHeroProgress();
       _heroSlideTimer = setInterval(() => {
-        slides[_heroSlideIdx].classList.remove('active');
-        _heroSlideIdx = (_heroSlideIdx + 1) % slides.length;
-        slides[_heroSlideIdx].classList.add('active');
-      }, 7000);
+        if (_heroPaused) return;
+        _goToSlide(_heroSlideIdx + 1, true);
+      }, HERO_INTERVAL_MS);
+    }
+
+    function setHeroSlide(idx) {
+      _goToSlide(idx, !_heroPaused);
+      // If paused, keep it paused on the new slide; if not paused reset timer
+      if (!_heroPaused) {
+        clearInterval(_heroSlideTimer);
+        _heroSlideTimer = setInterval(() => {
+          if (_heroPaused) return;
+          _goToSlide(_heroSlideIdx + 1, true);
+        }, HERO_INTERVAL_MS);
+      }
+    }
+
+    function heroNavStep(dir) {
+      setHeroSlide(_heroSlideIdx + dir);
+    }
+
+    function toggleHeroPause() {
+      _heroPaused = !_heroPaused;
+      const icon = document.getElementById('hero-pause-icon');
+      const btn  = document.getElementById('hero-pause-btn');
+      if (_heroPaused) {
+        // Freeze the progress bar in place
+        const thumbBtns = document.querySelectorAll('.hero-nav-thumb');
+        const bar = thumbBtns[_heroSlideIdx] ? thumbBtns[_heroSlideIdx].querySelector('.hero-thumb-progress') : null;
+        if (bar) {
+          const pct = bar.getBoundingClientRect().width / (bar.parentElement.getBoundingClientRect().width || 1) * 100;
+          bar.style.transition = 'none';
+          bar.style.width = pct + '%';
+        }
+        if (icon) { icon.classList.remove('fa-pause'); icon.classList.add('fa-play'); }
+        if (btn)  btn.classList.add('paused');
+      } else {
+        // Resume: restart progress from current position
+        _startHeroProgress();
+        if (icon) { icon.classList.remove('fa-play'); icon.classList.add('fa-pause'); }
+        if (btn)  btn.classList.remove('paused');
+      }
     }
 
     function updateHeroSynopsisGate() {
@@ -10342,35 +10573,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
     
     // Hero slide manual dot set
-    function setHeroSlide(idx) {
-      const slides = document.querySelectorAll('.hero-slide');
-      if (!slides.length) return;
-      
-      // Update active slide
-      slides[_heroSlideIdx].classList.remove('active');
-      _heroSlideIdx = idx;
-      slides[_heroSlideIdx].classList.add('active');
-      
-      // Update dots CSS
-      document.querySelectorAll('.hero-dots button').forEach((btn, i) => {
-        if (i === idx) btn.classList.add('active');
-        else btn.classList.remove('active');
-      });
-      
-      // Reset timer
-      clearInterval(_heroSlideTimer);
-      _heroSlideTimer = setInterval(() => {
-        slides[_heroSlideIdx].classList.remove('active');
-        _heroSlideIdx = (_heroSlideIdx + 1) % slides.length;
-        slides[_heroSlideIdx].classList.add('active');
-        
-        // Sincronizar dots
-        document.querySelectorAll('.hero-dots button').forEach((btn, i) => {
-          if (i === _heroSlideIdx) btn.classList.add('active');
-          else btn.classList.remove('active');
-        });
-      }, 7000);
-    }
+    // setHeroSlide / heroNavStep / toggleHeroPause defined above near initHeroSlider
     
     // Precompra Split Catalog State
     let precompraCategoryFilter = 'todos';
