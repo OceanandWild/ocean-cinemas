@@ -1871,7 +1871,7 @@
         <span id="overlay-text" class="block text-center text-white font-bold mt-4 text-2xl tracking-wider"></span>
       </div>
     </div>
-    <div id="video-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-40">
+    <div id="video-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-40 hidden">
       <i class="fas fa-circle-notch fa-spin text-7xl text-[#E50914] mb-6"></i>
       <p class="text-white text-xl font-medium animate-pulse">Cargando...</p>
     </div>
@@ -7720,6 +7720,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       };
 
       v.load();
+      if (l) l.classList.remove('hidden'); // Mostrar loading mientras carga el video
 
       // Mostrar presentación cinematográfica de Ocean Cinemas
       playOceanIntro(null);
