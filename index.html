@@ -452,7 +452,9 @@
       display: flex;
       align-items: center;
       padding-top: 100px;
+      padding-bottom: 110px;
       z-index: 0;
+      overflow-y: auto;
     }
 
     .hero-slide.active {
@@ -1684,6 +1686,9 @@
     <!-- Hero Slider -->
     <section class="hero-banner" id="hero-banner">
       <div class="hero-gradient"></div>
+      <!-- Bottom fade so nav bar never bleeds into content -->
+      <div class="absolute bottom-0 left-0 right-0 h-32 z-20 pointer-events-none"
+           style="background: linear-gradient(to top, rgba(2,5,18,0.85) 0%, transparent 100%);"></div>
 
       <!-- Hero arrows -->
       <button class="hero-arrow hero-arrow-left" onclick="heroNavStep(-1)" aria-label="Anterior">
@@ -1755,15 +1760,15 @@
         <!-- Slide 3: La Ira Consciente -->
         <div class="hero-slide" data-slide="2">
           <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
-          <div class="relative z-10 max-w-5xl px-6 md:px-12 mt-0">
+          <div class="relative z-10 max-w-5xl px-6 md:px-12 mt-0 self-start">
             <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
               <i class="fas fa-lock mr-1"></i>SERIE EXCLUSIVA
             </span>
-            <h1 class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-400 via-teal-200 to-white bg-clip-text text-transparent leading-none">
+            <h1 class="text-5xl md:text-7xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-400 via-teal-200 to-white bg-clip-text text-transparent leading-none">
               LA IRA CONSCIENTE
             </h1>
             
-            <div class="hero-synopsis-gate mt-6 mb-8 max-w-3xl rounded-3xl p-6 bg-black/60 border border-white/5 backdrop-blur-md relative overflow-hidden" id="hero-synopsis-gate" style="min-height: 240px;">
+            <div class="hero-synopsis-gate mt-4 mb-2 max-w-3xl rounded-3xl p-6 bg-black/60 border border-white/5 backdrop-blur-md relative overflow-hidden" id="hero-synopsis-gate">
               <div class="hero-synopsis-content space-y-4">
                 <p class="text-gray-200 text-sm md:text-base leading-relaxed">
                   En un universo devastado por guerras, emperadores de otros planetas y amenazas inimaginables, Kael carga con un power tan extraordinario como peligroso: una ira consciente capaz de destruir mundos... o proteger aquello que más ama.
