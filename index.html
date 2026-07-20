@@ -8568,12 +8568,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function rewind() {
       const video = document.getElementById('cinema-video');
+      if (!video || !isFinite(video.duration)) return;
       video.currentTime = Math.max(0, video.currentTime - 10);
       showOverlayIndicator('backward', '-10s');
     }
 
     function forward() {
       const video = document.getElementById('cinema-video');
+      if (!video || !isFinite(video.duration)) return;
       video.currentTime = Math.min(video.duration, video.currentTime + 10);
       showOverlayIndicator('forward', '+10s');
     }
