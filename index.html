@@ -5921,8 +5921,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function updateRecommendations() {
       const totalViews = STATE.viewHistory.length;
+      const recSection = document.getElementById('recommendations-section');
       if (totalViews < 3) {
-        document.getElementById('recommendations-section').classList.add('hidden');
+        if (recSection) recSection.classList.add('hidden');
         return;
       }
       const viewedMovieIds = STATE.viewHistory.map(v => v.movieId);
@@ -5936,7 +5937,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         recommendations.push(...allUnwatched.slice(0, 5));
       }
       renderRecommendations(recommendations);
-      document.getElementById('recommendations-section').classList.remove('hidden');
+      if (recSection) recSection.classList.remove('hidden');
     }
 
     function renderRecommendations(recs) {
