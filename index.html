@@ -10372,6 +10372,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     let selectedPrecompraId = null;
     let selectedSeatNumber = null;
     let selectedFormat = '2D';
+    let selectedEpisodeId = null;
     
     function filterPrecompraGrid(cat) {
       precompraCategoryFilter = cat;
@@ -10421,7 +10422,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function selectPrecompraTitle(id) {
       selectedPrecompraId = id;
       selectedSeatNumber = null;
+      selectedEpisodeId = null;
       renderPrecompraCatalog();
+      renderPrecompraDetails();
+    }
+    
+    function selectEpisode(epId) {
+      selectedEpisodeId = epId;
       renderPrecompraDetails();
     }
     
@@ -10439,8 +10446,26 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
       
       let price = m.price || OCEAN_TICKET_PRICE;
+      
+      if (m.type === 'series_container') {
+        if (selectedEpisodeId) {
+          const ep = STATE.movies.find(x => x.id === selectedEpisodeId);
+          price = ep ? (ep.price || OCEAN_TICKET_PRICE) : OCEAN_TICKET_PRICE;
+          confirmBtn.disabled = false;
+        } else {
+          price = 0;
+          confirmBtn.disabled = true;
+        }
+      } else {
+        price = m.price || OCEAN_TICKET_PRICE;
+        if (selectedSeatNumber !== null) {
+          confirmBtn.disabled = false;
+        } else {
+          confirmBtn.disabled = true;
+        }
+      }
+      
       summaryPrice.textContent = `${price} AB`;
-      confirmBtn.disabled = false;
       
       if (m.type === 'series_container') {
         const episodes = getSeriesEpisodes(m);
@@ -10454,10 +10479,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             if (!prevWatched) isLocked = true;
           }
           
+          const isSelected = selectedEpisodeId === ep.id;
+          
           return `
-            <div class="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5 ${isLocked ? 'episode-locked bg-red-950/5' : 'hover:border-cyan-500/20'}" onclick="${isLocked ? '' : `startWatchingEpisode(${ep.id})`}">
+            <div class="flex items-center justify-between p-3 rounded-lg border transition ${isLocked ? 'episode-locked bg-red-950/5 border-white/5 opacity-50' : isSelected ? 'border-cyan-400 bg-cyan-950/20 shadow-[0_0_10px_rgba(6,182,212,0.2)]' : 'bg-white/[0.03] border-white/5 hover:border-cyan-500/20 cursor-pointer'}" onclick="${isLocked ? '' : `selectEpisode(${ep.id})`}">
               <div class="flex items-center gap-3">
-                <i class="fas ${isLocked ? 'fa-lock text-red-500' : 'fa-play text-cyan-400'} text-xs"></i>
+                <i class="fas ${isLocked ? 'fa-lock text-red-500' : isSelected ? 'fa-check text-cyan-400' : 'fa-play text-gray-500'} text-xs"></i>
                 <div>
                   <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Episodio ${idx + 1}</span>
                   <h5 class="text-white text-xs font-bold">${ep.title}</h5>
@@ -10543,7 +10570,26 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const m = STATE.movies.find(x => x.id === selectedPrecompraId);
       if (!m) return;
       
-      const price = m.price || OCEAN_TICKET_PRICE;
+      let targetMovie = m;
+      let price = m.price || OCEAN_TICKET_PRICE;
+      let seatInfo = '';
+      
+      if (m.type === 'series_container') {
+        if (!selectedEpisodeId) {
+          showToast('❌ Por favor, selecciona un episodio.');
+          return;
+        }
+        const ep = STATE.movies.find(x => x.id === selectedEpisodeId);
+        if (!ep) return;
+        targetMovie = ep;
+        price = ep.price || OCEAN_TICKET_PRICE;
+      } else {
+        if (selectedSeatNumber === null) {
+          showToast('❌ Por favor, elige tu butaca.');
+          return;
+        }
+        seatInfo = ` (Butaca: ${selectedSeatNumber + 1}, Formato: ${selectedFormat})`;
+      }
       
       // Check Balance
       const balance = STATE.balance || 0;
@@ -10554,10 +10600,34 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       
       // Perform precompra
       STATE.balance -= price;
+      
+      const newTicket = {
+        id: generateTicketId(),
+        movieId: targetMovie.id,
+        movieTitle: targetMovie.title,
+        title: targetMovie.title,
+        artist: targetMovie.artist || 'Ocean Originals',
+        poster: targetMovie.poster || m.poster || 'assets/OceanCinemas.png',
+        purchaseDate: new Date().toISOString(),
+        price: price,
+        sala: targetMovie.sala || 'Sala General',
+        puerta: targetMovie.puerta || 'General',
+        used: false,
+        source: 'precompra'
+      };
+      
+      if (m.type !== 'series_container') {
+        newTicket.seat = selectedSeatNumber + 1;
+        newTicket.format = selectedFormat;
+      }
+      
+      STATE.tickets.push(newTicket);
       saveToStorage();
-      showToast(`🎉 Precompra realizada con éxito para "${m.title}"!`);
+      
+      showToast(`🎉 Precompra realizada con éxito para "${targetMovie.title}"${seatInfo}!`);
       closePrecompraScreen();
       updateBalanceDisplay();
+      if (typeof renderTickets === 'function') renderTickets();
     }
     
     // Early exit penalty system
