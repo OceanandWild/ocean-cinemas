@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 
 <head>
@@ -52,7 +52,8 @@
       flex-direction: column;
       gap: 16px;
       background: rgba(10, 15, 30, 0.6);
-      backdrop-blur-xl border: 1px solid rgba(34, 211, 238, 0.1);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(34, 211, 238, 0.1);
       border-radius: 24px;
       padding: 24px;
       overflow-y: auto;
@@ -543,6 +544,7 @@
     .catalog-title {
       background: linear-gradient(135deg, #22d3ee, #0ea5e9, #22d3ee);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       background-size: 200% auto;
       animation: catalogShimmer 4s linear infinite;
@@ -8182,6 +8184,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function closeCinema() {
       stopTextReaderPlayback();
       const v = document.getElementById('cinema-video');
+      if (v) detectEarlyExit(v);
       const cinemaHeader = document.getElementById('cinema-header');
       const cinemaControls = document.getElementById('cinema-controls');
       const textReader = document.getElementById('text-reader-container');
@@ -10360,7 +10363,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       });
       
       grid.innerHTML = list.map(m => `
-        <div onclick="selectPrecompraTitle(dots${m.id})" class="cursor-pointer group relative rounded-xl border ${selectedPrecompraId === m.id ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-950/20' : 'border-white/5 hover:border-cyan-500/40 bg-white/5'} p-3 transition duration-200">
+        <div onclick="selectPrecompraTitle(${m.id})" class="cursor-pointer group relative rounded-xl border ${selectedPrecompraId === m.id ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-950/20' : 'border-white/5 hover:border-cyan-500/40 bg-white/5'} p-3 transition duration-200">
           <div class="h-32 rounded-lg overflow-hidden relative">
             <img src="${m.poster}" class="w-full h-full object-cover">
           </div>
@@ -10469,7 +10472,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Elige tu Butaca</span>
               <div class="seat-grid">
                 ${Array.from({length: 40}).map((_, i) => `
-                  <button class="seat-button ${selectedSeatNumber === i ? 'selected' : ''}" onclick="selectSeat(${i})">dots${i+1}</button>
+                  <button class="seat-button ${selectedSeatNumber === i ? 'selected' : ''}" onclick="selectSeat(${i})">${i+1}</button>
                 `).join('')}
               </div>
             </div>
@@ -10515,7 +10518,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     let exitWarnCount = parseInt(localStorage.getItem('oc_early_exits') || '0');
     
     function detectEarlyExit(video) {
-      if (!video) return;
+      if (!video || !video.duration) return;
       const progress = video.currentTime / video.duration;
       if (progress < 0.95) {
         exitWarnCount++;
@@ -10547,6 +10550,16 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
     }
     
+    
+    function startWatchingEpisode(epId) {
+      const ep = STATE.movies.find(x => x.id === epId);
+      if (ep) {
+        window._activeMovieId = ep.id;
+        watchMovieDirectly(ep);
+        closePrecompraScreen();
+      }
+    }
+
     // Check suspension at load time
     function checkSuspensionState() {
       const suspendedUntil = parseInt(localStorage.getItem('oc_suspended_until') || '0');
@@ -10577,4 +10590,4 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
 </body>
 
-</html>
+</html>
