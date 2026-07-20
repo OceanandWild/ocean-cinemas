@@ -8714,22 +8714,34 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function openPrecompraScreen(movieId = null, bypassAuth = false) {
       const screen = document.getElementById('process-screen');
+      if (!screen) return;
+      screen.classList.remove('hidden');
       screen.classList.add('active');
+      document.body.style.overflow = 'hidden';
 
       if (!bypassAuth && (!STATE.oceanPayLinked || !isCinemasAccountLinked())) {
         showPrecompraAuthGateway(movieId, 'login');
         return;
       }
 
+      // Populate the new split-screen catalog
+      if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+
       if (movieId) {
-        startPrecompraFlow(movieId);
-      } else {
-        showCatalogSelection();
+        if (typeof selectPrecompraTitle === 'function') selectPrecompraTitle(movieId);
       }
     }
 
     function closeProcessScreen() {
-      document.getElementById('process-screen').classList.remove('active');
+      const screen = document.getElementById('process-screen');
+      if (!screen) return;
+      screen.classList.add('hidden');
+      screen.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function closePrecompraScreen() {
+      closeProcessScreen();
     }
 
     async function showCatalogSelection() {
