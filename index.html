@@ -10546,17 +10546,18 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const price = m.price || OCEAN_TICKET_PRICE;
       
       // Check Balance
-      const balance = STATE.cinemasSession?.tidesBalance || 0;
+      const balance = STATE.balance || 0;
       if (balance < price) {
         showToast('❌ Balance de AquaBux insuficiente.');
         return;
       }
       
       // Perform precompra
-      STATE.cinemasSession.tidesBalance -= price;
+      STATE.balance -= price;
+      saveToStorage();
       showToast(`🎉 Precompra realizada con éxito para "${m.title}"!`);
       closePrecompraScreen();
-      updateHeaderDisplays();
+      updateBalanceDisplay();
     }
     
     // Early exit penalty system
@@ -10570,12 +10571,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         localStorage.setItem('oc_early_exits', exitWarnCount);
         
         // Subtract AquaBux
-        if (STATE.cinemasSession) {
-          const deduction = 15;
-          STATE.cinemasSession.tidesBalance = Math.max(0, STATE.cinemasSession.tidesBalance - deduction);
-          updateHeaderDisplays();
-          showNotification(`⚠️ Has abandonado la sala antes de finalizar. Penalización: -${deduction} AquaBux.`);
-        }
+        const deduction = 15;
+        STATE.balance = Math.max(0, STATE.balance - deduction);
+        saveToStorage();
+        updateBalanceDisplay();
+        showNotification(`⚠️ Has abandonado la sala antes de finalizar. Penalización: -${deduction} AquaBux.`);
         
         if (exitWarnCount === 2) {
           showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente 2 veces. Un abandono adicional causará la suspensión de 24h.');
