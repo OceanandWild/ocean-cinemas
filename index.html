@@ -9,6 +9,108 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    /* === STYLES ADDED BY AGENT === */
+    .hero-dots button.active {
+      background-color: var(--ocean) !important;
+      width: 24px;
+      border-radius: 6px;
+    }
+    .hero-dots button {
+      transition: all 0.3s ease;
+    }
+    .notif-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+    }
+    .notif-item:hover {
+      background: rgba(34,211,238,0.08);
+      border-color: rgba(34,211,238,0.2);
+    }
+    
+    /* Precompra split screen styling */
+    .precompra-split-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 85vh;
+      gap: 24px;
+      padding: 10px;
+    }
+    @media (max-width: 768px) {
+      .precompra-split-container {
+        flex-direction: column;
+        height: auto;
+      }
+    }
+    .precompra-left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(10, 15, 30, 0.6);
+      backdrop-blur-xl border: 1px solid rgba(34, 211, 238, 0.1);
+      border-radius: 24px;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .precompra-right-panel {
+      flex: 1.5;
+      background: rgba(10, 15, 30, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 6px;
+      justify-content: center;
+      margin: 15px auto;
+      max-width: 320px;
+    }
+    .seat-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      transition: all 0.2s ease;
+    }
+    .seat-button:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--ocean);
+    }
+    .seat-button.selected {
+      background: var(--ocean);
+      border-color: #fff;
+      color: #000;
+      box-shadow: 0 0 10px var(--ocean);
+    }
+    .format-btn.active {
+      background: var(--ocean) !important;
+      color: #000 !important;
+      border-color: #fff !important;
+      box-shadow: 0 0 10px var(--ocean);
+    }
+    .episode-locked {
+      opacity: 0.5;
+      cursor: not-allowed !important;
+      pointer-events: none;
+    }
+  
     /* === RESET & BASE === */
     * {
       margin: 0;
@@ -349,16 +451,19 @@
       display: flex;
       align-items: center;
       padding-top: 100px;
+      z-index: 0;
     }
 
     .hero-slide.active {
       opacity: 1;
       pointer-events: auto;
+      z-index: 20;
     }
 
     .hero-slide-bg {
       position: absolute;
       inset: 0;
+      pointer-events: none;
       background-size: cover;
       background-position: center;
     }
@@ -614,6 +719,7 @@
     .hero-gradient {
       position: absolute;
       inset: 0;
+      pointer-events: none;
       background: linear-gradient(to top, #0a0a0a 0%, transparent 60%), linear-gradient(to right, #0a0a0a 0%, transparent 40%);
     }
 
@@ -1379,57 +1485,79 @@
   </div>
 
   <!-- NAVIGATION -->
-  <nav
-    class="fixed top-0 w-full z-50 px-6 md:px-12 py-4 bg-gradient-to-b from-black via-black/95 to-transparent backdrop-blur-xl border-b border-white/5">
-    <div class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <img src="assets/OceanCinemas.png" alt="Ocean Cinemas" class="h-8 md:h-10">
-        <span
-          class="hidden md:block text-xl font-black bg-gradient-to-r from-[#E50914] to-[#ff4d4d] bg-clip-text text-transparent">OCEAN
-          CINEMAS</span>
-      </div>
-      <div class="flex items-center gap-3 md:gap-4">
-        <div
-          class="px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 md:gap-3 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 shadow-lg shadow-yellow-900/20">
-          <i class="fas fa-coins text-yellow-400 text-base md:text-lg"></i>
-          <div class="flex flex-col md:flex-row md:items-center md:gap-2">
-            <span id="balance-display" class="font-black text-lg md:text-2xl text-yellow-400">0</span>
-            <span class="text-[10px] md:text-xs text-yellow-500/80 uppercase tracking-wider font-bold">AquaBux</span>
+  
+      <nav class="fixed top-0 w-full z-50 px-6 md:px-12 py-4 bg-[#050b18]/80 backdrop-blur-2xl border-b border-cyan-500/10 shadow-lg">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 cursor-pointer group" onclick="showCatalogSelection()">
+            <img src="assets/OceanCinemas.png" alt="Ocean Cinemas" class="h-8 md:h-10 transition group-hover:scale-105">
+            <span class="hidden md:block text-xl font-black bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">OCEAN CINEMAS</span>
           </div>
-        </div>
-        <div class="hidden md:block h-8 w-px bg-white/10"></div>
-        <div class="flex items-center gap-2">
-          <div id="vip-badge-nav" class="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 text-xs font-black uppercase tracking-wider"></div>
-          <button onclick="openPrecompraScreen()" class="netflix-btn px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-ticket-alt mr-0 md:mr-2"></i><span class="hidden md:inline">Precomprar</span>
-          </button>
-          <button onclick="openVipModal()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-wave-square mr-0 md:mr-2"></i><span class="hidden md:inline">Planes</span>
-          </button>
-          <button onclick="openUpdateLogModal()" class="netflix-secondary px-3 md:px-4 py-2 text-sm md:text-base">
-            <i class="fas fa-star mr-0 md:mr-2"></i><span class="hidden md:inline">Novedades</span>
-          </button>
-          <div class="relative">
-            <button onclick="toggleNavMenu()" id="nav-menu-trigger" class="netflix-secondary px-3 py-2 text-sm">
-              <i class="fas fa-ellipsis-v"></i>
+          
+          <div class="flex items-center gap-3 md:gap-4">
+            <!-- AquaBux Display -->
+            <div class="px-4 py-2 rounded-xl flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-yellow-600/10 border border-yellow-500/30">
+              <i class="fas fa-coins text-yellow-400 animate-pulse"></i>
+              <div class="flex flex-col md:flex-row md:items-center md:gap-2">
+                <span id="balance-display" class="font-black text-lg md:text-2xl text-yellow-400">0</span>
+                <span class="text-[10px] md:text-xs text-yellow-500/80 uppercase font-bold">AquaBux</span>
+              </div>
+            </div>
+            
+            <div id="vip-badge-nav" class="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 text-xs font-black uppercase"></div>
+            
+            <!-- Navigation items -->
+            <button onclick="openPrecompraScreen()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-bold text-sm text-white shadow-lg transition">
+              <i class="fas fa-ticket-alt mr-2"></i>Precomprar
             </button>
-            <div id="nav-dropdown" class="nav-dropdown">
-              <button onclick="openMisTicketsScreen(); closeNavMenu();"><i class="fas fa-list"></i>Mis Tickets</button>
-              <button onclick="openOceanPayModal(); closeNavMenu();"><i class="fas fa-wallet"></i>Ocean Pay</button>
-              <button onclick="openAdminModal(); closeNavMenu();"><i class="fas fa-user-shield"></i>Admin</button>
+            <button onclick="openVipModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-bold text-sm text-gray-300 transition">
+              <i class="fas fa-crown mr-2"></i>Planes
+            </button>
+            
+            <!-- Notification Center -->
+            <div class="relative">
+              <button onclick="toggleNotificationPanel()" class="relative px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 transition">
+                <i class="fas fa-bell text-lg"></i>
+                <span id="notif-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center hidden">0</span>
+              </button>
+              <div id="notif-panel" class="absolute right-0 mt-3 w-80 bg-[#0d1326] border border-white/10 rounded-2xl p-4 shadow-2xl hidden z-50">
+                <div class="flex justify-between items-center pb-2 border-b border-white/5 mb-3">
+                  <span class="font-black text-xs text-cyan-400 tracking-wider">NOTIFICACIONES</span>
+                  <button onclick="clearAllNotifications()" class="text-[9px] text-gray-500 hover:text-cyan-400 font-bold uppercase">Limpiar</button>
+                </div>
+                <div id="notif-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar text-xs text-gray-300">
+                  <div class="text-center py-4 text-gray-500">No tienes notificaciones.</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="relative">
+              <button onclick="toggleNavMenu()" id="nav-menu-trigger" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div id="nav-dropdown" class="nav-dropdown">
+                <button onclick="openMisTicketsScreen(); closeNavMenu();"><i class="fas fa-list"></i>Mis Tickets</button>
+                <button onclick="openOceanPayModal(); closeNavMenu();"><i class="fas fa-wallet"></i>Ocean Pay</button>
+                <button onclick="openAdminModal(); closeNavMenu();"><i class="fas fa-user-shield"></i>Admin</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </nav>
+      </nav>
+    
 
   <main>
     <!-- Hero Slider -->
     <section class="hero-banner" id="hero-banner">
       <div class="hero-gradient"></div>
 
-      <!-- Slide 1: Default -->
+      
+      <div class="hero-dots flex gap-3 justify-center absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(0)" id="hero-dot-0"></button>
+        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(1)" id="hero-dot-1"></button>
+        <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition" onclick="setHeroSlide(2)" id="hero-dot-2"></button>
+      </div>
+    
+<!-- Slide 1: Default -->
       <div class="hero-slide active" data-slide="0">
         <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
         <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
@@ -1451,208 +1579,63 @@
         </div>
       </div>
 
-<!-- Slide 2: Patreon -->
-        <div class="hero-slide" data-slide="1">
-          <div class="hero-slide-bg" style="background: linear-gradient(135deg, #00111a, #003344, #004466, #001220);"></div>
-          <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
-            <span class="hero-badge--new"><i class="fas fa-bolt mr-1"></i>NUEVO</span>
-            <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent leading-tight mt-4">
-              APOYA<br>NUESTRA VISIÓN
-            </h1>
-            <p class="text-2xl text-gray-200 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8">
-              Únete a nuestro Patreon y apoya el futuro del cine. Contenido exclusivo, acceso anticipado y recompensas diarias.
-            </p>
-            <a href="https://www.patreon.com/cw/OceanandWildStudios" target="_blank" rel="noopener" class="hero-cta-patreon">
-              <i class="fas fa-bolt mr-1"></i>Unirse al Patreon
-            </a>
-        </div>
-      </div>
 
-      <!-- Slide 3: La Ira Consciente -->
-      <div class="hero-slide" data-slide="2">
-        <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
-        <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
-          <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block"
-                style="background: rgba(20,184,166,0.2); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.4);">
-            <i class="fas fa-lock mr-1"></i>SERIE EXCLUSIVA
-          </span>
-          <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-teal-300 via-emerald-200 to-white bg-clip-text text-transparent leading-tight">
-            LA IRA<br>CONSCIENTE
-          </h1>
-          <div class="hero-synopsis-gate mt-6 mb-8 max-w-2xl rounded-xl p-4" id="hero-synopsis-gate">
-            <div class="hero-synopsis-content">
-              <p class="text-gray-200 text-sm md:text-base leading-relaxed">
-                En un universo devastado por guerras, emperadores de otros planetas y amenazas inimaginables, Kael carga con un poder tan extraordinario como peligroso: una ira consciente capaz de destruir mundos... o proteger aquello que más ama.
-              </p>
-              <p class="text-gray-300 text-sm leading-relaxed mt-3">
-                Tras convertirse en el único refugio de un niño huérfano llamado Liam, ambos emprenden un camino marcado por el miedo, la culpa y el aprendizaje. Mientras Kael lucha por controlar la oscuridad que habita en su interior, Liam intenta comprender a un padre que, unas veces, es el lugar más seguro del mundo y, otras, la persona que más teme.
-              </p>
-              <p class="text-gray-300 text-sm leading-relaxed mt-3">
-                Cada episodio explora las heridas invisibles que deja el trauma, la dificultad de confiar después del miedo y el profundo vínculo entre un padre y un hijo que intentan sanar juntos en un mundo que nunca les da descanso.
-              </p>
-              <p class="text-gray-300 text-sm leading-relaxed mt-3">
-                Pero, mientras ambos reconstruyen poco a poco su relación, nuevas amenazas comienzan a acercarse. Algunas tienen forma de emperadores capaces de destruir planetas. Otras son invisibles, capaces de atacar la mente, sembrar dudas y romper la confianza desde dentro.
-              </p>
-              <p class="text-cyan-300 text-sm font-bold mt-4">
-                Esta es la historia de dos personas que no intentan salvar al universo.<br>
-                Solo intentan no perderse el uno al otro.
-              </p>
-              <p class="text-cyan-400/60 text-xs mt-2 italic">La historia apenas comienza...</p>
-            </div>
-            <div class="hero-synopsis-overlay" id="heroSynLocked" style="display:none;">
-              <i class="fas fa-lock text-3xl text-cyan-400 mb-3"></i>
-              <p class="text-cyan-200 text-sm font-bold mb-2">Sinopsis exclusiva para plan Abisal o superior</p>
-              <button onclick="openVipModal()" class="plan-cta plan-cta--primary" style="width:auto; padding: 8px 20px;">
-                <i class="fas fa-wave-square mr-2"></i>Ver Planes
-              </button>
-            </div>
-          </div>
-          <div class="flex gap-4">
-            <button onclick="openPrecompraScreen()" class="netflix-btn px-8 py-3">
-              <i class="fas fa-ticket-alt mr-2"></i>Precomprar
+        <!-- Slide 2: Patreon -->
+        <div class="hero-slide" data-slide="1">
+          <div class="hero-slide-bg" style="background: radial-gradient(circle at center, #1a0f30 0%, #050b18 100%);"></div>
+          <div class="relative z-10 max-w-4xl px-6 md:px-12 mt-0">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-red-600 text-white"><i class="fas fa-bolt mr-1"></i>APOYAR PROYECTO</span>
+            <h1 class="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-orange-400 via-amber-200 to-white bg-clip-text text-transparent leading-tight mt-4">
+              PATREON<br>CREATIVO
+            </h1>
+            <p class="text-xl text-gray-300 drop-shadow-lg font-medium max-w-2xl mt-6 mb-8 leading-relaxed">
+              Forma parte activa de Ocean and Wild Studios. Al unirte a nuestro Patreon obtienes acceso a contenido inédito, scripts exclusivos, recompensas de juego diarias y el poder de decidir sobre el futuro de nuestras producciones.
+            </p>
+            <button onclick="window.open('https://www.patreon.com/cw/OceanandWildStudios', '_blank')" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-400 hover:to-red-500 text-white font-black shadow-lg shadow-orange-900/40 transform hover:-translate-y-1 transition duration-300">
+              <i class="fab fa-patreon mr-2"></i>Unirse a Patreon
             </button>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Stats -->
-    <section class="px-12 py-12 -mt-16 relative z-10">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-        <div class="stat-card">
-          <div class="flex items-center justify-between mb-3">
-            <i class="fas fa-film text-4xl text-[#E50914]"></i>
-            <span class="text-5xl font-black text-white">16</span>
-          </div>
-          <p class="text-gray-400 text-sm uppercase tracking-wider">Películas Disponibles</p>
-        </div>
-        <div class="stat-card">
-          <div class="flex items-center justify-between mb-3">
-            <i class="fas fa-music text-4xl text-purple-500"></i>
-            <span class="text-5xl font-black text-white">2</span>
-          </div>
-          <p class="text-gray-400 text-sm uppercase tracking-wider">Artistas Destacados</p>
-        </div>
-        <div class="stat-card">
-          <div class="flex items-center justify-between mb-3">
-            <i class="fas fa-crown text-4xl text-yellow-500"></i>
-            <span class="text-5xl font-black text-white">2</span>
-          </div>
-          <p class="text-gray-400 text-sm uppercase tracking-wider">Planes de Marea</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Rewards Section -->
-    <section id="rewards-section" class="hidden px-6 md:px-12 py-8">
-      <div class="glass rounded-2xl p-6 md:p-8 border border-cyan-500/20 bg-gradient-to-br from-cyan-900/10 via-blue-900/10 to-slate-900/30">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
-          <div>
-            <h2 class="text-3xl font-black bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
-              <i class="fas fa-coins text-cyan-300"></i>Centro de AquaBux
-            </h2>
-            <p class="text-gray-400 mt-2">Ahora solo se obtiene por racha diaria y lectura confirmada.</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div id="daily-reward-card" class="relative overflow-hidden rounded-xl border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-blue-900/20 p-6">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl"></div>
-            <div class="relative z-10">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
-                  <i class="fas fa-sun text-2xl text-white"></i>
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-white">Recompensa Diaria</h3>
-                  <p class="text-sm text-gray-400">Racha: <span id="daily-streak">0</span> días</p>
-                </div>
+        <!-- Slide 3: La Ira Consciente -->
+        <div class="hero-slide" data-slide="2">
+          <div class="hero-slide-bg" style="background-image: url('assets/hero-background.png');"></div>
+          <div class="relative z-10 max-w-5xl px-6 md:px-12 mt-0">
+            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+              <i class="fas fa-lock mr-1"></i>SERIE EXCLUSIVA
+            </span>
+            <h1 class="text-7xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-cyan-400 via-teal-200 to-white bg-clip-text text-transparent leading-none">
+              LA IRA CONSCIENTE
+            </h1>
+            
+            <div class="hero-synopsis-gate mt-6 mb-8 max-w-3xl rounded-3xl p-6 bg-black/60 border border-white/5 backdrop-blur-md relative overflow-hidden" id="hero-synopsis-gate" style="min-height: 240px;">
+              <div class="hero-synopsis-content space-y-4">
+                <p class="text-gray-200 text-sm md:text-base leading-relaxed">
+                  En un universo devastado por guerras, emperadores de otros planetas y amenazas inimaginables, Kael carga con un power tan extraordinario como peligroso: una ira consciente capaz de destruir mundos... o proteger aquello que más ama.
+                </p>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                  Tras convertirse en el único refugio de un niño huérfano llamado Liam, ambos emprenden un camino marcado por el miedo, la culpa y el aprendizaje. Mientras Kael lucha por controlar la oscuridad que habita en su interior, Liam intenta comprender a un padre que, unas veces, es el lugar más seguro del mundo y, otras, la persona que más teme.
+                </p>
+                <p class="text-cyan-300 text-sm font-bold">
+                  Esta es la historia de dos personas que no intentan salvar al universo. Solo intentan no perderse el uno al otro.
+                </p>
               </div>
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-3xl font-black text-cyan-300 flex items-center gap-2"><span id="daily-amount">50</span> <span class="text-sm text-gray-400">AquaBux</span><canvas class="currency-canvas" data-currency="aquabux"></canvas></div>
-                  <p class="text-xs text-gray-500">Escala hasta 150 AquaBux</p>
+              
+              <!-- Lock warning card with high definition blur -->
+              <div id="heroSynLocked" class="absolute inset-0 bg-[#070b16]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center border border-red-500/20 rounded-3xl transition duration-500" style="display: none;">
+                <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-4 animate-bounce">
+                  <i class="fas fa-lock text-red-500 text-2xl"></i>
                 </div>
-                <button id="claim-daily-btn" onclick="claimCinemasDailyReward(this)"
-                  class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold hover:from-cyan-400 hover:to-blue-400 transition-all shadow-lg shadow-cyan-500/20">
-                  <i class="fas fa-coins mr-2"></i>RECLAMAR
+                <h3 class="text-lg font-black text-white mb-2">Sinopsis Exclusiva</h3>
+                <p class="text-xs text-gray-400 max-w-xs mb-4">Requiere plan de suscripción Abisal o superior para leer esta reseña y sinopsis completa.</p>
+                <button onclick="openVipModal()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-red-950/50 transition">
+                  <i class="fas fa-crown mr-2"></i>Ver Planes
                 </button>
               </div>
-              <div id="daily-streak-checks" class="grid grid-cols-7 gap-2 mt-4"></div>
-            </div>
-          </div>
-          <div id="reading-reward-card" class="relative overflow-hidden rounded-xl border border-yellow-500/30 bg-gradient-to-br from-yellow-900/20 to-orange-900/20 p-6">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl"></div>
-            <div class="relative z-10">
-              <h3 class="text-xl font-bold text-white mb-2">Lectura Confirmada (estricta)</h3>
-              <p class="text-sm text-gray-400 mb-4">5 ep: +50 · 10 ep: +100 · 15 ep: +150</p>
-              <div class="text-sm text-gray-300">Confirmados hoy: <span id="reading-confirmed-count" class="font-black text-yellow-300">0</span></div>
-              <div class="text-xs text-gray-500 mt-2" id="reading-next-goal">Próximo hito: 5 episodios.</div>
-              <div class="text-xs text-cyan-300 mt-4">Máximo diario posible: 300 AquaBux (150 diaria + 150 lectura).</div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-
-
-    <!-- Recommendations -->
-    <section id="recommendations-section" class="hidden px-12 py-16 bg-gradient-to-b from-transparent to-black/30">
-      <div class="mb-12">
-        <h2
-          class="text-4xl font-black mb-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-          <i class="fas fa-sparkles mr-3"></i>Recomendado para Ti
-        </h2>
-        <p class="text-gray-400 text-lg">Basado en tu historial de visualización</p>
-      </div>
-      <div id="recommendations-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"></div>
-    </section>
-
-    <!-- Movies Catalog -->
-    <section id="movies-section" class="px-6 md:px-12 py-16 pt-20">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-        <h2 class="text-4xl font-black catalog-title flex items-center gap-3">
-          <i class="fas fa-film text-[#E50914]"></i>Películas y Series
-        </h2>
-        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div class="relative">
-            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="text" id="search-input" placeholder="Buscar título o artista..."
-              class="w-full md:w-80 pl-12 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-[#E50914] text-white transition-all">
-          </div>
-          <select id="genre-filter"
-            class="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-[#E50914] text-white transition-all appearance-none cursor-pointer">
-            <option value="all">Todos los Géneros</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="flex flex-wrap gap-3 mb-8">
-        <button id="tab-all" class="category-tab active" onclick="showMovieCategory('all')">
-          <i class="fas fa-th-large mr-2"></i>Todos
-        </button>
-        <button id="tab-ows_universe" class="category-tab" onclick="showMovieCategory('ows_universe')">
-          <i class="fas fa-infinity mr-2"></i>Universo OWS
-        </button>
-        <button id="tab-other_worlds" class="category-tab" onclick="showMovieCategory('other_worlds')">
-          <i class="fas fa-meteor mr-2"></i>Otros Mundos
-        </button>
-        <button id="tab-nature" class="category-tab" onclick="showMovieCategory('nature')">
-          <i class="fas fa-water mr-2"></i>Vida en el Oceano
-        </button>
-        <button id="tab-accion" class="category-tab" onclick="showMovieCategory('accion')">
-          <i class="fas fa-bolt mr-2"></i>Acción
-        </button>
-      </div>
-
-      <div id="movies-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-        <!-- Rendered via JS -->
-      </div>
-    </section>
-
-
-
-  </main>
+      </main>
 
   <!-- MODALS -->
   <div id="vip-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center">
@@ -1795,61 +1778,7 @@
     </div>
   </div>
 
-  <div id="update-log-modal" class="fixed inset-0 z-[140] hidden flex items-center justify-center">
-    <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeUpdateLogModal()"></div>
-    <div class="relative w-full max-w-4xl glass rounded-3xl p-10 overflow-y-auto max-h-[90vh]">
-      <button onclick="closeUpdateLogModal()"
-        class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition z-10"><i
-          class="fas fa-times text-2xl"></i></button>
-      <div class="space-y-6">
-        <div class="text-center mb-8">
-          <h2
-            class="text-5xl font-black mb-4 bg-gradient-to-r from-[#E50914] via-purple-500 to-yellow-500 bg-clip-text text-transparent">
-            ðŸŽ¬ NOVEDADES</h2>
-          <p class="text-xl text-gray-300">Versión 2.1 - 28 de Noviembre, 2024</p>
-        </div>
-        <div class="space-y-4 text-white">
-          <h3 class="text-2xl font-bold text-[#E50914]">ðŸŽ¥ Nueva Sala de Cine Premium</h3>
-          <ul class="space-y-2 text-gray-300 ml-6">
-            <li>âœ¨ EstÃ©tica glassmorphism con efectos de backdrop blur</li>
-            <li>ðŸŽ¨ Gradientes rojos con sombras luminosas</li>
-            <li>âš¡ Animaciones suaves de hover con transformaciones</li>
-            <li>ðŸŽ¯ BotÃ³n de play principal con gradiente circular</li>
-            <li>ðŸ“± DiseÃ±o completamente responsive</li>
-          </ul>
-          <h3 class="text-2xl font-bold text-purple-500 mt-8">ðŸŽ­ PresentaciÃ³n CinematogrÃ¡fica</h3>
-          <ul class="space-y-2 text-gray-300 ml-6">
-            <li>ðŸŒŠ Ondas de sonido expandiÃ©ndose con animaciÃ³n</li>
-            <li>ðŸŽ¬ Logo de Ocean Cinemas con efecto de apariciÃ³n</li>
-            <li>âœ¨ Texto "OCEAN CINEMAS" con efecto tracking</li>
-            <li>?? Duración: 3 segundos con fade out suave</li>
-          </ul>
-          <h3 class="text-2xl font-bold text-yellow-500 mt-8">ðŸŽ« Sistema de Tickets Mejorado</h3>
-          <ul class="space-y-2 text-gray-300 ml-6">
-            <li>ðŸŸ¢ Estados: ACTIVO, USADO, VENCIDO</li>
-            <li>? Vencimiento automático después de 24 horas</li>
-            <li>ðŸ“Š InformaciÃ³n detallada de compra y uso</li>
-            <li>âœ“ Un solo uso por ticket</li>
-          </ul>
-          <h3 class="text-2xl font-bold text-blue-500 mt-8">ðŸ“– Modo Lectura</h3>
-          <ul class="space-y-2 text-gray-300 ml-6">
-            <li>ðŸ“š Para pelÃ­culas tipo texto/documentales</li>
-            <li>âž¡ï¸ NavegaciÃ³n entre capÃ­tulos</li>
-            <li>âœ¨ TipografÃ­a optimizada</li>
-          </ul>
-          <div
-            class="mt-8 p-6 bg-gradient-to-r from-[#E50914]/20 to-purple-500/20 rounded-xl border border-[#E50914]/30">
-            <p class="text-center text-white font-bold">âš™ï¸ Funciones del Reproductor Completamente Funcionales</p>
-            <p class="text-center text-gray-400 mt-2">Play/Pause ? Rewind ? Forward ? Mute ? Pantalla Completa</p>
-          </div>
-        </div>
-        <div class="text-center mt-8 pt-6 border-t border-white/10">
-          <p class="text-gray-400 text-sm">Desarrollado con ?? por <span class="text-[#E50914] font-bold">Ocean and Wild
-              Studios</span></p>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
   <div id="movie-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
     <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeMovieModal()"></div>
@@ -1859,28 +1788,59 @@
   </div>
 
   <!-- PROCESS SCREEN (Precompra Flow) -->
-  <div id="process-screen">
-    <div id="process-content" class="text-center max-w-4xl mx-auto p-6"></div>
-  </div>
-
-  <!-- MIS TICKETS SCREEN -->
-  <div id="mis-tickets-screen" class="fixed inset-0 z-[260] bg-gradient-to-b from-[#0a0e1a] to-[#1a1f3a]"
-    style="display: none;">
-    <div id="mis-tickets-content" class="w-full h-full overflow-y-auto"></div>
-  </div>
-
-  <div id="cinema-room" class="hidden fixed inset-0 bg-black z-[200]">
-    <div id="ocean-intro-cinema"
-      class="absolute inset-0 flex items-center justify-center z-[250] hidden overflow-hidden">
-      <div class="oc-intro-bg"></div>
-      <canvas id="oc-intro-pixi"></canvas>
-      <div class="oc-intro-content">
-        <div class="oc-intro-bar" id="oc-intro-bar"></div>
-        <div class="oc-intro-wordmark" id="oc-intro-wordmark">Ocean Cinemas</div>
-        <div class="oc-intro-sub" id="oc-intro-sub">Ocean &amp; Wild Studios</div>
-        <div class="oc-intro-line" id="oc-intro-line"></div>
+  
+      <div id="process-screen" class="fixed inset-0 z-[120] hidden flex flex-col bg-[#020512]">
+        <div class="flex justify-between items-center px-8 py-5 border-b border-white/5">
+          <h2 class="text-2xl font-black text-white uppercase tracking-wider"><i class="fas fa-shopping-cart text-cyan-400 mr-3"></i>Módulo de Precompra OWS</h2>
+          <button onclick="closePrecompraScreen()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold transition">Volver al catálogo</button>
+        </div>
+        
+        <!-- Main split viewport -->
+        <div class="precompra-split-container flex-1 overflow-hidden p-6">
+          
+          <!-- LEFT SIDE: Details (Top) & Purchase Stats (Bottom) -->
+          <div class="precompra-left-panel flex flex-col">
+            <div id="precompra-left-details" class="flex-1 overflow-y-auto pr-1">
+              <div class="text-center text-gray-500 py-12">
+                <i class="fas fa-film text-5xl mb-4 opacity-30"></i>
+                <p>Selecciona un título de la derecha para ver los detalles.</p>
+              </div>
+            </div>
+            
+            <div class="h-px bg-white/10 my-4"></div>
+            
+            <div id="precompra-left-purchase" class="bg-black/25 p-4 rounded-xl border border-white/5">
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Resumen de compra</span>
+              <div class="flex justify-between items-center mt-3">
+                <span class="text-gray-300 text-sm font-bold">Monto estimado:</span>
+                <span class="text-xl font-black text-yellow-400" id="precompra-summary-price">0 AB</span>
+              </div>
+              <div class="mt-4 flex gap-2">
+                <button id="precompra-confirm-btn" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black text-sm uppercase tracking-wider shadow-lg shadow-yellow-950/30 transition hover:scale-[1.02] disabled:opacity-50 disabled:pointer-events-none" disabled onclick="confirmActivePrecompra()">Confirmar compra</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- RIGHT SIDE: Movie/Series catalog grid -->
+          <div class="precompra-right-panel flex flex-col">
+            <!-- Headers and filters -->
+            <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-4">
+              <div class="flex gap-2 bg-white/5 p-1 rounded-xl">
+                <button onclick="filterPrecompraGrid('todos')" class="px-4 py-2 rounded-lg font-bold text-xs bg-cyan-500 text-black transition" id="p-filter-todos">Todos</button>
+                <button onclick="filterPrecompraGrid('pelicula')" class="px-4 py-2 rounded-lg font-bold text-xs text-gray-400 hover:text-white transition" id="p-filter-pelicula">Películas</button>
+                <button onclick="filterPrecompraGrid('series_container')" class="px-4 py-2 rounded-lg font-bold text-xs text-gray-400 hover:text-white transition" id="p-filter-series">Series</button>
+              </div>
+              <input type="text" id="precompra-search" placeholder="Buscar título..." class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:border-cyan-500 outline-none w-full md:w-48" oninput="renderPrecompraCatalog()">
+            </div>
+            
+            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1">
+              <!-- Rendered programmatically -->
+            </div>
+          </div>
+          
+        </div>
       </div>
-    </div>
+    
     <video id="cinema-video" class="w-full h-full object-contain">
       <source id="video-source" src="" type="video/mp4">
     </video>
@@ -2504,7 +2464,7 @@
 
           const data = await res.json();
           if (res.ok) {
-            showToast("âœ… TransacciÃ³n exitosa");
+            showToast("âœ… Transacción exitosa");
             document.getElementById('checkout-modal').classList.add('hidden');
             if (this.pendingTransaction.onSuccess) this.pendingTransaction.onSuccess();
             refreshSyncState();
@@ -2514,7 +2474,7 @@
             confirmBtn.disabled = false;
           }
         } catch (e) {
-          showToast("âŒ Error de comunicaciÃ³n con Ocean Pay");
+          showToast("âŒ Error de comunicación con Ocean Pay");
           confirmBtn.innerText = originalText;
           confirmBtn.disabled = false;
         }
@@ -6142,7 +6102,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           STATE.oceanPayUser = JSON.parse(opUser);
           STATE.oceanPayLinked = true;
           STATE.balance = resolveOceanPayBalance(STATE.oceanPayUser);
-          console.log('âœ… SesiÃ³n de Ocean Pay restaurada. Saldo:', STATE.balance);
+          console.log('âœ… Sesión de Ocean Pay restaurada. Saldo:', STATE.balance);
         } catch (e) {
           console.error('Error restaurando sesión de Ocean Pay:', e);
         }
@@ -6546,8 +6506,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       v.innerHTML = `
         <i class="fas fa-wave-square ${isPaid ? 'text-cyan-300' : 'text-gray-400'}"></i>
         <span class="${isPaid ? 'text-cyan-200 font-black' : ''}">${plan.name}</span>
-        ${isPaid ? '<span class="text-xs text-cyan-400/80 font-bold uppercase tracking-wider">Activo</span>' : ''}
-        <span class="text-cyan-200/80">${tides} Tides</span>
+        ${isPaid ? '<span class="text-xs text-cyan-400/80 font-bold uppercase tracking-wider">Activo</span>' : '<span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Gratuito</span>'}
       `;
 
       const statusWrap = document.getElementById('vip-status-container');
@@ -6769,7 +6728,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         if (dailyAmountEl) dailyAmountEl.textContent = '0';
         if (dailyStreakEl) dailyStreakEl.textContent = '--';
         if (dailyBtn) {
-          dailyBtn.disabled = true;
+          dailyBtn.disabled = false;
           dailyBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>MEJORA TU PLAN';
           dailyBtn.onclick = () => { openVipModal(); };
         }
@@ -7536,7 +7495,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             }
           }, 500);
         } else {
-          showToast(`ðŸŽ« Tu funciÃ³n es a las ${customHorario}`);
+          showToast(`🎟️ Tu función es a las ${customHorario}`);
           setTimeout(() => openMisTicketsScreen(), 1000);
         }
       });
@@ -7754,7 +7713,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       v.onerror = () => {
         console.error('Error cargando video code:', v.error ? v.error.code : 'unknown', v.error);
         if (l) l.classList.add('hidden');
-        showToast('âš ï¸ Error al cargar la pelÃ­cula. Verifica tu conexiÃ³n o intenta mÃ¡s tarde.');
+        showToast('âš ï¸ Error al cargar la película. Verifica tu conexión o intenta más tarde.');
       };
 
       v.load();
@@ -8231,7 +8190,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         if (ti !== -1) {
           STATE.tickets[ti].used = true;
           saveToStorage();
-          showToast('âœ… Gracias por ver la pelÃ­cula');
+          showToast('âœ… Gracias por ver la película');
         }
       }
       v.pause();
@@ -8405,7 +8364,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             }
           } catch (e) {
             console.error(e);
-            showToast('âŒ Error de conexiÃ³n');
+            showToast('âŒ Error de conexión');
             claimBtn.disabled = false;
             claimBtn.textContent = 'REINTENTAR';
           }
@@ -8517,7 +8476,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               ` : ''}
 
               <!-- Gradient Overlay on Hover -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 ${accessible ? 'group-hover:opacity-100' : ''} transition-opacity duration-300 flex flex-col justify-end p-4">
+              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 ${accessible ? 'group-hover:opacity-100' : 'pointer-events-none'} transition-opacity duration-300 flex flex-col justify-end p-4">
                 <div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                   <div class="flex items-center gap-2 mb-2 flex-wrap">
                     <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-[#E50914] hover:text-white transition-colors">
@@ -8569,7 +8528,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       updateHeroSynopsisGate();
       // Sincronizar saldo de Ocean Pay con el servidor
       setTimeout(() => refreshSyncState(), 1000);
-      showToast('ðŸŽ¬ Bienvenido a Ocean Cinemas!');
+      showToast('🎬 Bienvenido a Ocean Cinemas!');
       if (typeof gsap !== 'undefined') {
         gsap.from('.stat-card', {
           opacity: 0,
@@ -8787,11 +8746,18 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             </button>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[50vh] overflow-y-auto p-4">
-            ${movies.map(m => `
-              <div class="movie-card cursor-pointer rounded-xl overflow-hidden transform hover:scale-105 transition" onclick="startPrecompraFlow(${m.id})">
+            ${movies.map(m => {
+              const preAcc = isMovieAccessibleByPlan(m);
+              return `
+              <div class="movie-card cursor-pointer rounded-xl overflow-hidden transform hover:scale-105 transition" onclick="${preAcc ? `startPrecompraFlow(${m.id})` : ''}">
                 <div class="aspect-[2/3] relative">
                   <img src="${m.poster}" class="w-full h-full object-cover" onerror="this.src='assets/OceanCinemas.png'">
                   <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                  ${!preAcc ? `<div class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-1 z-10">
+                    <i class="fas fa-lock text-2xl text-gray-500"></i>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Plan Litoral</span>
+                    <button onclick="event.stopPropagation(); openVipModal()" class="mt-1 px-2 py-1 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[10px] font-bold">Mejorar plan</button>
+                  </div>` : ''}
                   <div class="absolute bottom-0 left-0 right-0 p-3">
                     <h4 class="font-bold text-sm">${m.title}</h4>
                     <p class="text-xs text-cyan-400">${OCEAN_TICKET_PRICE} <canvas class="currency-canvas" data-currency="aquabux"></canvas></p>
@@ -8800,7 +8766,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
                   </div>
                 </div>
               </div>
-            `).join('')}
+            `;}).join('')}
           </div>
           <button onclick="closeProcessScreen()" class="netflix-secondary mt-6 px-8 py-3">Cancelar</button>
         </div>
@@ -8810,6 +8776,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     async function startPrecompraFlow(movieId, isEpisode = false, skipUpcomingGate = false) {
       const movie = STATE.movies.find(m => m.id === movieId);
       if (!movie) return;
+
+      // Plan gate: bloquear si el plan no tiene acceso a esta película
+      if (!isMovieAccessibleByPlan(movie)) {
+        showToast('🔒 Este contenido requiere un plan superior a Litoral.');
+        showUpgradePrompt(movie.title);
+        return;
+      }
 
       const content = document.getElementById('process-content');
       document.getElementById('process-screen').classList.add('active');
@@ -9573,7 +9546,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
     }
 
-    // ========== LÃ“GICA DE TICKETS UNIFICADA (V2) ==========
+    // ========== LÓGICA DE TICKETS UNIFICADA (V2) ==========
 
     // Redefiniendo getTicketStatus aquí para asegurar que usa la lógica correcta
     // (Fast Pass 30 min, Reembolsos > 1h)
@@ -10277,46 +10250,331 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
 
+  
+    // ==========================================
+    // JS SCRIPTS ADDED BY AGENT FOR VISUAL REWORK
+    // ==========================================
+    
+    // Notification Center State
+    let STATE_notifications = JSON.parse(localStorage.getItem('oc_notifs') || '[]');
+    
+    function toggleNotificationPanel() {
+      const panel = document.getElementById('notif-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+    
+    function showNotification(msg) {
+      STATE_notifications.unshift({ id: Date.now(), msg, date: new Date().toLocaleTimeString() });
+      localStorage.setItem('oc_notifs', JSON.stringify(STATE_notifications));
+      renderNotifications();
+    }
+    
+    function renderNotifications() {
+      const list = document.getElementById('notif-list');
+      const badge = document.getElementById('notif-badge');
+      if (!list) return;
+      
+      if (STATE_notifications.length === 0) {
+        list.innerHTML = '<div class="text-center py-4 text-gray-500">No tienes notificaciones.</div>';
+        if (badge) badge.classList.add('hidden');
+        return;
+      }
+      
+      if (badge) {
+        badge.textContent = STATE_notifications.length;
+        badge.classList.remove('hidden');
+      }
+      
+      list.innerHTML = STATE_notifications.map(n => `
+        <div class="notif-item">
+          <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+            <span>AVISO OWS</span>
+            <span>${n.date}</span>
+          </div>
+          <p class="text-white leading-relaxed">${n.msg}</p>
+        </div>
+      `).join('');
+    }
+    
+    function clearAllNotifications() {
+      STATE_notifications = [];
+      localStorage.setItem('oc_notifs', '[]');
+      renderNotifications();
+    }
+    
+    // Hero slide manual dot set
+    function setHeroSlide(idx) {
+      const slides = document.querySelectorAll('.hero-slide');
+      if (!slides.length) return;
+      
+      // Update active slide
+      slides[_heroSlideIdx].classList.remove('active');
+      _heroSlideIdx = idx;
+      slides[_heroSlideIdx].classList.add('active');
+      
+      // Update dots CSS
+      document.querySelectorAll('.hero-dots button').forEach((btn, i) => {
+        if (i === idx) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      
+      // Reset timer
+      clearInterval(_heroSlideTimer);
+      _heroSlideTimer = setInterval(() => {
+        slides[_heroSlideIdx].classList.remove('active');
+        _heroSlideIdx = (_heroSlideIdx + 1) % slides.length;
+        slides[_heroSlideIdx].classList.add('active');
+        
+        // Sincronizar dots
+        document.querySelectorAll('.hero-dots button').forEach((btn, i) => {
+          if (i === _heroSlideIdx) btn.classList.add('active');
+          else btn.classList.remove('active');
+        });
+      }, 7000);
+    }
+    
+    // Precompra Split Catalog State
+    let precompraCategoryFilter = 'todos';
+    let selectedPrecompraId = null;
+    let selectedSeatNumber = null;
+    let selectedFormat = '2D';
+    
+    function filterPrecompraGrid(cat) {
+      precompraCategoryFilter = cat;
+      document.getElementById('p-filter-todos').className = cat === 'todos' ? 'px-4 py-2 rounded-lg font-bold text-xs bg-cyan-500 text-black transition' : 'px-4 py-2 rounded-lg font-bold text-xs text-gray-400 hover:text-white transition';
+      document.getElementById('p-filter-pelicula').className = cat === 'pelicula' ? 'px-4 py-2 rounded-lg font-bold text-xs bg-cyan-500 text-black transition' : 'px-4 py-2 rounded-lg font-bold text-xs text-gray-400 hover:text-white transition';
+      document.getElementById('p-filter-series').className = cat === 'series_container' ? 'px-4 py-2 rounded-lg font-bold text-xs bg-cyan-500 text-black transition' : 'px-4 py-2 rounded-lg font-bold text-xs text-gray-400 hover:text-white transition';
+      renderPrecompraCatalog();
+    }
+    
+    function renderPrecompraCatalog() {
+      const grid = document.getElementById('precompra-catalog-grid');
+      if (!grid) return;
+      
+      const query = document.getElementById('precompra-search').value.toLowerCase();
+      let list = STATE.movies.filter(m => {
+        // filter containers
+        if (precompraCategoryFilter === 'series_container' && m.type !== 'series_container') return false;
+        if (precompraCategoryFilter === 'pelicula' && m.type === 'series_container') return false;
+        return m.title.toLowerCase().includes(query);
+      });
+      
+      grid.innerHTML = list.map(m => `
+        <div onclick="selectPrecompraTitle(dots${m.id})" class="cursor-pointer group relative rounded-xl border ${selectedPrecompraId === m.id ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-950/20' : 'border-white/5 hover:border-cyan-500/40 bg-white/5'} p-3 transition duration-200">
+          <div class="h-32 rounded-lg overflow-hidden relative">
+            <img src="${m.poster}" class="w-full h-full object-cover">
+          </div>
+          <h4 class="text-white text-xs font-black mt-2 line-clamp-1 group-hover:text-cyan-400">${m.title}</h4>
+          <span class="text-[9px] uppercase tracking-wider text-cyan-500/80 font-bold">${m.type === 'series_container' ? 'Serie' : 'Película'}</span>
+        </div>
+      `).join('');
+    }
+    
+    function selectPrecompraTitle(id) {
+      selectedPrecompraId = id;
+      selectedSeatNumber = null;
+      renderPrecompraCatalog();
+      renderPrecompraDetails();
+    }
+    
+    function renderPrecompraDetails() {
+      const details = document.getElementById('precompra-left-details');
+      const confirmBtn = document.getElementById('precompra-confirm-btn');
+      const summaryPrice = document.getElementById('precompra-summary-price');
+      if (!details) return;
+      
+      const m = STATE.movies.find(x => x.id === selectedPrecompraId);
+      if (!m) {
+        confirmBtn.disabled = true;
+        summaryPrice.textContent = '0 AB';
+        return;
+      }
+      
+      let price = m.price || OCEAN_TICKET_PRICE;
+      summaryPrice.textContent = `${price} AB`;
+      confirmBtn.disabled = false;
+      
+      if (m.type === 'series_container') {
+        const episodes = getSeriesEpisodes(m);
+        // Build episode list with previous watch condition checks
+        const episodesHtml = episodes.map((ep, idx) => {
+          // Check if previous episode is watched
+          let isLocked = false;
+          if (idx > 0) {
+            const prevEpId = episodes[idx - 1].id;
+            const prevWatched = localStorage.getItem(`oc_watched_${prevEpId}`) === 'true';
+            if (!prevWatched) isLocked = true;
+          }
+          
+          return `
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5 ${isLocked ? 'episode-locked bg-red-950/5' : 'hover:border-cyan-500/20'}" onclick="${isLocked ? '' : `startWatchingEpisode(${ep.id})`}">
+              <div class="flex items-center gap-3">
+                <i class="fas ${isLocked ? 'fa-lock text-red-500' : 'fa-play text-cyan-400'} text-xs"></i>
+                <div>
+                  <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Episodio ${idx + 1}</span>
+                  <h5 class="text-white text-xs font-bold">${ep.title}</h5>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+            </div>
+          `;
+        }).join('');
+        
+        details.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex gap-4">
+              <img src="${m.poster}" class="w-20 h-28 rounded-lg object-cover border border-white/10">
+              <div>
+                <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Serie</span>
+                <h3 class="text-lg font-black text-white leading-tight">${m.title}</h3>
+                <p class="text-[11px] text-gray-400 line-clamp-3 mt-1">${m.description}</p>
+              </div>
+            </div>
+            
+            <div class="h-px bg-white/10 my-3"></div>
+            
+            <h4 class="text-xs font-black text-cyan-400 uppercase tracking-widest mb-2">Episodios y Temporadas</h4>
+            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+              ${episodesHtml}
+            </div>
+          </div>
+        `;
+      } else {
+        // Película: selector de formatos e interactivo de butacas
+        details.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex gap-4">
+              <img src="${m.poster}" class="w-20 h-28 rounded-lg object-cover border border-white/10">
+              <div>
+                <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Película</span>
+                <h3 class="text-lg font-black text-white leading-tight">${m.title}</h3>
+                <p class="text-[11px] text-gray-400 line-clamp-3 mt-1">${m.description}</p>
+              </div>
+            </div>
+            
+            <div class="h-px bg-white/10 my-3"></div>
+            
+            <!-- Formato Selector -->
+            <div>
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Selecciona Formato</span>
+              <div class="flex gap-2 mt-2">
+                <button onclick="setFormat('2D')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white font-bold transition format-btn ${selectedFormat === '2D' ? 'active' : ''}" id="f-2D">2D</button>
+                <button onclick="setFormat('3D')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white font-bold transition format-btn ${selectedFormat === '3D' ? 'active' : ''}" id="f-3D">3D</button>
+                <button onclick="setFormat('IMAX')" class="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-white font-bold transition format-btn ${selectedFormat === 'IMAX' ? 'active' : ''}" id="f-IMAX">IMAX</button>
+              </div>
+            </div>
+            
+            <!-- Butacas -->
+            <div>
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Elige tu Butaca</span>
+              <div class="seat-grid">
+                ${Array.from({length: 40}).map((_, i) => `
+                  <button class="seat-button ${selectedSeatNumber === i ? 'selected' : ''}" onclick="selectSeat(${i})">dots${i+1}</button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function setFormat(fmt) {
+      selectedFormat = fmt;
+      document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`f-${fmt}`);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+    
+    function selectSeat(num) {
+      selectedSeatNumber = num;
+      renderPrecompraDetails();
+    }
+    
+    function confirmActivePrecompra() {
+      if (!selectedPrecompraId) return;
+      const m = STATE.movies.find(x => x.id === selectedPrecompraId);
+      if (!m) return;
+      
+      const price = m.price || OCEAN_TICKET_PRICE;
+      
+      // Check Balance
+      const balance = STATE.cinemasSession?.tidesBalance || 0;
+      if (balance < price) {
+        showToast('❌ Balance de AquaBux insuficiente.');
+        return;
+      }
+      
+      // Perform precompra
+      STATE.cinemasSession.tidesBalance -= price;
+      showToast(`🎉 Precompra realizada con éxito para "${m.title}"!`);
+      closePrecompraScreen();
+      updateHeaderDisplays();
+    }
+    
+    // Early exit penalty system
+    let exitWarnCount = parseInt(localStorage.getItem('oc_early_exits') || '0');
+    
+    function detectEarlyExit(video) {
+      if (!video) return;
+      const progress = video.currentTime / video.duration;
+      if (progress < 0.95) {
+        exitWarnCount++;
+        localStorage.setItem('oc_early_exits', exitWarnCount);
+        
+        // Subtract AquaBux
+        if (STATE.cinemasSession) {
+          const deduction = 15;
+          STATE.cinemasSession.tidesBalance = Math.max(0, STATE.cinemasSession.tidesBalance - deduction);
+          updateHeaderDisplays();
+          showNotification(`⚠️ Has abandonado la sala antes de finalizar. Penalización: -${deduction} AquaBux.`);
+        }
+        
+        if (exitWarnCount === 2) {
+          showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente 2 veces. Un abandono adicional causará la suspensión de 24h.');
+        } else if (exitWarnCount >= 3) {
+          // Suspend Account
+          const liftTime = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+          localStorage.setItem('oc_suspended_until', liftTime);
+          showNotification('🚨 Tu cuenta ha sido SUSPENDIDA temporalmente por comportamiento abusivo en las salas.');
+          alert('Tu cuenta de Ocean Cinemas ha sido suspendida por 24 horas.');
+          location.reload();
+        }
+      } else {
+        // Mark as watched for series progress check
+        if (window._activeMovieId) {
+          localStorage.setItem(`oc_watched_${window._activeMovieId}`, 'true');
+        }
+      }
+    }
+    
+    // Check suspension at load time
+    function checkSuspensionState() {
+      const suspendedUntil = parseInt(localStorage.getItem('oc_suspended_until') || '0');
+      if (suspendedUntil && Date.now() < suspendedUntil) {
+        // Lock screen
+        document.body.innerHTML = `
+          <div class="fixed inset-0 bg-[#020512] flex flex-col items-center justify-center text-center p-8 z-[9999]">
+            <div class="w-24 h-24 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-6">
+              <i class="fas fa-user-slash text-red-500 text-4xl"></i>
+            </div>
+            <h1 class="text-3xl font-black text-white mb-2">Cuenta Suspendida Temporalmente</h1>
+            <p class="text-gray-400 max-w-md mb-6">Tu acceso a Ocean Cinemas ha sido restringido por comportamiento inadecuado al abandonar salas repetidamente.</p>
+            <div class="p-4 bg-white/5 border border-white/10 rounded-xl text-sm font-mono text-cyan-400 mb-6">
+              Tiempo restante: ${Math.ceil((suspendedUntil - Date.now()) / (60 * 1000))} minutos
+            </div>
+            <p class="text-xs text-gray-500">La suspensión finalizará automáticamente al concluir el periodo de 24 horas.</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Hook video play/close checks
+    window.addEventListener('DOMContentLoaded', () => {
+      checkSuspensionState();
+      renderNotifications();
+    });
   </script>
 
 </body>
 
-</html>
-
-
-
-
-
-
-
-
-
- 
- . h e r o - c t a - p a t r e o n   {  
-     d i s p l a y :   i n l i n e - f l e x ;  
-     a l i g n - i t e m s :   c e n t e r ;  
-     g a p :   8 p x ;  
-     p a d d i n g :   1 0 p x   1 8 p x ;  
-     b o r d e r - r a d i u s :   1 2 p x ;  
-     f o n t - s i z e :   0 . 9 5 r e m ;  
-     f o n t - w e i g h t :   8 0 0 ;  
-     b a c k g r o u n d :   l i n e a r - g r a d i e n t ( 1 3 5 d e g ,   # 0 0 b 8 d 4 ,   # 0 0 6 6 c c ) ;  
-     c o l o r :   # 0 2 0 6 1 7 ;  
-     b o r d e r :   1 p x   s o l i d   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 3 ) ;  
-     b o x - s h a d o w :   0   4 p x   1 2 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 2 ) ;  
-     t r a n s i t i o n :   a l l   0 . 3 s   e a s e ;  
- }  
- . h e r o - c t a - p a t r e o n : h o v e r   {  
-     b o x - s h a d o w :   0   0   1 5 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 5 ) ;  
-     t r a n s f o r m :   t r a n s l a t e Y ( - 2 p x ) ;  
- }  
- . h e r o - c t a - p a t r e o n : h o v e r   . f a - b o l t   {  
-     a n i m a t i o n :   p a t r e o n P u l s e   2 s   e a s e - i n - o u t   i n f i n i t e ;  
- }  
- @ k e y f r a m e s   p a t r e o n P u l s e   {  
-     0 %   {   b o x - s h a d o w :   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 3 ) ;   }  
-     5 0 %   {   b o x - s h a d o w :   0   0   2 5 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 6 ) ,   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 2 ) ;   }  
-     1 0 0 %   {   b o x - s h a d o w :   0   0   1 0 p x   r g b a ( 0 , 2 2 9 , 2 5 5 , 0 . 4 ) ;   }  
- }  
-  
- 
+</html>
