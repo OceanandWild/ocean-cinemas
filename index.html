@@ -8201,7 +8201,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       v.pause();
       v.currentTime = 0;
       v.src = '';
-      document.getElementById('cinema-room').classList.add('hidden');
+      const cinemaRoom = document.getElementById('cinema-room');
+      if (cinemaRoom) cinemaRoom.classList.add('hidden');
       document.body.style.overflow = '';
       if (cinemaHeader) cinemaHeader.classList.remove('hidden');
       if (cinemaControls) cinemaControls.classList.remove('hidden');
@@ -8215,8 +8216,10 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
     function showSection(s) {
-      document.getElementById('movies-section').classList.toggle('hidden', s !== 'movies');
-      document.getElementById('tickets-section').classList.toggle('hidden', s !== 'tickets');
+      const moviesSection = document.getElementById('movies-section');
+      const ticketsSection = document.getElementById('tickets-section');
+      if (moviesSection) moviesSection.classList.toggle('hidden', s !== 'movies');
+      if (ticketsSection) ticketsSection.classList.toggle('hidden', s !== 'tickets');
       if (s === 'tickets') renderTickets();
     }
 
