@@ -111,6 +111,24 @@
       cursor: not-allowed !important;
       pointer-events: none;
     }
+
+    .precompra-success-screen {
+      animation: precompraSuccessIn 0.35s ease-out both;
+    }
+
+    @keyframes precompraSuccessIn {
+      from { opacity: 0; transform: scale(.96) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .precompra-success-icon {
+      animation: precompraSuccessIcon 0.55s .15s ease-out both;
+    }
+
+    @keyframes precompraSuccessIcon {
+      from { opacity: 0; transform: scale(.5) rotate(-15deg); }
+      to { opacity: 1; transform: scale(1) rotate(0); }
+    }
   
     /* === RESET & BASE === */
     * {
@@ -6009,8 +6027,16 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           body: JSON.stringify({ username: cleanUser, password: cleanPassword })
         });
         const data = await res.json();
-        if (!res.ok) return { ok: false, error: data.error || 'Credenciales invalidas.' };
+        if (!res.ok) {
+          if (data.suspended) {
+            renderSuspensionWaitingRoom({ suspended_until: new Date(data.suspendedUntil), reason: data.reason });
+            return { ok: false, error: 'Cuenta suspendida. Revisa la pantalla de restricción.' };
+          }
+          return { ok: false, error: data.error || 'Credenciales invalidas.' };
+        }
+        clearSuspensionOverlay();
         applySessionState(data.user.username, data.token, data.user);
+        checkSuspensionState();
         return { ok: true, account: data.user };
       } catch (e) {
         console.error('[OC] login fetch error:', e);
@@ -6033,6 +6059,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           return;
         }
         const user = await res.json();
+        // Check for active suspension
+        const susp = user.suspension;
+        if (susp && susp.suspended && susp.suspendedUntil) {
+          renderSuspensionWaitingRoom({ suspended_until: new Date(susp.suspendedUntil), reason: susp.reason });
+          return;
+        }
         // Refresh local account data with server data
         applySessionState(user.username, session.token, user);
       } catch (_e) { /* offline — keep session as-is */ }
@@ -10837,10 +10869,58 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       STATE.tickets.push(newTicket);
       saveToStorage();
       
-      showToast(`🎉 Precompra realizada con éxito para "${targetMovie.title}"${seatInfo}!`);
       closePrecompraScreen();
       updateBalanceDisplay();
       if (typeof renderTickets === 'function') renderTickets();
+      showPrecompraSuccess(targetMovie, newTicket, seatInfo);
+    }
+
+    function showPrecompraSuccess(movie, ticket, seatInfo = '') {
+      const existing = document.getElementById('precompra-success-screen');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'precompra-success-screen';
+      overlay.className = 'fixed inset-0 z-[280] flex items-center justify-center p-5 bg-slate-950/90 backdrop-blur-xl';
+      overlay.innerHTML = `
+        <div class="precompra-success-screen w-full max-w-lg overflow-hidden rounded-[2rem] border border-cyan-300/20 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_0_80px_rgba(6,182,212,.18)]">
+          <div class="relative px-6 pt-10 pb-8 text-center sm:px-10">
+            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"></div>
+            <div class="precompra-success-icon mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-emerald-300/30 bg-emerald-400/15 text-4xl text-emerald-300 shadow-[0_0_35px_rgba(52,211,153,.2)]">
+              <i class="fas fa-check"></i>
+            </div>
+            <p class="mb-2 text-xs font-black uppercase tracking-[.28em] text-emerald-300">Precompra confirmada</p>
+            <h2 class="text-2xl font-black text-white sm:text-3xl">¡Tu entrada está lista!</h2>
+            <p class="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-slate-400">La compra se guardó correctamente. Ya puedes encontrarla en tu sección de tickets.</p>
+
+            <div class="mt-7 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.04] p-3 text-left">
+              <img src="${movie.poster || 'assets/OceanCinemas.png'}" alt="" class="h-20 w-14 rounded-xl object-cover" onerror="this.src='assets/OceanCinemas.png'">
+              <div class="min-w-0">
+                <p class="truncate text-base font-black text-white">${movie.title}</p>
+                <p class="mt-1 text-xs text-slate-400">${movie.sala || 'Sala General'} · ${movie.puerta || 'General'}</p>
+                <p class="mt-1 text-xs font-bold text-cyan-300">${ticket.price} AquaBux${seatInfo}</p>
+              </div>
+            </div>
+
+            <div class="mt-7 grid gap-3 sm:grid-cols-2">
+              <button onclick="closePrecompraSuccess(); openMisTicketsScreen()" class="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 text-sm font-black text-white shadow-lg shadow-cyan-950/30 transition hover:scale-[1.02]">
+                <i class="fas fa-ticket-alt mr-2"></i>Ver mis tickets
+              </button>
+              <button onclick="closePrecompraSuccess(); showCatalogSelection()" class="rounded-xl border border-white/15 bg-white/[.06] px-4 py-3 text-sm font-bold text-slate-200 transition hover:bg-white/10">
+                <i class="fas fa-film mr-2"></i>Volver al catálogo
+              </button>
+            </div>
+            <button onclick="closePrecompraSuccess()" class="mt-4 text-xs font-bold text-slate-500 transition hover:text-white">Cerrar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+    }
+
+    function closePrecompraSuccess() {
+      const overlay = document.getElementById('precompra-success-screen');
+      if (!overlay) return;
+      overlay.querySelector('.precompra-success-screen')?.classList.add('opacity-0');
+      setTimeout(() => overlay.remove(), 180);
     }
     
     // Early exit penalty system
@@ -10851,6 +10931,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     // ============================================================
     async function detectEarlyExit(video) {
       if (!video || !video.duration) return;
+      if (video.dataset.ocExitReported === '1') return;
+      video.dataset.ocExitReported = '1';
       const currentTime = video.currentTime;
       const duration = video.duration;
       const watchedRatio = currentTime / duration;
@@ -10876,6 +10958,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           body: JSON.stringify({ movieId, currentTime, duration, watchedRatio })
         });
         const data = await res.json();
+        if (!res.ok) {
+          if (data.suspended) {
+            renderSuspensionWaitingRoom(data);
+          } else {
+            showNotification(data.error || 'No se pudo registrar la salida.');
+          }
+          return;
+        }
         if (!data.success) return;
 
         if (!data.isEarly) {
@@ -10887,9 +10977,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         // Show the main result message
         showNotification(data.notification || data.message);
 
-        // If suspended: render waiting room
+        // If suspended: render waiting room immediately
         if (data.suspended) {
-          setTimeout(() => renderSuspensionWaitingRoom(data), 1500);
+          renderSuspensionWaitingRoom(data);
         }
       } catch (e) {
         console.warn('[OC] detectEarlyExit fetch failed:', e);
@@ -10916,6 +11006,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function renderSuspensionWaitingRoom(suspData) {
       const suspUntil = suspData?.suspended_until ? new Date(suspData.suspended_until) : new Date(Date.now() + 24*3600*1000);
       const reason = suspData?.reason || 'Salidas prematuras reiteradas';
+
+      // Remove any existing suspension overlay first
+      const existing = document.getElementById('oc-suspension-overlay');
+      if (existing) existing.remove();
+      if (suspData?._cleanupOnly) return;
 
       const overlay = document.createElement('div');
       overlay.id = 'oc-suspension-overlay';
@@ -10948,6 +11043,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       `;
 
       document.body.appendChild(overlay);
+      document.body.style.overflow = 'hidden';
 
       // Start countdown ticker
       function tick() {
@@ -10961,7 +11057,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               <h2 style="color:#fff;margin:0 0 0.5rem;">Suspensión levantada</h2>
               <p style="color:#64748b;">Tu acceso ha sido restaurado. La página se recargará en 3 segundos...</p>
             </div>`;
-          setTimeout(() => location.reload(), 3000);
+          setTimeout(() => { clearSuspensionOverlay(); location.reload(); }, 3000);
           return;
         }
         const h = Math.floor(ms / 3600000);
@@ -10972,6 +11068,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         setTimeout(tick, 1000);
       }
       tick();
+    }
+
+    function clearSuspensionOverlay() {
+      const overlay = document.getElementById('oc-suspension-overlay');
+      if (overlay) overlay.remove();
+      document.body.style.overflow = '';
     }
 
     // Check suspension state at load time (using backend)
