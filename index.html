@@ -10051,10 +10051,21 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             ${historyTickets.length > 0 ? section('Historial', 'fa-clock-rotate', historyTickets.map(t => renderPaidTicketItem(t, 'history')).join(''), 'text-slate-500') + `<div class="flex justify-end mb-10"><button onclick="clearTicketHistory()" class="text-[11px] font-bold text-slate-600 hover:text-red-400 transition px-4 py-2 rounded-lg hover:bg-white/[.03] uppercase tracking-wider"><i class="fas fa-trash-can mr-1.5"></i>Limpiar historial</button></div>` : ''}
             
             ${activeTickets.length === 0 && unpaid.length === 0 && historyTickets.length === 0 ? `
-              <div class="flex flex-col items-center justify-center py-20 text-center glass rounded-3xl">
-                <i class="fas fa-ticket-alt text-7xl text-gray-700 mb-6"></i>
-                <p class="text-xl text-gray-400 font-medium">No tienes tickets disponibles</p>
-                <button onclick="closeMisTicketsScreen(); showSection('movies');" class="mt-8 netflix-btn px-8 py-3">Ver Cartelera</button>
+              <div class="relative flex flex-col items-center justify-center py-24 text-center overflow-hidden rounded-3xl border border-white/[0.04]" style="background:radial-gradient(ellipse at 50% 30%, rgba(34,211,238,0.04) 0%, transparent 70%);">
+                <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 50% 20%, rgba(34,211,238,0.06) 0%, transparent 50%);"></div>
+                <div class="relative z-10 flex flex-col items-center gap-6">
+                  <div class="w-24 h-24 rounded-full bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-2" style="box-shadow:inset 0 0 40px rgba(34,211,238,0.03);">
+                    <i class="fas fa-ticket text-3xl text-slate-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-xl text-slate-300 font-bold mb-1">No tienes tickets disponibles</p>
+                    <p class="text-sm text-slate-600">Explora la cartelera y consigue tus primeras entradas</p>
+                  </div>
+                  <button onclick="closeMisTicketsScreen(); showSection('movies');" class="group relative overflow-hidden mt-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black px-8 py-3.5 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm flex items-center gap-2.5 uppercase tracking-widest">
+                    <span class="relative z-10 flex items-center gap-2.5"><i class="fas fa-film"></i>Ver Cartelera</span>
+                    <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  </button>
+                </div>
               </div>
             ` : ''}
           </div>
