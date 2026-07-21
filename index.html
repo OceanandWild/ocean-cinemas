@@ -9080,7 +9080,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
 
       // Populate the new split-screen catalog
-      if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+      requestAnimationFrame(() => {
+        if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+      });
 
       if (movieId) {
         if (typeof selectPrecompraTitle === 'function') selectPrecompraTitle(movieId);
