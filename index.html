@@ -1983,19 +1983,32 @@
   <!-- PROCESS SCREEN (Precompra Flow) -->
   
       <div id="process-screen" class="fixed inset-0 z-[120] hidden flex flex-col bg-[#020512]">
-        <div class="relative px-8 py-5 flex items-center gap-5 overflow-hidden" style="background:linear-gradient(135deg,rgba(6,182,212,0.06) 0%,rgba(34,211,238,0.02) 40%,transparent 70%);border-bottom:1px solid rgba(34,211,238,0.08);">
-          <div class="absolute top-0 left-0 w-40 h-full pointer-events-none" style="background:radial-gradient(ellipse at 0% 50%,rgba(34,211,238,0.06) 0%,transparent 70%);"></div>
-          <button onclick="closePrecompraScreen()" class="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-cyan-500/10 border border-white/[0.08] hover:border-cyan-500/30 text-slate-400 hover:text-cyan-300 font-bold text-sm transition-all duration-200 group">
-            <i class="fas fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform duration-200"></i>
-            Volver al catálogo
-          </button>
-          <div class="relative flex items-center gap-3 pl-5">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center" style="box-shadow:0 0 20px rgba(34,211,238,0.08);">
-              <i class="fas fa-ticket text-cyan-400 text-sm"></i>
+        <div class="relative px-8 py-5 flex items-center justify-between gap-6 overflow-hidden" style="background:linear-gradient(135deg,rgba(6,182,212,0.06) 0%,rgba(34,211,238,0.02) 40%,transparent 70%);border-bottom:1px solid rgba(34,211,238,0.08);">
+          <div class="absolute top-0 left-0 w-60 h-full pointer-events-none" style="background:radial-gradient(ellipse at 0% 50%,rgba(34,211,238,0.06) 0%,transparent 70%);"></div>
+          <div class="relative flex items-center gap-5">
+            <button onclick="closePrecompraScreen()" class="flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-cyan-500/10 border border-white/[0.08] hover:border-cyan-500/30 text-slate-400 hover:text-cyan-300 font-bold text-sm transition-all duration-200 group">
+              <i class="fas fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform duration-200"></i>
+              Volver
+            </button>
+            <div class="w-px h-8 bg-white/[0.06]"></div>
+            <div class="flex items-center gap-3.5">
+              <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center" style="box-shadow:0 0 24px rgba(34,211,238,0.08);">
+                <i class="fas fa-ticket text-cyan-400"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-black text-white tracking-wide leading-tight">Módulo de Precompra</h2>
+                <p class="text-[10px] text-cyan-500/50 font-bold uppercase tracking-[0.25em]">Ocean Wild Studios</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-lg font-black text-white tracking-wide leading-tight">Módulo de Precompra</h2>
-              <p class="text-[10px] text-cyan-500/60 font-bold uppercase tracking-[0.2em]">Ocean Wild Studios</p>
+          </div>
+          <div class="relative flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <i class="fas fa-film text-cyan-500/40 text-xs"></i>
+              <span id="precompra-count" class="text-xs font-bold text-slate-500">0 títulos</span>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-amber-500/[0.06] border border-amber-500/15">
+              <i class="fas fa-coins text-amber-400 text-xs"></i>
+              <span id="precompra-header-balance" class="text-sm font-black text-amber-400 tabular-nums">0 AB</span>
             </div>
           </div>
         </div>
@@ -10863,6 +10876,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           <h4 class="text-white text-xs font-black mt-2 line-clamp-1 group-hover:text-cyan-400">${m.title}</h4>
         </div>
       `).join('');
+      
+      const countEl = document.getElementById('precompra-count');
+      if (countEl) countEl.textContent = `${list.length} título${list.length !== 1 ? 's' : ''}`;
+      
+      const balanceEl = document.getElementById('precompra-header-balance');
+      if (balanceEl) balanceEl.textContent = `${STATE.balance || 0} AB`;
     }
     
     function selectPrecompraTitle(id) {
