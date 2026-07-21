@@ -2000,22 +2000,33 @@
           <!-- LEFT SIDE: Details (Top) & Purchase Stats (Bottom) -->
           <div class="precompra-left-panel flex flex-col">
             <div id="precompra-left-details" class="flex-1 overflow-y-auto pr-1">
-              <div class="text-center text-gray-500 py-12">
-                <i class="fas fa-film text-5xl mb-4 opacity-30"></i>
-                <p>Selecciona un título de la derecha para ver los detalles.</p>
+              <div class="relative flex flex-col items-center justify-center h-full min-h-[260px] text-center overflow-hidden rounded-2xl border border-white/[0.04]" style="background:radial-gradient(ellipse at 50% 30%, rgba(34,211,238,0.03) 0%, transparent 60%);">
+                <div class="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-5" style="box-shadow:inset 0 0 30px rgba(34,211,238,0.03);">
+                  <i class="fas fa-film text-2xl text-slate-600"></i>
+                </div>
+                <p class="text-slate-400 font-bold text-sm mb-1">Selecciona un título</p>
+                <p class="text-slate-600 text-xs">de la derecha para ver los detalles</p>
               </div>
             </div>
             
-            <div class="h-px bg-white/10 my-4"></div>
+            <div class="h-px my-4" style="background:linear-gradient(90deg,transparent,rgba(34,211,238,0.12),transparent);"></div>
             
-            <div id="precompra-left-purchase" class="bg-black/25 p-4 rounded-xl border border-white/5">
-              <span class="text-[10px] text-gray-500 uppercase tracking-widest font-black">Resumen de compra</span>
-              <div class="flex justify-between items-center mt-3">
-                <span class="text-gray-300 text-sm font-bold">Monto estimado:</span>
-                <span class="text-xl font-black text-yellow-400" id="precompra-summary-price">0 AB</span>
-              </div>
-              <div class="mt-4 flex gap-2">
-                <button id="precompra-confirm-btn" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black text-sm uppercase tracking-wider shadow-lg shadow-yellow-950/30 transition hover:scale-[1.02] disabled:opacity-50 disabled:pointer-events-none" disabled onclick="confirmActivePrecompra()">Confirmar compra</button>
+            <div id="precompra-left-purchase" class="relative overflow-hidden rounded-2xl border border-white/[0.06]" style="background:linear-gradient(145deg,rgba(10,14,28,0.95),rgba(6,9,20,0.98));">
+              <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent"></div>
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-7 h-7 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                    <i class="fas fa-receipt text-yellow-400 text-[10px]"></i>
+                  </div>
+                  <span class="text-[10px] text-yellow-400/80 uppercase tracking-widest font-black">Resumen de compra</span>
+                </div>
+                <div class="flex justify-between items-center mb-5 pb-4 border-b border-white/[0.04]">
+                  <span class="text-slate-400 text-sm font-bold">Monto estimado</span>
+                  <span class="text-2xl font-black text-yellow-400 tabular-nums" id="precompra-summary-price">0 AB</span>
+                </div>
+                <button id="precompra-confirm-btn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black text-sm uppercase tracking-wider shadow-lg shadow-yellow-950/30 transition-all hover:scale-[1.02] hover:shadow-yellow-500/20 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none" disabled onclick="confirmActivePrecompra()">
+                  <i class="fas fa-check mr-2"></i>Confirmar compra
+                </button>
               </div>
             </div>
           </div>
