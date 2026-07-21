@@ -1674,13 +1674,28 @@
                 <i class="fas fa-bell text-lg"></i>
                 <span id="notif-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center hidden">0</span>
               </button>
-              <div id="notif-panel" class="absolute right-0 mt-3 w-80 bg-[#0d1326] border border-white/10 rounded-2xl p-4 shadow-2xl hidden z-50">
-                <div class="flex justify-between items-center pb-2 border-b border-white/5 mb-3">
-                  <span class="font-black text-xs text-cyan-400 tracking-wider">NOTIFICACIONES</span>
-                  <button onclick="clearAllNotifications()" class="text-[9px] text-gray-500 hover:text-cyan-400 font-bold uppercase">Limpiar</button>
+              <div id="notif-panel" class="absolute right-0 mt-3 w-96 bg-[#0b1120] border border-white/[0.08] rounded-2xl shadow-2xl hidden z-50 overflow-hidden" style="backdrop-filter:blur(24px);">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                      <i class="fas fa-bell text-cyan-400" style="font-size:0.85rem;"></i>
+                    </div>
+                    <div>
+                      <span class="text-sm font-black text-white tracking-wide">NOTIFICACIONES</span>
+                      <span id="notif-count-label" class="text-[10px] text-slate-500 ml-2 font-bold">0</span>
+                    </div>
+                  </div>
+                  <button onclick="clearAllNotifications()" class="text-[10px] font-bold text-slate-500 hover:text-cyan-400 uppercase tracking-wider transition px-3 py-1.5 rounded-lg hover:bg-white/5">Limpiar</button>
                 </div>
-                <div id="notif-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar text-xs text-gray-300">
-                  <div class="text-center py-4 text-gray-500">No tienes notificaciones.</div>
+                <div id="notif-list" class="max-h-80 overflow-y-auto" style="scrollbar-width:thin;scrollbar-color:rgba(34,211,238,0.2) transparent;">
+                  <div class="flex flex-col items-center justify-center py-10 text-slate-500">
+                    <i class="fas fa-bell-slash text-2xl mb-3 opacity-40"></i>
+                    <p class="text-xs font-medium">No tienes notificaciones.</p>
+                  </div>
+                </div>
+                <div id="notif-server-bar" class="hidden px-5 py-3 border-t border-white/5 bg-white/[.02] flex items-center gap-2 text-[10px] text-slate-500">
+                  <i class="fas fa-cloud"></i>
+                  <span id="notif-server-status">Conectando con el servidor...</span>
                 </div>
               </div>
             </div>
@@ -10569,16 +10584,42 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     // JS SCRIPTS ADDED BY AGENT FOR VISUAL REWORK
     // ==========================================
     
-    // Notification Center State
+    // Notification Center State (local + server dual source)
     let STATE_notifications = JSON.parse(localStorage.getItem('oc_notifs') || '[]');
+    let STATE_serverNotifs = [];
+    let notifPanelOpen = false;
+    
+    const NOTIF_CONFIG = {
+      warning:    { icon: 'fa-exclamation-triangle', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.25)', iconColor: '#fbbf24', label: 'ADVERTENCIA' },
+      cinemas_warning: { icon: 'fa-exclamation-triangle', bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.25)', iconColor: '#fbbf24', label: 'CINES' },
+      info:       { icon: 'fa-info-circle', bg: 'rgba(34,211,238,0.08)', border: 'rgba(34,211,238,0.25)', iconColor: '#22d3ee', label: 'INFORMACIÓN' },
+      success:    { icon: 'fa-check-circle', bg: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.25)', iconColor: '#34d399', label: 'ÉXITO' },
+      payment:    { icon: 'fa-credit-card', bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.25)', iconColor: '#a855f7', label: 'PAGO' },
+      suspension: { icon: 'fa-ban', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.25)', iconColor: '#ef4444', label: 'SUSPENSIÓN' },
+      default:    { icon: 'fa-bell', bg: 'rgba(148,163,184,0.06)', border: 'rgba(148,163,184,0.15)', iconColor: '#94a3b8', label: 'AVISO' },
+    };
+    
+    function getNotifConfig(notif) {
+      const t = (notif.type || 'default').toLowerCase();
+      return NOTIF_CONFIG[t] || NOTIF_CONFIG.default;
+    }
     
     function toggleNotificationPanel() {
       const panel = document.getElementById('notif-panel');
-      if (panel) panel.classList.toggle('hidden');
+      if (!panel) return;
+      notifPanelOpen = !notifPanelOpen;
+      if (notifPanelOpen) {
+        panel.classList.remove('hidden');
+        fetchServerNotifications();
+      } else {
+        panel.classList.add('hidden');
+      }
     }
     
-    function showNotification(msg) {
-      STATE_notifications.unshift({ id: Date.now(), msg, date: new Date().toLocaleTimeString() });
+    function showNotification(msg, type) {
+      const safeType = typeof type === 'string' ? type : 'default';
+      STATE_notifications.unshift({ id: Date.now(), msg, date: new Date().toISOString(), type: safeType, local: true });
+      STATE_notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
       localStorage.setItem('oc_notifs', JSON.stringify(STATE_notifications));
       renderNotifications();
     }
@@ -10586,28 +10627,116 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function renderNotifications() {
       const list = document.getElementById('notif-list');
       const badge = document.getElementById('notif-badge');
+      const countLabel = document.getElementById('notif-count-label');
       if (!list) return;
-      
-      if (STATE_notifications.length === 0) {
-        list.innerHTML = '<div class="text-center py-4 text-gray-500">No tienes notificaciones.</div>';
+      const merged = mergeNotifs(STATE_serverNotifs, STATE_notifications);
+      if (merged.length === 0) {
+        list.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-10 text-slate-500">
+            <i class="fas fa-bell-slash text-2xl mb-3 opacity-40"></i>
+            <p class="text-xs font-medium">No tienes notificaciones.</p>
+          </div>`;
         if (badge) badge.classList.add('hidden');
+        if (countLabel) countLabel.textContent = '';
         return;
       }
-      
       if (badge) {
-        badge.textContent = STATE_notifications.length;
+        badge.textContent = merged.length > 99 ? '99+' : merged.length;
         badge.classList.remove('hidden');
       }
-      
-      list.innerHTML = STATE_notifications.map(n => `
-        <div class="notif-item">
-          <div class="flex justify-between text-[10px] text-gray-500 mb-1">
-            <span>AVISO OWS</span>
-            <span>${n.date}</span>
-          </div>
-          <p class="text-white leading-relaxed">${n.msg}</p>
-        </div>
-      `).join('');
+      if (countLabel) countLabel.textContent = `· ${merged.length}`;
+      list.innerHTML = merged.map(n => {
+        const cfg = getNotifConfig(n);
+        const ts = formatNotifDate(n.date);
+        return `
+          <div class="notif-item group flex items-start gap-3 px-5 py-3.5 border-b border-white/[.03] hover:bg-white/[.03] transition cursor-pointer" style="background:${n.isServer ? cfg.bg : 'transparent'};">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:${cfg.bg};border:1px solid ${cfg.border};">
+              <i class="fas ${cfg.icon}" style="color:${cfg.iconColor};font-size:0.8rem;"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-[10px] font-black uppercase tracking-wider" style="color:${cfg.iconColor};">${cfg.label}</span>
+                <span class="text-[9px] text-slate-600 font-medium shrink-0">${ts}</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed break-words">${n.msg || n.message || ''}</p>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    
+    function formatNotifDate(dateStr) {
+      if (!dateStr) return '';
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const now = new Date();
+        const diff = (now - d) / 1000;
+        if (diff < 60) return 'Ahora';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+        return d.toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+    
+    function mergeNotifs(server, local) {
+      const seen = new Set();
+      const result = [];
+      const all = [
+        ...server.map(n => ({ ...n, isServer: true })),
+        ...local.map(n => ({ ...n, isServer: false }))
+      ];
+      all.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+      for (const n of all) {
+        const key = n.id ? String(n.id) : (n.msg || n.message || '') + n.date;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        result.push(n);
+      }
+      return result;
+    }
+    
+    async function fetchServerNotifications() {
+      const bar = document.getElementById('notif-server-bar');
+      const status = document.getElementById('notif-server-status');
+      if (bar) bar.classList.remove('hidden');
+      if (status) status.textContent = 'Conectando con el servidor...';
+      let token = STATE.cinemasSession?.token || null;
+      if (!token) {
+        const raw = localStorage.getItem('ocean_cinemas_session_v2');
+        if (raw) {
+          try { const p = JSON.parse(raw); token = p.token || p; } catch (e) { token = raw; }
+        }
+      }
+      if (!token) {
+        if (status) status.textContent = 'Inicia sesión para ver notificaciones del servidor.';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}/ocean-pay/notifications/me`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Error ' + res.status);
+        const data = await res.json();
+        STATE_serverNotifs = Array.isArray(data) ? data.map(normalizeNotif) : ((data.notifications || []).map(normalizeNotif));
+        if (bar) bar.classList.add('hidden');
+        renderNotifications();
+      } catch (e) {
+        if (status) status.textContent = 'No se pudieron cargar notificaciones del servidor.';
+        setTimeout(() => { if (bar) bar.classList.add('hidden'); }, 5000);
+      }
+    }
+    
+    function normalizeNotif(n) {
+      return {
+        id: n.id,
+        date: n.created_at || n.date || n.timestamp,
+        msg: n.message || n.msg || n.title || '',
+        type: (n.type || 'info').toLowerCase(),
+        title: n.title || '',
+        read_at: n.read_at || null
+      };
     }
     
     function clearAllNotifications() {
@@ -10949,7 +11078,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (!session?.token) {
         // Fallback: no session, just local notification
         if (watchedRatio < 0.95) {
-          showNotification('⚠️ Vincula tu cuenta para registrar progreso de visualización.');
+          showNotification('⚠️ Vincula tu cuenta para registrar progreso de visualización.', 'warning');
         }
         return;
       }
@@ -10969,7 +11098,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           if (data.suspended) {
             renderSuspensionWaitingRoom(data);
           } else {
-            showNotification(data.error || 'No se pudo registrar la salida.');
+            showNotification(data.error || 'No se pudo registrar la salida.', 'warning');
           }
           return;
         }
@@ -10977,13 +11106,14 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
         if (!data.isEarly) {
           // Watched till end - show congratulations
-          showNotification(`🎉 ¡Película completada! +${data.rewardAmount || 50} AquaBux`);
+          showNotification(`🎉 ¡Película completada! +${data.rewardAmount || 50} AquaBux`, 'success');
           return;
         }
 
         // Show the main result message
         const exitMessage = data.notification || data.message;
-        showNotification(exitMessage);
+        const notifType = data.suspended ? 'suspension' : 'warning';
+        showNotification(exitMessage, notifType);
         // Keep the warning visible immediately; the notification panel is
         // intentionally closed by default and is easy to miss after exiting.
         if (data.isEarly && data.notification) showToast(data.notification);
@@ -10996,7 +11126,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         console.warn('[OC] detectEarlyExit fetch failed:', e);
         // Graceful fallback - still show generic message
         if (watchedRatio < 0.95) {
-          showNotification('⚠️ Has salido antes de finalizar la película.');
+          showNotification('⚠️ Has salido antes de finalizar la película.', 'warning');
         }
       }
     }
