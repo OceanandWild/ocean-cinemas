@@ -64,10 +64,10 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 24px;
       padding: 24px;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-height: 0;
     }
     .seat-grid {
       display: grid;
@@ -2051,7 +2051,7 @@
               <input type="text" id="precompra-search" placeholder="Buscar título..." class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:border-cyan-500 outline-none w-full md:w-48" oninput="renderPrecompraCatalog()">
             </div>
             
-            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1" style="min-height: 200px;">
+            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1" style="min-height: 0;">
               <!-- Rendered programmatically -->
             </div>
           </div>
@@ -8508,38 +8508,56 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function closeCinema() {
       stopTextReaderPlayback();
       const v = document.getElementById('cinema-video');
-      // === EARLY EXIT DETECTION — inline (guaranteed to run) ===
+      // === EARLY EXIT DETECTION — supports BOTH video AND text content ===
+      let exitReported = false;
+      let watchedRatio = 0;
+      let isCompleted = false;
+
+      // VIDEO: check via video element
       if (v && v.duration && !v.dataset.ocExitReported) {
-        const watchedRatio = v.currentTime / v.duration;
+        watchedRatio = v.currentTime / v.duration;
+        isCompleted = watchedRatio >= 0.95;
+        exitReported = true;
         v.dataset.ocExitReported = '1';
-        if (watchedRatio >= 0.95) {
-          // Completed normally — reset local counter
+      }
+      // TEXT: check via textReaderState segments progress
+      else if (textReaderState.movie && textReaderState.segments.length > 0 && !textReaderState._exitReported) {
+        const totalSegs = textReaderState.segments.length;
+        const completedSegs = Math.min(textReaderState.segmentIndex, totalSegs);
+        watchedRatio = totalSegs > 0 ? completedSegs / totalSegs : 0;
+        isCompleted = textReaderState.segmentIndex >= totalSegs;
+        exitReported = true;
+        textReaderState._exitReported = true;
+      }
+
+      if (exitReported) {
+        if (isCompleted) {
           localStorage.setItem('oc_early_exits_local', '0');
         } else {
-          // Early exit — always show local warning
           let localCount = parseInt(localStorage.getItem('oc_early_exits_local') || '0');
           localCount++;
           localStorage.setItem('oc_early_exits_local', String(localCount));
           if (localCount === 1) {
-            showNotification('⚠️ Salida prematura (1ra vez). Se han deducido 15 AquaBux de tu saldo.', 'warning');
-            showToast('⚠️ Salida prematura - Se han deducido 15 AquaBux');
+            showNotification('Salida prematura (1ra vez). Se han deducido 15 AquaBux de tu saldo.', 'warning');
+            showToast('Salida prematura - Se han deducido 15 AquaBux');
           } else if (localCount === 2) {
-            showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente por 2da vez. Has recibido una recompensa reducida. Debes esperar un Plazo de 12 horas de buen comportamiento, de lo contrario una 3ra salida provocará una suspensión de 24 horas.', 'warning');
-            showToast('⚠️ ADVERTENCIA: 3ra salida = suspensión de 24h');
+            showNotification('ADVERTENCIA: Has abandonado la sala prematuramente por 2da vez. Has recibido una recompensa reducida. Debes esperar un Plazo de 12 horas de buen comportamiento, de lo contrario una 3ra salida provocara una suspension de 24 horas.', 'warning');
+            showToast('ADVERTENCIA: 3ra salida = suspension de 24h');
           } else if (localCount >= 3) {
-            showNotification('🚨 Tu cuenta ha sido SUSPENDIDA de Ocean Cinemas por 24 horas debido a salidas prematuras recurrentes.', 'suspension');
-            showToast('🚨 Cuenta SUSPENDIDA por 24 horas');
+            showNotification('Tu cuenta ha sido SUSPENDIDA de Ocean Cinemas por 24 horas debido a salidas prematuras recurrentes.', 'suspension');
+            showToast('Cuenta SUSPENDIDA por 24 horas');
             localStorage.setItem('oc_early_exits_local', '0');
-            renderSuspensionWaitingRoom({ suspended: true, suspended_until: new Date(Date.now() + 86400000).toISOString(), reason: 'Salidas prematuras reiteradas (3 veces o más)' });
+            renderSuspensionWaitingRoom({ suspended: true, suspended_until: new Date(Date.now() + 86400000).toISOString(), reason: 'Salidas prematuras reiteradas (3 veces o mas)' });
           }
-          // Fire server sync (async, fire-and-forget)
           const session = STATE.cinemasSession;
           if (session?.token) {
             const movieId = window._activeMovieId || 'unknown';
+            const ct = v && v.duration ? v.currentTime : 0;
+            const dur = v && v.duration ? v.duration : 0;
             fetch(`${API_URL}/ocean-cinemas/movies/exit`, {
               method: 'POST',
               headers: { 'Authorization': `Bearer ${session.token}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ movieId, currentTime: v.currentTime, duration: v.duration, watchedRatio })
+              body: JSON.stringify({ movieId, currentTime: ct, duration: dur, watchedRatio })
             }).then(r => r.json()).then(d => {
               if (d.suspended) { renderSuspensionWaitingRoom(d); localStorage.setItem('oc_early_exits_local', '0'); }
               if (d.earlyExitsCount) localStorage.setItem('oc_early_exits_local', String(d.earlyExitsCount));
@@ -8555,7 +8573,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         if (ti !== -1) {
           STATE.tickets[ti].used = true;
           saveToStorage();
-          showToast('✅ Gracias por ver la película');
+          showToast('Gracias por ver la pelicula');
         }
       }
       if (v) { v.pause(); v.currentTime = 0; v.src = ''; }
@@ -8567,6 +8585,10 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       if (textReader) textReader.classList.add('hidden');
       _stopReaderPixi();
       videoState = { playing: false, currentTicket: null };
+      textReaderState.movie = null;
+      textReaderState.segments = [];
+      textReaderState.segmentIndex = 0;
+      textReaderState._exitReported = false;
       renderTickets();
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -9080,13 +9102,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
       // Populate the new split-screen catalog after layout is computed
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
-        });
+        if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
       });
       setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
-      }, 200);
+      }, 100);
       setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
       }, 500);
