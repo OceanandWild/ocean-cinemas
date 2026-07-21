@@ -1996,7 +1996,6 @@
             </div>
             <div>
               <h2 class="text-xl font-black text-white tracking-wide leading-tight">Módulo de Precompra</h2>
-              <p class="text-[10px] text-cyan-500/50 font-bold uppercase tracking-[0.25em]">Ocean Wild Studios</p>
             </div>
           </div>
           <div class="flex-1"></div>
@@ -2052,7 +2051,7 @@
               <input type="text" id="precompra-search" placeholder="Buscar título..." class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:border-cyan-500 outline-none w-full md:w-48" oninput="renderPrecompraCatalog()">
             </div>
             
-            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1">
+            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1" style="min-height: 200px;">
               <!-- Rendered programmatically -->
             </div>
           </div>
@@ -9079,13 +9078,18 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         return;
       }
 
-      // Populate the new split-screen catalog
+      // Populate the new split-screen catalog after layout is computed
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+        });
+      });
       setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
-      }, 50);
+      }, 200);
       setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
-      }, 300);
+      }, 500);
 
       if (movieId) {
         if (typeof selectPrecompraTitle === 'function') selectPrecompraTitle(movieId);
@@ -10848,7 +10852,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function renderPrecompraCatalog() {
       const grid = document.getElementById('precompra-catalog-grid');
       if (!grid) {
-        setTimeout(() => renderPrecompraCatalog(), 150);
+        setTimeout(() => renderPrecompraCatalog(), 200);
         return;
       }
       
@@ -10889,6 +10893,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       
       const balanceEl = document.getElementById('precompra-header-balance');
       if (balanceEl) balanceEl.textContent = `${STATE.balance || 0} AB`;
+
+      // Force layout reflow so flex-1 grid computes its height after content is injected
+      requestAnimationFrame(() => { grid.offsetHeight; });
     }
     
     function selectPrecompraTitle(id) {
