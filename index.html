@@ -10719,7 +10719,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         });
         if (!res.ok) throw new Error('Error ' + res.status);
         const data = await res.json();
-        STATE_serverNotifs = Array.isArray(data) ? data.map(normalizeNotif) : ((data.notifications || []).map(normalizeNotif));
+        const raw = Array.isArray(data) ? data : (data.notifications || []);
+        STATE_serverNotifs = raw.map(normalizeNotif).filter(isCinemasNotif);
         if (bar) bar.classList.add('hidden');
         renderNotifications();
       } catch (e) {
@@ -10737,6 +10738,13 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         title: n.title || '',
         read_at: n.read_at || null
       };
+    }
+    
+    function isCinemasNotif(n) {
+      if (n.type === 'cinemas_warning') return true;
+      if (n.title && /cinemas/i.test(n.title)) return true;
+      if (n.type === 'warning' && n.msg && /(salida prematura|abandonado la sala|suspendid)/i.test(n.msg)) return true;
+      return false;
     }
     
     function clearAllNotifications() {
@@ -11059,11 +11067,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       setTimeout(() => overlay.remove(), 180);
     }
     
-    // Early exit penalty system
-    let exitWarnCount = parseInt(localStorage.getItem('oc_early_exits') || '0');
-    
     // ============================================================
-    // EARLY EXIT PENALTY SYSTEM — Backend-driven
+    // EARLY EXIT SYSTEM — Local fallback + server-driven penalties
     // ============================================================
     async function detectEarlyExit(video) {
       if (!video || !video.duration) return;
@@ -11072,14 +11077,38 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const currentTime = video.currentTime;
       const duration = video.duration;
       const watchedRatio = currentTime / duration;
+      const isEarly = watchedRatio < 0.95;
 
-      // Get OC session token
+      if (!isEarly) {
+        // Movie completed normally — reset local counter
+        localStorage.setItem('oc_early_exits_local', '0');
+        return;
+      }
+
+      // === LOCAL FALLBACK TRACKING (works even without session/server) ===
+      let localCount = parseInt(localStorage.getItem('oc_early_exits_local') || '0');
+      localCount++;
+      localStorage.setItem('oc_early_exits_local', String(localCount));
+
+      // Always show local warning regardless of server
+      if (localCount === 1) {
+        showNotification('⚠️ Salida prematura (1ra vez). Se han deducido 15 AquaBux de tu saldo.', 'warning');
+        showToast('⚠️ Salida prematura - Se han deducido 15 AquaBux');
+      } else if (localCount === 2) {
+        showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente por 2da vez. Has recibido una recompensa reducida. Debes esperar un Plazo de 12 horas de buen comportamiento, de lo contrario una 3ra salida provocará una suspensión de 24 horas.', 'warning');
+        showToast('⚠️ ADVERTENCIA: 3ra salida = suspensión de 24h');
+      } else if (localCount >= 3) {
+        showNotification('🚨 Tu cuenta ha sido SUSPENDIDA de Ocean Cinemas por 24 horas debido a salidas prematuras recurrentes.', 'suspension');
+        showToast('🚨 Cuenta SUSPENDIDA por 24 horas');
+        localStorage.setItem('oc_early_exits_local', '0');
+        renderSuspensionWaitingRoom({ suspended: true, suspended_until: new Date(Date.now() + 86400000).toISOString(), reason: 'Salidas prematuras reiteradas (3 veces o más)' });
+        return; // Don't also hit server, suspension is handled locally
+      }
+
+      // === SERVER-DRIVEN PENALTIES (balance deduction, DB tracking, server suspension) ===
       const session = STATE.cinemasSession;
       if (!session?.token) {
-        // Fallback: no session, just local notification
-        if (watchedRatio < 0.95) {
-          showNotification('⚠️ Vincula tu cuenta para registrar progreso de visualización.', 'warning');
-        }
+        showNotification('⚠️ Vincula tu cuenta para registrar progreso de visualización (las penalizaciones no se aplican sin sesión).', 'warning');
         return;
       }
 
@@ -11097,37 +11126,43 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         if (!res.ok) {
           if (data.suspended) {
             renderSuspensionWaitingRoom(data);
-          } else {
-            showNotification(data.error || 'No se pudo registrar la salida.', 'warning');
+            localStorage.setItem('oc_early_exits_local', '0');
           }
+          // Don't show another notification — local one already showed
           return;
         }
         if (!data.success) return;
 
+        // If server says watched till end — reset local counter
         if (!data.isEarly) {
-          // Watched till end - show congratulations
+          localStorage.setItem('oc_early_exits_local', '0');
           showNotification(`🎉 ¡Película completada! +${data.rewardAmount || 50} AquaBux`, 'success');
           return;
         }
 
-        // Show the main result message
-        const exitMessage = data.notification || data.message;
-        const notifType = data.suspended ? 'suspension' : 'warning';
-        showNotification(exitMessage, notifType);
-        // Keep the warning visible immediately; the notification panel is
-        // intentionally closed by default and is easy to miss after exiting.
-        if (data.isEarly && data.notification) showToast(data.notification);
-
-        // If suspended: render waiting room immediately
+        // If server confirms suspension, ensure local counter resets
         if (data.suspended) {
+          localStorage.setItem('oc_early_exits_local', '0');
           renderSuspensionWaitingRoom(data);
+          // Local fallback already showed the notification, but show toast
+          if (data.notification) showToast(data.notification);
+          return;
+        }
+
+        // Server notification replaces the local one for accuracy
+        if (data.notification || data.message) {
+          const exitMessage = data.notification || data.message;
+          showNotification(exitMessage, 'warning');
+          if (data.notification) showToast(data.notification);
+        }
+
+        // Sync local counter with server count
+        if (typeof data.earlyExitsCount === 'number') {
+          localStorage.setItem('oc_early_exits_local', String(data.earlyExitsCount));
         }
       } catch (e) {
         console.warn('[OC] detectEarlyExit fetch failed:', e);
-        // Graceful fallback - still show generic message
-        if (watchedRatio < 0.95) {
-          showNotification('⚠️ Has salido antes de finalizar la película.', 'warning');
-        }
+        // Local fallback already showed notification, keep it
       }
     }
     
