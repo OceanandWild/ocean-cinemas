@@ -9080,9 +9080,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
 
       // Populate the new split-screen catalog
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
-      });
+      }, 50);
+      setTimeout(() => {
+        if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+      }, 300);
 
       if (movieId) {
         if (typeof selectPrecompraTitle === 'function') selectPrecompraTitle(movieId);
@@ -10844,7 +10847,10 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     
     function renderPrecompraCatalog() {
       const grid = document.getElementById('precompra-catalog-grid');
-      if (!grid) return;
+      if (!grid) {
+        setTimeout(() => renderPrecompraCatalog(), 150);
+        return;
+      }
       
       const searchEl = document.getElementById('precompra-search');
       const query = searchEl ? searchEl.value.toLowerCase() : '';
