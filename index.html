@@ -7933,6 +7933,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const t = STATE.tickets.find(x => x.id === tid);
       if (!m || !t) return;
 
+      // The cinema room must be the only active surface when launched from
+      // Mis Tickets; otherwise its full-screen layer can remain above it.
+      closeMisTicketsScreen();
+      window._activeMovieId = m.id;
+
       // Validar estado del ticket con el nuevo sistema
       const ticketStatus = getTicketStatus(t);
       if (!ticketStatus.canWatch) {
@@ -10545,6 +10550,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     }
 
     function watchMovieDirectly(movie) {
+      closeMisTicketsScreen();
+      window._activeMovieId = movie.id;
       if (movie.type === 'text') {
         openTextReader(movie);
         document.getElementById('cinema-room').classList.remove('hidden');
@@ -10975,7 +10982,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         }
 
         // Show the main result message
-        showNotification(data.notification || data.message);
+        const exitMessage = data.notification || data.message;
+        showNotification(exitMessage);
+        // Keep the warning visible immediately; the notification panel is
+        // intentionally closed by default and is easy to miss after exiting.
+        if (data.isEarly && data.notification) showToast(data.notification);
 
         // If suspended: render waiting room immediately
         if (data.suspended) {
