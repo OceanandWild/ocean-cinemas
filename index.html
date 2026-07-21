@@ -69,6 +69,15 @@
       gap: 16px;
       min-height: 0;
     }
+    .precompra-grid-item {
+      flex: 0 0 calc(50% - 8px);
+      min-width: 0;
+    }
+    @media (min-width: 768px) {
+      .precompra-grid-item {
+        flex: 0 0 calc(33.33% - 11px);
+      }
+    }
     .seat-grid {
       display: grid;
       grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -2051,7 +2060,7 @@
               <input type="text" id="precompra-search" placeholder="Buscar título..." class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:border-cyan-500 outline-none w-full md:w-48" oninput="renderPrecompraCatalog()">
             </div>
             
-            <div id="precompra-catalog-grid" class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pr-1" style="min-height: 0;">
+            <div id="precompra-catalog-grid" class="flex-1 flex flex-wrap gap-4 overflow-y-auto custom-scrollbar pr-1 content-start" style="min-height: 0;">
               <!-- Rendered programmatically -->
             </div>
           </div>
@@ -7998,6 +8007,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       }
 
       // === DETECTAR TIPO DE PELÍCULA ===
+      window._cinemaSessionActive = true;
       if (m.type === 'text') {
         // MODO LECTURA para películas de texto
         openTextReader(m);
@@ -8508,29 +8518,20 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function closeCinema() {
       stopTextReaderPlayback();
       const v = document.getElementById('cinema-video');
-      // === EARLY EXIT DETECTION — supports BOTH video AND text content ===
-      let exitReported = false;
-      let watchedRatio = 0;
-      let isCompleted = false;
-
-      // VIDEO: check via video element
-      if (v && v.duration && !v.dataset.ocExitReported) {
-        watchedRatio = v.currentTime / v.duration;
-        isCompleted = watchedRatio >= 0.95;
-        exitReported = true;
-        v.dataset.ocExitReported = '1';
-      }
-      // TEXT: check via textReaderState segments progress
-      else if (textReaderState.movie && textReaderState.segments.length > 0 && !textReaderState._exitReported) {
-        const totalSegs = textReaderState.segments.length;
-        const completedSegs = Math.min(textReaderState.segmentIndex, totalSegs);
-        watchedRatio = totalSegs > 0 ? completedSegs / totalSegs : 0;
-        isCompleted = textReaderState.segmentIndex >= totalSegs;
-        exitReported = true;
-        textReaderState._exitReported = true;
-      }
-
-      if (exitReported) {
+      // === EARLY EXIT DETECTION — uses _cinemaSessionActive set in watchMovie() ===
+      if (window._cinemaSessionActive) {
+        window._cinemaSessionActive = false;
+        let isCompleted = false;
+        // VIDEO: check via video element
+        if (v && v.duration && v.currentTime / v.duration >= 0.95) {
+          isCompleted = true;
+        }
+        // TEXT: check via textReaderState segments
+        if (textReaderState.movie && textReaderState.segments.length > 0) {
+          if (textReaderState.segmentIndex >= textReaderState.segments.length) {
+            isCompleted = true;
+          }
+        }
         if (isCompleted) {
           localStorage.setItem('oc_early_exits_local', '0');
         } else {
@@ -8549,6 +8550,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             localStorage.setItem('oc_early_exits_local', '0');
             renderSuspensionWaitingRoom({ suspended: true, suspended_until: new Date(Date.now() + 86400000).toISOString(), reason: 'Salidas prematuras reiteradas (3 veces o mas)' });
           }
+          // Server sync (async)
           const session = STATE.cinemasSession;
           if (session?.token) {
             const movieId = window._activeMovieId || 'unknown';
@@ -8557,7 +8559,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
             fetch(`${API_URL}/ocean-cinemas/movies/exit`, {
               method: 'POST',
               headers: { 'Authorization': `Bearer ${session.token}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ movieId, currentTime: ct, duration: dur, watchedRatio })
+              body: JSON.stringify({ movieId, currentTime: ct, duration: dur, watchedRatio: ct && dur ? ct/dur : 0 })
             }).then(r => r.json()).then(d => {
               if (d.suspended) { renderSuspensionWaitingRoom(d); localStorage.setItem('oc_early_exits_local', '0'); }
               if (d.earlyExitsCount) localStorage.setItem('oc_early_exits_local', String(d.earlyExitsCount));
@@ -8588,7 +8590,6 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       textReaderState.movie = null;
       textReaderState.segments = [];
       textReaderState.segmentIndex = 0;
-      textReaderState._exitReported = false;
       renderTickets();
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -9100,7 +9101,8 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         return;
       }
 
-      // Populate the new split-screen catalog after layout is computed
+      // Populate the new split-screen catalog — synchronous + async fallbacks
+      if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
       requestAnimationFrame(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
       });
@@ -9110,6 +9112,9 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       setTimeout(() => {
         if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
       }, 500);
+      setTimeout(() => {
+        if (typeof renderPrecompraCatalog === 'function') renderPrecompraCatalog();
+      }, 1500);
 
       if (movieId) {
         if (typeof selectPrecompraTitle === 'function') selectPrecompraTitle(movieId);
@@ -10664,6 +10669,7 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
 
     function watchMovieDirectly(movie) {
       closeMisTicketsScreen();
+      window._cinemaSessionActive = true;
       window._activeMovieId = movie.id;
       if (movie.type === 'text') {
         openTextReader(movie);
@@ -10892,12 +10898,12 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       });
       
       if (list.length === 0) {
-        grid.innerHTML = `<div class="col-span-3 text-center text-gray-500 py-12"><i class="fas fa-search text-3xl mb-3 opacity-30"></i><p>No se encontraron títulos.</p></div>`;
+        grid.innerHTML = `<div style="width:100%;text-align:center;color:#6b7280;padding:3rem 0;"><i class="fas fa-search" style="font-size:1.875rem;margin-bottom:0.75rem;opacity:0.3;"></i><p>No se encontraron títulos.</p></div>`;
         return;
       }
 
       grid.innerHTML = list.map(m => `
-        <div onclick="selectPrecompraTitle(${m.id})" class="cursor-pointer group relative rounded-xl border ${selectedPrecompraId === m.id ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-950/20' : 'border-white/5 hover:border-cyan-500/40 bg-white/5'} p-3 transition duration-200">
+        <div onclick="selectPrecompraTitle(${m.id})" class="precompra-grid-item cursor-pointer group relative rounded-xl border ${selectedPrecompraId === m.id ? 'border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-950/20' : 'border-white/5 hover:border-cyan-500/40 bg-white/5'} p-3 transition duration-200">
           <div class="h-32 rounded-lg overflow-hidden relative">
             <img src="${m.poster}" onerror="this.src='assets/OceanCinemas.png'" class="w-full h-full object-cover">
             <div class="absolute top-2 left-2">
