@@ -8489,21 +8489,57 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
     function closeCinema() {
       stopTextReaderPlayback();
       const v = document.getElementById('cinema-video');
-      if (v) detectEarlyExit(v);
+      // === EARLY EXIT DETECTION — inline (guaranteed to run) ===
+      if (v && v.duration && !v.dataset.ocExitReported) {
+        const watchedRatio = v.currentTime / v.duration;
+        v.dataset.ocExitReported = '1';
+        if (watchedRatio >= 0.95) {
+          // Completed normally — reset local counter
+          localStorage.setItem('oc_early_exits_local', '0');
+        } else {
+          // Early exit — always show local warning
+          let localCount = parseInt(localStorage.getItem('oc_early_exits_local') || '0');
+          localCount++;
+          localStorage.setItem('oc_early_exits_local', String(localCount));
+          if (localCount === 1) {
+            showNotification('⚠️ Salida prematura (1ra vez). Se han deducido 15 AquaBux de tu saldo.', 'warning');
+            showToast('⚠️ Salida prematura - Se han deducido 15 AquaBux');
+          } else if (localCount === 2) {
+            showNotification('⚠️ ADVERTENCIA: Has abandonado la sala prematuramente por 2da vez. Has recibido una recompensa reducida. Debes esperar un Plazo de 12 horas de buen comportamiento, de lo contrario una 3ra salida provocará una suspensión de 24 horas.', 'warning');
+            showToast('⚠️ ADVERTENCIA: 3ra salida = suspensión de 24h');
+          } else if (localCount >= 3) {
+            showNotification('🚨 Tu cuenta ha sido SUSPENDIDA de Ocean Cinemas por 24 horas debido a salidas prematuras recurrentes.', 'suspension');
+            showToast('🚨 Cuenta SUSPENDIDA por 24 horas');
+            localStorage.setItem('oc_early_exits_local', '0');
+            renderSuspensionWaitingRoom({ suspended: true, suspended_until: new Date(Date.now() + 86400000).toISOString(), reason: 'Salidas prematuras reiteradas (3 veces o más)' });
+          }
+          // Fire server sync (async, fire-and-forget)
+          const session = STATE.cinemasSession;
+          if (session?.token) {
+            const movieId = window._activeMovieId || 'unknown';
+            fetch(`${API_URL}/ocean-cinemas/movies/exit`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${session.token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ movieId, currentTime: v.currentTime, duration: v.duration, watchedRatio })
+            }).then(r => r.json()).then(d => {
+              if (d.suspended) { renderSuspensionWaitingRoom(d); localStorage.setItem('oc_early_exits_local', '0'); }
+              if (d.earlyExitsCount) localStorage.setItem('oc_early_exits_local', String(d.earlyExitsCount));
+            }).catch(() => {});
+          }
+        }
+      }
       const cinemaHeader = document.getElementById('cinema-header');
       const cinemaControls = document.getElementById('cinema-controls');
       const textReader = document.getElementById('text-reader-container');
-      if (videoState.currentTicket && v.currentTime / v.duration > 0.1) {
+      if (videoState.currentTicket && v && v.duration && v.currentTime / v.duration > 0.1) {
         const ti = STATE.tickets.findIndex(x => x.id === videoState.currentTicket.id);
         if (ti !== -1) {
           STATE.tickets[ti].used = true;
           saveToStorage();
-          showToast('âœ… Gracias por ver la película');
+          showToast('✅ Gracias por ver la película');
         }
       }
-      v.pause();
-      v.currentTime = 0;
-      v.src = '';
+      if (v) { v.pause(); v.currentTime = 0; v.src = ''; }
       const cinemaRoom = document.getElementById('cinema-room');
       if (cinemaRoom) cinemaRoom.classList.add('hidden');
       document.body.style.overflow = '';
@@ -9971,12 +10007,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
       const content = document.getElementById('mis-tickets-content');
       selectedTicketIds = [];
 
-      // 1. Unificar fuentes de tickets
       const directTickets = STATE.tickets.map(t => ({
         ...t,
         paid: true,
         puerta: '1',
-        artist: STATE.movies.find(m => m.id === t.movieId).artist || 'Ocean Cinemas',
+        artist: STATE.movies.find(m => m.id === t.movieId)?.artist || 'Ocean Cinemas',
         source: 'direct'
       }));
 
@@ -9986,27 +10021,24 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
         source: 'precompra'
       }));
 
-      // Unir y ordenar por fecha más reciente
       const allPaid = [...directTickets, ...precomprasPaid].sort((a, b) => (b.purchaseDate || 0) - (a.purchaseDate || 0));
       const unpaid = STATE.precompras.filter(p => !p.paid);
 
-      const renderSection = (title, icon, htmlContent, colorClass) => {
-        if (!htmlContent) return '';
-        return `
-        <div class="mb-10">
-            <h3 class="text-2xl font-black mb-6 flex items-center gap-3">
-              <i class="fas ${icon} ${colorClass}"></i>${title}
-            </h3>
-            <div class="space-y-4">
-              ${htmlContent}
-            </div>
-          </div>
-        `;
-      };
+      // Split paid into active + history
+      const activeTickets = allPaid.filter(t => {
+        const s = getTicketStatus(t);
+        return s.status === 'ACTIVO' || s.status === 'PRÓXIMAMENTE' || s.status === 'FAST PASS' || s.status === 'EN SALA' || s.canWatch;
+      });
+      const historyTickets = allPaid.filter(t => {
+        const s = getTicketStatus(t);
+        return s.status === 'USADO' || s.status === 'VENCIDO' || s.status === 'FINALIZADO' || (!s.canWatch && !s.canRefund);
+      });
+
+      const section = (title, icon, html, cls) => html ? `<div class="mb-10"><h3 class="text-2xl font-black mb-6 flex items-center gap-3"><i class="fas ${icon} ${cls}"></i>${title}</h3><div class="space-y-3">${html}</div></div>` : '';
 
       content.innerHTML = `
         <div class="p-8 max-w-5xl mx-auto min-h-full flex flex-col">
-          <div class="flex items-center justify-between mb-10">
+          <div class="flex items-center justify-between mb-8">
             <h2 class="text-4xl font-black text-white">Gestión de Entradas</h2>
             <button onclick="closeMisTicketsScreen()" class="w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 transition flex items-center justify-center">
               <i class="fas fa-times text-xl"></i>
@@ -10014,10 +10046,11 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
           </div>
           
           <div class="flex-1">
-            ${renderSection('Entradas Listas', 'fa-ticket-alt', allPaid.map(t => renderPaidTicketItem(t)).join(''), 'text-green-400')}
-            ${renderSection('En Proceso de Pago', 'fa-clock', unpaid.map(t => renderMisTicketItem(t)).join(''), 'text-cyan-400')}
+            ${section('Entradas Activas', 'fa-ticket-alt', activeTickets.map(t => renderPaidTicketItem(t, 'active')).join(''), 'text-emerald-400')}
+            ${section('En Proceso de Pago', 'fa-clock', unpaid.map(t => renderMisTicketItem(t)).join(''), 'text-cyan-400')}
+            ${historyTickets.length > 0 ? section('Historial', 'fa-clock-rotate', historyTickets.map(t => renderPaidTicketItem(t, 'history')).join(''), 'text-slate-500') + `<div class="flex justify-end mb-10"><button onclick="clearTicketHistory()" class="text-[11px] font-bold text-slate-600 hover:text-red-400 transition px-4 py-2 rounded-lg hover:bg-white/[.03] uppercase tracking-wider"><i class="fas fa-trash-can mr-1.5"></i>Limpiar historial</button></div>` : ''}
             
-            ${unpaid.length === 0 && allPaid.length === 0 ? `
+            ${activeTickets.length === 0 && unpaid.length === 0 && historyTickets.length === 0 ? `
               <div class="flex flex-col items-center justify-center py-20 text-center glass rounded-3xl">
                 <i class="fas fa-ticket-alt text-7xl text-gray-700 mb-6"></i>
                 <p class="text-xl text-gray-400 font-medium">No tienes tickets disponibles</p>
@@ -10040,75 +10073,80 @@ Lo que había cambiado era que ya no tenía que hacerlo solo.`
               </div>
             </div>
           ` : ''}
-        </div>
-        `;
+        </div>`;
+    }
+    
+    function clearTicketHistory() {
+      const historyIds = STATE.tickets.filter(t => {
+        const s = getTicketStatus(t);
+        return s.status === 'USADO' || s.status === 'VENCIDO' || s.status === 'FINALIZADO';
+      }).map(t => t.id);
+      STATE.tickets = STATE.tickets.filter(t => !historyIds.includes(t.id));
+      saveToStorage();
+      showMisTicketsList();
+      renderTickets();
+      showToast('🧹 Historial limpiado');
     }
 
-    function renderPaidTicketItem(ticket) {
+    function renderPaidTicketItem(ticket, mode) {
       const s = getTicketStatus(ticket);
-      // Resolve title/poster/artist from movie if missing on ticket
       const movie = STATE.movies.find(x => x.id === ticket.movieId);
       const displayTitle = ticket.title || ticket.movieTitle || movie?.title || 'Sin título';
       const displayPoster = ticket.poster || movie?.poster || 'assets/OceanCinemas.png';
       const displayArtist = ticket.artist || movie?.artist || 'Ocean Cinemas';
+      const isHistory = mode === 'history';
 
-      // Status color map
-      const statusColors = {
-        'PRÓXIMAMENTE': { border: 'border-yellow-500/30', bg: 'bg-yellow-950/20', badge: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40', icon: 'text-yellow-400' },
-        'FAST PASS':    { border: 'border-purple-500/40', bg: 'bg-purple-950/20', badge: 'bg-purple-500/20 text-purple-200 border-purple-500/40', icon: 'text-purple-400' },
-        'EN SALA':      { border: 'border-green-500/40',  bg: 'bg-green-950/20',  badge: 'bg-green-500/20 text-green-200 border-green-500/40',   icon: 'text-green-400' },
-        'VENCIDO':      { border: 'border-red-900/40',    bg: 'bg-red-950/15',    badge: 'bg-red-900/30 text-red-400 border-red-900/40',          icon: 'text-red-400' },
-        'USADO':        { border: 'border-white/5',       bg: '',                 badge: 'bg-gray-800 text-gray-500 border-gray-700',             icon: 'text-gray-500' },
-        'FINALIZADO':   { border: 'border-white/5',       bg: '',                 badge: 'bg-gray-800 text-gray-500 border-gray-700',             icon: 'text-gray-500' },
+      // Status-based visual config
+      const STATUS_CFG = {
+        'PRÓXIMAMENTE': { icon: 'fa-clock', border: 'border-yellow-500/30', glow: 'rgba(234,179,8,0.06)', badge: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30', color: '#eab308' },
+        'FAST PASS':    { icon: 'fa-bolt', border: 'border-purple-500/35', glow: 'rgba(168,85,247,0.06)', badge: 'bg-purple-500/15 text-purple-200 border-purple-500/30', color: '#a855f7' },
+        'EN SALA':      { icon: 'fa-play', border: 'border-emerald-500/35', glow: 'rgba(52,211,153,0.06)', badge: 'bg-emerald-500/15 text-emerald-200 border-emerald-500/30', color: '#34d399' },
+        'ACTIVO':       { icon: 'fa-check', border: 'border-cyan-500/30', glow: 'rgba(34,211,238,0.05)', badge: 'bg-cyan-500/12 text-cyan-300 border-cyan-500/25', color: '#22d3ee' },
+        'VENCIDO':      { icon: 'fa-hourglass-end', border: 'border-red-800/30', glow: 'rgba(239,68,68,0.03)', badge: 'bg-red-900/25 text-red-400 border-red-800/30', color: '#ef4444' },
+        'USADO':        { icon: 'fa-check-double', border: 'border-slate-700/20', glow: 'rgba(148,163,184,0.02)', badge: 'bg-slate-800/30 text-slate-500 border-slate-700/20', color: '#64748b' },
+        'FINALIZADO':   { icon: 'fa-flag-checkered', border: 'border-slate-700/20', glow: 'rgba(148,163,184,0.02)', badge: 'bg-slate-800/30 text-slate-500 border-slate-700/20', color: '#64748b' },
       };
-      const sc = statusColors[s.status] || { border: 'border-white/10', bg: '', badge: 'bg-white/10 text-gray-300 border-white/15', icon: 'text-cyan-400' };
+      const cfg = STATUS_CFG[s.status] || STATUS_CFG['ACTIVO'];
 
       let actionBtn = '';
-      if (s.canWatch) {
-        const clickAction = ticket.source === 'direct' ? `watchMovie(${ticket.movieId}, '${ticket.id}')` : `showTicketDoorScreenById('${ticket.id}')`;
+      if (isHistory) {
+        actionBtn = `<span class="text-slate-600 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5"><i class="fas ${cfg.icon} mr-1"></i>${s.status}</span>`;
+      } else if (s.canWatch) {
+        const clickAction = ticket.source === 'direct' ? `watchMovie(${ticket.movieId},'${ticket.id}')` : `showTicketDoorScreenById('${ticket.id}')`;
         actionBtn = `<button onclick="${clickAction}" class="group/btn relative overflow-hidden bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black px-5 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-900/30 text-xs flex items-center gap-2 uppercase tracking-widest">
           <span class="relative z-10 flex items-center gap-2"><i class="fas fa-play text-[10px]"></i>Ver ahora</span>
           <span class="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
         </button>`;
       } else if (s.canRefund) {
         actionBtn = `<button onclick="deleteTicket('${ticket.id}')" class="bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 border border-yellow-500/30 font-bold px-5 py-2.5 rounded-xl transition-all hover:scale-105 text-xs flex items-center gap-2 uppercase tracking-widest">
-          <i class="fas fa-undo text-[10px]"></i>Reembolso
-        </button>`;
-      } else if (s.canDelete) {
-        actionBtn = `<button onclick="deleteTicket('${ticket.id}')" class="bg-red-900/15 text-red-400/80 hover:bg-red-900/30 border border-red-900/30 font-bold px-5 py-2.5 rounded-xl transition-all text-xs flex items-center gap-2 uppercase tracking-widest">
-          <i class="fas fa-trash text-[10px]"></i>Eliminar
-        </button>`;
-      } else {
-        actionBtn = `<span class="bg-white/5 text-gray-500 px-4 py-2 rounded-lg text-xs font-bold uppercase border border-white/8">${s.status}</span>`;
+          <i class="fas fa-undo text-[10px]"></i>Reembolso</button>`;
       }
 
+      const opacity = isHistory ? 'opacity-50 hover:opacity-80' : '';
       return `
-        <div class="oc-ticket-card relative rounded-2xl border ${sc.border} ${sc.bg} overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:shadow-xl hover:shadow-black/40 group/card"
+        <div class="oc-ticket-card relative rounded-2xl border ${cfg.border} overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:shadow-xl hover:shadow-black/40 group/card ${opacity}"
              style="background:linear-gradient(135deg,rgba(10,14,28,0.95),rgba(6,9,20,0.98))">
-          <!-- Shimmer line -->
-          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent"></div>
           <div class="flex items-center gap-4 p-4">
-            <!-- Poster -->
-            <div class="relative flex-shrink-0 w-14 h-20 rounded-xl overflow-hidden shadow-lg border border-white/8">
+            <div class="relative flex-shrink-0 w-14 h-20 rounded-xl overflow-hidden shadow-lg border border-white/8" style="${isHistory ? 'filter:grayscale(0.7);' : ''}">
               <img src="${displayPoster}" class="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" onerror="this.src='assets/OceanCinemas.png'">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
-            <!-- Info -->
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2 mb-1">
-                <h4 class="font-black text-white text-sm leading-tight truncate group-hover/card:text-cyan-300 transition-colors">${displayTitle}</h4>
-                <span class="flex-shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${sc.badge}">
-                  <i class="fas ${s.icon} ${sc.icon} text-[9px]"></i>${s.status.split(' ')[0]}
+                <h4 class="font-black text-white text-sm leading-tight truncate group-hover/card:text-cyan-300 transition-colors" style="${isHistory ? 'color:#64748b;' : ''}">${displayTitle}</h4>
+                <span class="flex-shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${cfg.badge}">
+                  <i class="fas ${cfg.icon} text-[9px]"></i>${s.status.split(' ')[0]}
                 </span>
               </div>
               <p class="text-xs text-gray-500 mb-2">${displayArtist}</p>
               <div class="flex flex-wrap gap-2">
                 ${ticket.horario ? `<span class="flex items-center gap-1 text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="far fa-clock text-yellow-400/70 text-[9px]"></i>${ticket.horario}</span>` : ''}
                 ${ticket.puerta ? `<span class="flex items-center gap-1 text-[10px] text-cyan-400/80 bg-cyan-900/15 px-2 py-0.5 rounded-md border border-cyan-500/15"><i class="fas fa-door-open text-[9px]"></i>Puerta ${ticket.puerta}</span>` : ''}
-                ${s.msg ? `<span class="flex items-center gap-1 text-[10px] text-white/70 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="fas fa-info-circle text-[9px] ${sc.icon}"></i>${s.msg}</span>` : ''}
+                ${ticket.price ? `<span class="flex items-center gap-1 text-[10px] text-yellow-500/80 bg-yellow-900/12 px-2 py-0.5 rounded-md border border-yellow-500/15"><i class="fas fa-coins text-[9px]"></i>${ticket.price} AB</span>` : ''}
+                ${s.msg ? `<span class="flex items-center gap-1 text-[10px] text-white/70 bg-white/5 px-2 py-0.5 rounded-md border border-white/8"><i class="fas fa-info-circle text-[9px]" style="color:${cfg.color};"></i>${s.msg}</span>` : ''}
               </div>
             </div>
-            <!-- Action -->
             <div class="flex-shrink-0">${actionBtn}</div>
           </div>
         </div>`;
